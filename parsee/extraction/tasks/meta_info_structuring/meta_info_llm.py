@@ -1,0 +1,56 @@
+from typing import *
+import re
+
+from src.extraction.extractor_elements import ExtractedEl, FinalOutputTableColumn
+from src.extraction.ml.tasks.meta_info_structuring.meta_info import MetaInfoClassifier
+from src.extraction.ml.models.llm_models.structuring_schema import get_prompt_schema_item
+from src.extraction.templates.general_structuring_schema import StructuringItemSchema
+from src.extraction.extractor_dataclasses import ParseeMeta
+from src.extraction.ml.models.llm_models.llm_base_model import LLMBaseModel
+from src.storage.interfaces import StorageManager
+from src.extraction.ml.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
+
+
+class MetaLLMClassifier(MetaInfoClassifier):
+
+    def __init__(self, items: List[StructuringItemSchema], llm: LLMBaseModel, storage: StorageManager, **kwargs):
+        super().__init__(items)
+        self.storage = storage
+        self.classifier_name = llm.classifier_name if llm is not None else "llm"
+        self.default_prob_answer = 0.8
+        self.elements = []
+        self.llm = llm
+        self.feature_builder: LLMMetaFeatureBuilder = LLMMetaFeatureBuilder()
+
+    def parse_prompt_answer(self, prompt_answer: str) -> Dict[str, Tuple[str, bool]]:
+        answers = prompt_answer.splitlines()
+        output = {}
+        for k, answer in enumerate(answers):
+            result = re.search(r'((\d+)\) *)(.+)', answer)
+            if result is not None and len(result.groups()) > 2:
+                number = result.group(2)
+                value_predicted = result.group(3)
+                number_check = (int(number) == k + 1) if number.isdigit() else False
+                if number_check:
+                    output[self.items[k].id] = get_prompt_schema_item(self.items[k]).get_value(value_predicted)
+        return output
+
+    def predict_meta(self, columns: List[FinalOutputTableColumn], elements: List[ExtractedEl]) -> List[List[ParseeMeta]]:
+
+        all_output = []
+        for column in columns:
+            prompt = self.feature_builder.make_prompt(column, elements, self.items)
+
+            prompt_answer, amount = self.llm.make_prompt_request(prompt)
+
+            self.storage.log_expense(self.llm.classifier_name, amount, "meta LLM")
+
+            prediction_dict = self.parse_prompt_answer(prompt_answer)
+
+            output: List[ParseeMeta] = []
+            for key, values in prediction_dict.items():
+                value, parse_success = values
+                output.append(ParseeMeta(self.classifier_name, column.col_idx, column.sources, key, value, self.default_prob_answer if parse_success else 0))
+            all_output.append(output)
+
+        return all_output
