@@ -1,13 +1,17 @@
+import os
 from decimal import Decimal
 from typing import List, Tuple, Dict, Union
 
 from parsee.extraction.extractor_elements import ExtractedEl, StructuredTable, ExtractedSource, StructuredRow, \
     StructuredTableCell
-from pdf_reader.main import get_elements_from_pdf
-from parsee.raw_converters.interfaces import RawToJsonConverter
+from pdf_reader import get_elements_from_pdf
+from parsee.converters.interfaces import RawToJsonConverter
 from parsee.utils.enums import DocumentType, ElementType
-from parsee.utils.settings import PRICING_CONVERSION
 from pdf_reader.custom_dataclasses import RelativeAreaPrediction
+from pdf_reader.custom_dataclasses import ExtractedPage
+
+
+PRICING_PDF_CONVERSION = Decimal(os.getenv("PRICING_CONVERSION")) if os.getenv("PRICING_CONVERSION") is not None else Decimal(0)
 
 
 class PdfConverter(RawToJsonConverter):
@@ -15,35 +19,34 @@ class PdfConverter(RawToJsonConverter):
     def __init__(self, predicted_areas: Union[None, Dict[int, List[RelativeAreaPrediction]]]):
         super().__init__(DocumentType.PDF)
         self.service_name = "simfin_pdf"
-        self.repair_layout = True
         self.areas = predicted_areas
 
-    def pages_to_extracted_el(self, pages):
+    def pages_to_extracted_el(self, pages: List[ExtractedPage]) -> List[ExtractedEl]:
         elements: List[ExtractedEl] = []
         for page_num, page in enumerate(pages):
-            for idx, el in enumerate(page['paragraphs']):
+            for idx, el in enumerate(page.paragraphs):
                 dict_el = el.dict_el
                 element = None
                 if dict_el["type"] == "et":
                     element = self._make_structured_table(
                         ExtractedSource(DocumentType.PDF, {"x0": el.x0, "x1": el.x1, "y0": el.y0, "y1": el.y1}, None,
-                                        len(elements), {"page_idx": page_num, "page_size": page['size']}), dict_el)
+                                        len(elements), {"page_idx": page_num, "page_size": [page.size.x0, page.size.y0, page.size.x1, page.size.y1]}), dict_el)
                 elif dict_el["type"] == "em":
                     element = ExtractedEl(ElementType.TEXT, ExtractedSource(DocumentType.PDF,
                                                                             {"x0": el.x0, "x1": el.x1, "y0": el.y0,
                                                                              "y1": el.y1}, None, len(elements),
                                                                             {"page_idx": page_num,
-                                                                             "page_size": page['size']}), el.get_text())
+                                                                             "page_size": [page.size.x0, page.size.y0, page.size.x1, page.size.y1]}), el.get_text())
                 elif dict_el["type"] == "ef":
-                    element = ExtractedEl(ElementType.FIGURE, ExtractedSource(DocumentType.PDF, {"x0": el.x0, "x1": el.x1, "y0": el.y0, "y1": el.y1}, None, len(elements), {"page_idx": page_num, "page_size": page['size']}), None)
+                    element = ExtractedEl(ElementType.FIGURE, ExtractedSource(DocumentType.PDF, {"x0": el.x0, "x1": el.x1, "y0": el.y0, "y1": el.y1}, None, len(elements), {"page_idx": page_num, "page_size": [page.size.x0, page.size.y0, page.size.x1, page.size.y1]}), None)
                 elements.append(element)
         return elements
 
     def convert(self, file_path: str) -> Tuple[List[ExtractedEl], Decimal]:
 
-        pages = get_elements_from_pdf(file_path, self.repair_layout, self.areas)
+        pages = get_elements_from_pdf(file_path, self.areas)
 
-        return self.pages_to_extracted_el(pages), PRICING_CONVERSION
+        return self.pages_to_extracted_el(pages), PRICING_PDF_CONVERSION
 
     def _make_structured_table(self, source: ExtractedSource, extracted_table_dict) -> StructuredTable:
 

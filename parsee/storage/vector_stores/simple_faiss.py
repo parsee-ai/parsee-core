@@ -6,7 +6,7 @@ import io
 
 import numpy as np
 import faiss
-import tiktoken
+from sentence_transformers import SentenceTransformer
 
 from parsee.storage.vector_stores.interfaces import VectorStore
 from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
@@ -16,7 +16,7 @@ from parsee.utils.enums import ElementType
 class SimpleFaissStore(VectorStore):
 
     def __init__(self):
-        self.encoder = tiktoken.get_encoding("cl100k_base")
+        self.encoder = SentenceTransformer('all-MiniLM-L6-v2')
         self.min_chunk_size_characters = 1000
         self.k = 100
 
@@ -61,7 +61,7 @@ class SimpleFaissStore(VectorStore):
 
         query = f"{search_element_title}" + (f"; {keywords}" if keywords is not None else "")
 
-        xq = self.encoder.encode(query)
+        xq = self.encoder.encode([query])
 
         _, results = index.search(xq, self.k)  # search
 

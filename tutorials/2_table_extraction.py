@@ -2,7 +2,7 @@ import os
 
 from parsee.templates.helpers import TableItem, MetaItem, create_template
 from parsee.extraction.models.helpers import gpt_config, replicate_config
-from parsee.raw_converters.main import load_document
+from parsee.converters.main import load_document
 from parsee.extraction_jobs import run_job_with_single_model
 from parsee.utils.enums import *
 

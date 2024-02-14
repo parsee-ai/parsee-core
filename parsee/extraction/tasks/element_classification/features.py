@@ -6,7 +6,7 @@ from parsee.templates.element_schema import ElementSchema
 from parsee.utils.helper import words_contained, clean_text_for_word_vectors2, composition_percentages
 from parsee.utils.enums import ElementType, SearchStrategy
 from parsee.datasets.dataset_dataclasses import DatasetRow
-from parsee.utils.settings import ELEMENTS_WORDS_TO_INCLUDE, ELEMENTS_TABLES_TO_INCLUDE
+from parsee.utils.constants import ELEMENTS_WORDS_TO_INCLUDE, ELEMENTS_TABLES_TO_INCLUDE
 from parsee.storage.interfaces import StorageManager
 from parsee.extraction.models.llm_models.prompts import Prompt
 

@@ -6,12 +6,6 @@ class DocumentType(Enum):
     PDF = "pdf"
 
 
-class ConversionMethod(Enum):
-    SIMPLE = "simple"
-    COMPLEX = "complex"
-    AWS = "aws"
-
-
 class ElementType(Enum):
     TEXT = "text"
     TABLE = "table"

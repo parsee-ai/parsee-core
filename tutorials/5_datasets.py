@@ -7,7 +7,7 @@ Once we have a dataset, we can also run comparisons between different models (se
 """
 from parsee.templates.helpers import StructuringItem, MetaItem, create_template
 from parsee.extraction.extractor_dataclasses import AssignedAnswer, AssignedMeta
-from parsee.raw_converters.main import load_document
+from parsee.converters.main import load_document
 from parsee.datasets.main import create_dataset_rows
 from parsee.datasets.writers.disk_writer import CsvDiskWriter
 from parsee.utils.enums import *

@@ -2,16 +2,15 @@ from typing import Dict, List, Union, Any
 
 from parsee.templates.element_schema import ElementDetectionSchema, ElementSchema
 from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQuerySchema, GeneralQueryItemSchema
-from parsee.extraction.tasks.element_classification.element_classifier import ElementClassifier, \
-    SimpleElementClassifier, AssignedElementClassifier
+from parsee.extraction.tasks.element_classification.element_classifier import ElementClassifier, AssignedElementClassifier
 from parsee.extraction.tasks.questions.question_classifier import QuestionModel, SimpleQuestionModel, AssignedQuestionModel
 from parsee.extraction.models.llm_models.chatgpt_model import ChatGPTModel
 from parsee.extraction.models.llm_models.replicate_model import ReplicateModel
 from parsee.extraction.tasks.questions.question_classifier_llm import LLMQuestionModel
-from parsee.extraction.tasks.meta_info_structuring.meta_info import SimpleMetaInfoClassifier, MetaInfoClassifier
+from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoClassifier
 from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMClassifier
 from parsee.extraction.tasks.element_classification.element_classifier_llm import ElementClassifierLLM
-from parsee.extraction.tasks.mappings.mapping_classifier import MappingClassifier, SimpleMappingClassifier
+from parsee.extraction.tasks.mappings.mapping_classifier import MappingClassifier
 from parsee.extraction.tasks.mappings.mapping_classifier_llm import MappingClassifierLLM
 from parsee.storage.interfaces import StorageManager
 from parsee.utils.enums import ModelType

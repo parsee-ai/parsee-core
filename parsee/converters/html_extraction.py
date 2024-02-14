@@ -1,14 +1,17 @@
 import re
 from decimal import Decimal
 from typing import Tuple, List, Union
+import os
 
 from bs4 import BeautifulSoup
 
 from parsee.extraction.extractor_elements import ExtractedEl, StructuredTable
-from parsee.raw_converters.interfaces import RawToJsonConverter
+from parsee.converters.interfaces import RawToJsonConverter
 from parsee.extraction.extractor_elements import ExtractedSource, StructuredRow, StructuredTableCell
 from parsee.utils.enums import DocumentType, ElementType
-from parsee.utils.settings import PRICING_CONVERSION
+
+
+PRICING_HTML_CONVERSION = Decimal(os.getenv("PRICING_CONVERSION")) if os.getenv("PRICING_CONVERSION") is not None else Decimal(0)
 
 
 def get_element_sibling_xpath(element, xpath=""):
@@ -33,7 +36,7 @@ class HtmlConverter(RawToJsonConverter):
     def convert(self, file_path: str) -> Tuple[List[ExtractedEl], Decimal]:
         with open(file_path) as html_file:
             html_content = html_file.read()
-            return self._extract_elements_from_html_data(html_content), PRICING_CONVERSION
+            return self._extract_elements_from_html_data(html_content), PRICING_HTML_CONVERSION
 
     def _extract_elements_from_html_data(self, html_data) -> List[ExtractedEl]:
 
