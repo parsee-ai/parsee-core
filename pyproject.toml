@@ -1,8 +1,10 @@
 [tool.poetry]
-name = "extractor"
+name = "parsee-core"
 version = "0.1.0"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
+homepage = "https://parsee.ai"
+packages = [{include = "parsee"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
@@ -15,6 +17,7 @@ pydantic = "^1.6.2"
 faiss-cpu = "^1.7.4"
 replicate = "^0.23.1"
 beautifulsoup4 = "^4.11.1"
+parsee-pdf-reader = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 

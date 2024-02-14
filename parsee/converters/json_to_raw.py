@@ -1,6 +1,5 @@
 import json
 from typing import List
-from pydantic.dataclasses import dataclass
 
 from parsee.extraction.extractor_elements import ExtractedEl, StructuredTable, StructuredTableCell, StructuredRow, StandardDocumentFormat
 from parsee.utils.enums import ElementType, DocumentType
