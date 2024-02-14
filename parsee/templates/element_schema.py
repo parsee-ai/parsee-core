@@ -1,9 +1,9 @@
 from pydantic.dataclasses import dataclass
 from typing import Dict, List, Any, Union, Optional
 
-from src.utils.enums import SearchStrategy
-from src.extraction.templates.mappings import MappingSchema
-from src.extraction.templates.general_structuring_schema import StructuringItemSchema
+from parsee.utils.enums import SearchStrategy
+from parsee.templates.mappings import MappingSchema
+from parsee.templates.general_structuring_schema import StructuringItemSchema
 
 
 @dataclass

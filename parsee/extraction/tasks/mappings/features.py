@@ -1,13 +1,13 @@
 from typing import *
 
-from src.datasets.dataset_dataclasses import MappingUniqueIdentifier
-from src.extraction.extractor_elements import FinalOutputTable
-from src.extraction.extractor_dataclasses import ParseeBucket
-from src.utils.helper import clean_text_for_word_vectors2
-from src.extraction.ml.models.llm_models.prompts import Prompt
-from src.extraction.templates.mappings import MappingBucket
-from src.datasets.dataset_dataclasses import DatasetRow
-from src.extraction.ml.tasks.mappings.mapping_classifier import MappingSchema
+from parsee.datasets.dataset_dataclasses import MappingUniqueIdentifier
+from parsee.extraction.extractor_elements import FinalOutputTable
+from parsee.extraction.extractor_dataclasses import ParseeBucket
+from parsee.utils.helper import clean_text_for_word_vectors2
+from parsee.extraction.models.llm_models.prompts import Prompt
+from parsee.templates.mappings import MappingBucket
+from parsee.datasets.dataset_dataclasses import DatasetRow
+from parsee.extraction.tasks.mappings.mapping_classifier import MappingSchema
 
 
 class MappingFeatureBuilder:

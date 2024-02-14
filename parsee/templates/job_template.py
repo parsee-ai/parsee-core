@@ -1,9 +1,9 @@
 from pydantic.dataclasses import dataclass
 from typing import Dict, Optional, List, Union
 
-from src.extraction.templates.element_schema import ElementDetectionSchema
-from src.extraction.templates.general_structuring_schema import GeneralQuerySchema, StructuringItemSchema
-from src.extraction.ml.models.model_dataclasses import MlModelSpecification
+from parsee.templates.element_schema import ElementDetectionSchema
+from parsee.templates.general_structuring_schema import GeneralQuerySchema, StructuringItemSchema
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
 
 
 @dataclass

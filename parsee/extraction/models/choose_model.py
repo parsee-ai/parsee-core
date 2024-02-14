@@ -1,25 +1,24 @@
 from typing import Dict, List, Union, Any
 
-from src.extraction.templates.element_schema import ElementDetectionSchema, ElementSchema
-from src.extraction.templates.general_structuring_schema import StructuringItemSchema, GeneralQuerySchema, GeneralQueryItemSchema
-from src.extraction.ml.tasks.element_classification.element_classifier import ElementClassifier, \
+from parsee.templates.element_schema import ElementDetectionSchema, ElementSchema
+from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQuerySchema, GeneralQueryItemSchema
+from parsee.extraction.tasks.element_classification.element_classifier import ElementClassifier, \
     SimpleElementClassifier, AssignedElementClassifier
-from src.extraction.ml.tasks.questions.question_classifier import QuestionModel, SimpleQuestionModel, AssignedQuestionModel
-from src.extraction.ml.models.llm_models.chatgpt_model import ChatGPTModel
-from src.extraction.ml.models.llm_models.replicate_model import ReplicateModel
-from src.extraction.ml.tasks.questions.question_classifier_llm import LLMQuestionModel
-from src.extraction.ml.tasks.meta_info_structuring.meta_info import SimpleMetaInfoClassifier, MetaInfoClassifier
-from src.extraction.ml.tasks.meta_info_structuring.meta_info_llm import MetaLLMClassifier
-from src.extraction.ml.tasks.element_classification.element_classifier_llm import ElementClassifierLLM
-from src.extraction.ml.tasks.mappings.mapping_classifier import MappingClassifier, SimpleMappingClassifier
-from src.extraction.ml.tasks.mappings.mapping_classifier_llm import MappingClassifierLLM
-from src.storage.interfaces import StorageManager
-from src.utils.enums import ModelType
-from src.extraction.ml.tasks.element_classification.element_classifier_custom import CustomElementClassifier
-from src.extraction.ml.tasks.meta_info_structuring.meta_info_custom_model import CustomMetaInfoClassifier
-from src.extraction.ml.tasks.mappings.mapping_classifier_custom import MappingClassifierCustom
-from src.extraction.ml.tasks.questions.question_responder_xbrl import XbrlQuestionResponder
-from src.extraction.ml.models.model_dataclasses import MlModelSpecification
+from parsee.extraction.tasks.questions.question_classifier import QuestionModel, SimpleQuestionModel, AssignedQuestionModel
+from parsee.extraction.models.llm_models.chatgpt_model import ChatGPTModel
+from parsee.extraction.models.llm_models.replicate_model import ReplicateModel
+from parsee.extraction.tasks.questions.question_classifier_llm import LLMQuestionModel
+from parsee.extraction.tasks.meta_info_structuring.meta_info import SimpleMetaInfoClassifier, MetaInfoClassifier
+from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMClassifier
+from parsee.extraction.tasks.element_classification.element_classifier_llm import ElementClassifierLLM
+from parsee.extraction.tasks.mappings.mapping_classifier import MappingClassifier, SimpleMappingClassifier
+from parsee.extraction.tasks.mappings.mapping_classifier_llm import MappingClassifierLLM
+from parsee.storage.interfaces import StorageManager
+from parsee.utils.enums import ModelType
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
+
+
+# TODO: fix custom models
 
 
 def get_question_model_from_spec(model: MlModelSpecification, items: List[GeneralQueryItemSchema], all_meta_items: List[StructuringItemSchema], storage: StorageManager, settings: Dict[str, Any]) -> LLMQuestionModel:

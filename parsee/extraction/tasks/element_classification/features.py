@@ -1,14 +1,14 @@
 from typing import *
 
-from src.extraction.extractor_elements import ExtractedEl, get_text_distance, StandardDocumentFormat
-from src.extraction.extractor_dataclasses import ParseeLocation
-from src.extraction.templates.element_schema import ElementSchema
-from src.utils.helper import words_contained, clean_text_for_word_vectors2, composition_percentages
-from src.utils.enums import ElementType, SearchStrategy
-from src.datasets.dataset_dataclasses import DatasetRow
-from src.utils.settings import ELEMENTS_WORDS_TO_INCLUDE, ELEMENTS_TABLES_TO_INCLUDE
-from src.storage.interfaces import StorageManager
-from src.extraction.ml.models.llm_models.prompts import Prompt
+from parsee.extraction.extractor_elements import ExtractedEl, get_text_distance, StandardDocumentFormat
+from parsee.extraction.extractor_dataclasses import ParseeLocation
+from parsee.templates.element_schema import ElementSchema
+from parsee.utils.helper import words_contained, clean_text_for_word_vectors2, composition_percentages
+from parsee.utils.enums import ElementType, SearchStrategy
+from parsee.datasets.dataset_dataclasses import DatasetRow
+from parsee.utils.settings import ELEMENTS_WORDS_TO_INCLUDE, ELEMENTS_TABLES_TO_INCLUDE
+from parsee.storage.interfaces import StorageManager
+from parsee.extraction.models.llm_models.prompts import Prompt
 
 
 class LocationFeatureBuilder:

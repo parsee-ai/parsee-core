@@ -8,9 +8,9 @@ import numpy as np
 import faiss
 import tiktoken
 
-from src.storage.vector_stores.interfaces import VectorStore
-from src.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
-from src.utils.enums import ElementType
+from parsee.storage.vector_stores.interfaces import VectorStore
+from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
+from parsee.utils.enums import ElementType
 
 
 class SimpleFaissStore(VectorStore):

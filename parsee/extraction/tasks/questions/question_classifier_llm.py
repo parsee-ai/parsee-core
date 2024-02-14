@@ -1,15 +1,15 @@
 from typing import *
 
-from src.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
-from src.extraction.ml.tasks.questions.question_classifier import QuestionModel
-from src.extraction.ml.tasks.questions.features import GeneralQueriesPromptBuilder
-from src.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta
-from src.storage.interfaces import StorageManager
-from src.extraction.ml.models.llm_models.llm_base_model import LLMBaseModel
-from src.extraction.ml.tasks.questions.utils import parse_sources, parse_answer_blocks, parse_main_and_meta, MAIN_QUESTION_STR
-from src.extraction.templates.general_structuring_schema import StructuringItemSchema, GeneralQueryItemSchema
-from src.extraction.ml.models.llm_models.structuring_schema import get_prompt_schema_item
-from src.datasets.dataset_dataclasses import DatasetRow
+from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
+from parsee.extraction.tasks.questions.question_classifier import QuestionModel
+from parsee.extraction.tasks.questions.features import GeneralQueriesPromptBuilder
+from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta
+from parsee.storage.interfaces import StorageManager
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
+from parsee.extraction.tasks.questions.utils import parse_sources, parse_answer_blocks, parse_main_and_meta, MAIN_QUESTION_STR
+from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQueryItemSchema
+from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
+from parsee.datasets.dataset_dataclasses import DatasetRow
 
 
 class LLMQuestionModel(QuestionModel):

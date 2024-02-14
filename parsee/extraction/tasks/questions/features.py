@@ -1,14 +1,14 @@
 from typing import *
 from functools import reduce
 
-from src.extraction.ml.models.llm_models.prompts import Prompt
-from src.extraction.ml.models.llm_models.structuring_schema import get_prompt_schema_item
-from src.extraction.templates.general_structuring_schema import GeneralQueryItemSchema, StructuringItemSchema
-from src.extraction.ml.tasks.questions.utils import build_raw_value
-from src.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
-from src.utils.enums import DocumentType, SearchStrategy
-from src.storage.interfaces import StorageManager
-from src.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
+from parsee.extraction.models.llm_models.prompts import Prompt
+from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
+from parsee.templates.general_structuring_schema import GeneralQueryItemSchema, StructuringItemSchema
+from parsee.extraction.tasks.questions.utils import build_raw_value
+from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
+from parsee.utils.enums import DocumentType, SearchStrategy
+from parsee.storage.interfaces import StorageManager
+from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
 
 
 class GeneralQueriesPromptBuilder:

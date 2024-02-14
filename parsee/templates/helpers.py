@@ -1,10 +1,10 @@
 from typing import *
 from functools import reduce
 
-from src.extraction.templates.job_template import JobTemplate
-from src.extraction.templates.general_structuring_schema import GeneralQueryItemSchema, GeneralQuerySchema, StructuringItemSchema
-from src.extraction.templates.element_schema import ElementDetectionSchema, ElementSchema
-from src.utils.enums import OutputType, ContextType, SearchStrategy
+from parsee.templates.job_template import JobTemplate
+from parsee.templates.general_structuring_schema import GeneralQueryItemSchema, GeneralQuerySchema, StructuringItemSchema
+from parsee.templates.element_schema import ElementDetectionSchema, ElementSchema
+from parsee.utils.enums import OutputType, ContextType, SearchStrategy
 
 
 id_store = {}

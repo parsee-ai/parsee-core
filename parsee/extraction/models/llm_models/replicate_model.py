@@ -8,9 +8,9 @@ import math
 import tiktoken
 import replicate
 
-from src.extraction.ml.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
-from src.extraction.ml.models.llm_models.prompts import Prompt, SummarizationPrompt
-from src.extraction.ml.models.model_dataclasses import MlModelSpecification
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
+from parsee.extraction.models.llm_models.prompts import Prompt, SummarizationPrompt
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
 
 
 class ReplicateModel(LLMBaseModel):

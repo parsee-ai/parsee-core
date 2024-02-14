@@ -5,12 +5,12 @@ You can create a simple dataset manually as shown in the previous tutorial.
 You can also run extractions for one or several documents on Parsee Cloud (https://app.parsee.ai),
 correct and see the output in a graphical user interface, and then create datasets from there.
 """
-from src.datasets.evaluation.main import evaluate_llm_performance
-from src.datasets.readers.disk_reader import CsvDiskReader
-from src.extraction.templates.helpers import StructuringItem, MetaItem, create_template
-from src.extraction.ml.models.helpers import gpt_config, replicate_config
-from src.storage.in_memory_storage import InMemoryStorageManager
-from src.utils.enums import *
+from parsee.datasets.evaluation.main import evaluate_llm_performance
+from parsee.datasets.readers.disk_reader import CsvDiskReader
+from parsee.templates.helpers import StructuringItem, MetaItem, create_template
+from parsee.extraction.models.helpers import gpt_config, replicate_config
+from parsee.storage.in_memory_storage import InMemoryStorageManager
+from parsee.utils.enums import *
 
 # Let's first use the dataset we created in the previous example and run it for two different models
 dataset_path = "/Users/thomasflassbeck/Desktop/temp/x/dataset_cf611191-2aa6-4c7f-8e53-777d29b92634/questions_invoice.csv"

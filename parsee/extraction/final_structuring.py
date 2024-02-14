@@ -1,9 +1,9 @@
 from typing import List, Dict
 
-from src.extraction.extractor_elements import StandardDocumentFormat, ElementGroup, get_text_distance, FinalOutputTableColumn, FinalOutputTable
-from src.extraction.extractor_dataclasses import ParseeMeta, ParseeLocation
-from src.extraction.templates.job_template import JobTemplate
-from src.utils.constants import *
+from parsee.extraction.extractor_elements import StandardDocumentFormat, ElementGroup, get_text_distance, FinalOutputTableColumn, FinalOutputTable
+from parsee.extraction.extractor_dataclasses import ParseeMeta, ParseeLocation
+from parsee.templates.job_template import JobTemplate
+from parsee.utils.constants import *
 
 
 def text_distance_table_groups(el1: ElementGroup, el2: ElementGroup, elements):

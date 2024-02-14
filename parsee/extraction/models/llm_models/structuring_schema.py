@@ -1,9 +1,9 @@
 from typing import List, Optional, Union, Tuple
 import re
 
-from src.extraction.templates.general_structuring_schema import StructuringItemSchema
-from src.utils.enums import OutputType
-from src.utils.helper import clean_numeric_value_llm, get_entity_value, get_date_regex
+from parsee.templates.general_structuring_schema import StructuringItemSchema
+from parsee.utils.enums import OutputType
+from parsee.utils.helper import clean_numeric_value_llm, get_entity_value, get_date_regex
 
 
 class PromptSchemaItem:

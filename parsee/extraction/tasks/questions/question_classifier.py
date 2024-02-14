@@ -1,10 +1,10 @@
 from typing import *
 
-from src.extraction.extractor_elements import StandardDocumentFormat
-from src.extraction.templates.general_structuring_schema import StructuringItemSchema, GeneralQueryItemSchema
-from src.extraction.extractor_dataclasses import ParseeAnswer, AssignedAnswer, ParseeMeta
-from src.extraction.ml.tasks.questions.utils import build_raw_value
-from src.datasets.dataset_dataclasses import DatasetRow
+from parsee.extraction.extractor_elements import StandardDocumentFormat
+from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQueryItemSchema
+from parsee.extraction.extractor_dataclasses import ParseeAnswer, AssignedAnswer, ParseeMeta
+from parsee.extraction.tasks.questions.utils import build_raw_value
+from parsee.datasets.dataset_dataclasses import DatasetRow
 
 
 class QuestionModel:

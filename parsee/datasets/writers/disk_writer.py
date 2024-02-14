@@ -6,8 +6,8 @@ import uuid
 import pickle
 from shutil import rmtree
 
-from src.datasets.dataset_dataclasses import BaseDatasetRow, Transformation, ColumnSettings
-from src.datasets.writers.interfaces import DatasetWriter, ModelWriter
+from parsee.datasets.dataset_dataclasses import BaseDatasetRow, Transformation, ColumnSettings
+from parsee.datasets.writers.interfaces import DatasetWriter, ModelWriter
 
 
 class CsvDiskWriter(DatasetWriter):
@@ -58,22 +58,3 @@ class CsvDiskWriter(DatasetWriter):
     def delete_all_files(self):
         shutil.rmtree(self.write_location)
 
-
-class DiskModelWriter(ModelWriter):
-
-    def __init__(self, save_dir: str):
-        self.local_write_dir = save_dir
-        self._org_dir = save_dir
-
-    def set_sub_directory(self, sub_directory_name: str):
-        new_dir = os.path.join(self._org_dir, sub_directory_name)
-        if os.path.exists(new_dir):
-            # clear
-            rmtree(new_dir)
-        os.mkdir(new_dir)
-        self.local_write_dir = new_dir
-
-    def save_model_settings(self, settings: Dict[str, ColumnSettings]):
-        file_path = os.path.join(self.local_write_dir, "settings.pkl")
-        with open(file_path, "wb") as t:
-            pickle.dump(settings, t)

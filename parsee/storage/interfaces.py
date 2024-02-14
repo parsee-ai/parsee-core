@@ -1,14 +1,13 @@
 from decimal import Decimal
 from typing import List, Dict, Tuple
 
-from src.extraction.extractor_elements import StandardDocumentFormat, FinalOutputTableColumn, ParseeAnswer
-from src.utils.enums import DocumentType
-from src.extraction.templates.job_template import JobTemplate
-from src.extraction.extractor_dataclasses import ParseeBucket
-from src.utils.labeling_helper_dataclasses import UserLabeledInput
-from src.extraction.ml.models.model_dataclasses import MlModelSpecification
-from src.datasets.readers.interfaces import ModelReader
-from src.storage.vector_stores.interfaces import VectorStore
+from parsee.extraction.extractor_elements import StandardDocumentFormat, FinalOutputTableColumn, ParseeAnswer
+from parsee.utils.enums import DocumentType
+from parsee.templates.job_template import JobTemplate
+from parsee.extraction.extractor_dataclasses import ParseeBucket
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
+from parsee.datasets.readers.interfaces import ModelReader
+from parsee.storage.vector_stores.interfaces import VectorStore
 
 
 class StorageManager:
@@ -28,9 +27,6 @@ class StorageManager:
         raise NotImplemented
 
     def db_values_template(self, job_template: JobTemplate, strict: bool) -> JobTemplate:
-        raise NotImplemented
-
-    def user_values_template(self, job_template: JobTemplate, labeled: UserLabeledInput, source_identifier: str, source_type: DocumentType) -> JobTemplate:
         raise NotImplemented
 
     def store_mappings(self, source_type: DocumentType, source_identifier: str, mappings: List[ParseeBucket]):

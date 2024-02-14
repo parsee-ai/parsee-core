@@ -4,23 +4,23 @@ from typing import *
 
 import tiktoken
 
-from src.datasets.writers.interfaces import DatasetWriter
-from src.extraction.extractor_elements import StandardDocumentFormat
-from src.extraction.extractor_dataclasses import ID_NOT_AVAILABLE
-from src.extraction.templates.job_template import JobTemplate
-from src.storage.interfaces import StorageManager
-from src.storage.in_memory_storage import InMemoryStorageManager
-from src.extraction.ml.tasks.element_classification.element_classifier_llm import LLMLocationFeatureBuilder
-from src.utils.enums import ElementType
-from src.extraction.ml.choose_model import element_classifiers_from_schema, meta_classifiers_from_items, mapping_classifiers_from_schema, question_classifiers_from_schema
-from src.extraction.ml.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
-from src.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
-from src.extraction.ml.tasks.mappings.features import LLMMappingFeatureBuilder
-from src.extraction.ml.tasks.questions.features import GeneralQueriesPromptBuilder
-from src.extraction.ml.tasks.mappings.mapping_classifier import ParseeBucket
-from src.extraction.ml.models.llm_models.llm_base_model import truncate_prompt
-from src.datasets.dataset_dataclasses import DatasetRow
-from src.extraction.extractor_dataclasses import AssignedAnswer
+from parsee.datasets.writers.interfaces import DatasetWriter
+from parsee.extraction.extractor_elements import StandardDocumentFormat
+from parsee.extraction.extractor_dataclasses import ID_NOT_AVAILABLE
+from parsee.templates.job_template import JobTemplate
+from parsee.storage.interfaces import StorageManager
+from parsee.storage.in_memory_storage import InMemoryStorageManager
+from parsee.extraction.tasks.element_classification.element_classifier_llm import LLMLocationFeatureBuilder
+from parsee.utils.enums import ElementType
+from parsee.extraction.models.choose_model import element_classifiers_from_schema, meta_classifiers_from_items, mapping_classifiers_from_schema, question_classifiers_from_schema
+from parsee.extraction.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
+from parsee.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
+from parsee.extraction.tasks.mappings.features import LLMMappingFeatureBuilder
+from parsee.extraction.tasks.questions.features import GeneralQueriesPromptBuilder
+from parsee.extraction.tasks.mappings.mapping_classifier import ParseeBucket
+from parsee.extraction.models.llm_models.llm_base_model import truncate_prompt
+from parsee.datasets.dataset_dataclasses import DatasetRow
+from parsee.extraction.extractor_dataclasses import AssignedAnswer
 
 
 PARTIAL_TABLE_APPEND = "_partial"

@@ -1,12 +1,12 @@
 from typing import *
 
-from src.extraction.extractor_dataclasses import ParseeAnswer
-from src.datasets.readers.interfaces import DatasetReader
-from src.extraction.ml.models.model_dataclasses import MlModelSpecification
-from src.extraction.templates.job_template import JobTemplate
-from src.extraction.ml.choose_model import get_question_model_from_spec
-from src.storage.interfaces import StorageManager
-from src.storage.in_memory_storage import InMemoryStorageManager
+from parsee.extraction.extractor_dataclasses import ParseeAnswer
+from parsee.datasets.readers.interfaces import DatasetReader
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
+from parsee.templates.job_template import JobTemplate
+from parsee.extraction.models.choose_model import get_question_model_from_spec
+from parsee.storage.interfaces import StorageManager
+from parsee.storage.in_memory_storage import InMemoryStorageManager
 
 
 class EvaluationResult:

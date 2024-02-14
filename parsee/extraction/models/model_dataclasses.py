@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 import os
 
-from src.utils.enums import ModelType
+from parsee.utils.enums import ModelType
 
 
 @dataclass

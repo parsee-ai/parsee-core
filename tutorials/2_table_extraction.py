@@ -1,10 +1,10 @@
 import os
 
-from src.extraction.templates.helpers import TableItem, MetaItem, create_template
-from src.extraction.ml.models.helpers import gpt_config, replicate_config
-from src.extraction.raw_converters.main import load_document
-from src.extraction_jobs import run_job_with_single_model
-from src.utils.enums import *
+from parsee.templates.helpers import TableItem, MetaItem, create_template
+from parsee.extraction.models.helpers import gpt_config, replicate_config
+from parsee.raw_converters.main import load_document
+from parsee.extraction_jobs import run_job_with_single_model
+from parsee.utils.enums import *
 
 # TABLE EXTRACTION
 

@@ -3,7 +3,7 @@ from typing import *
 
 from tiktoken.core import Encoding
 
-from src.extraction.ml.models.llm_models.prompts import Prompt
+from parsee.extraction.models.llm_models.prompts import Prompt
 
 
 def get_tokens_encoded(prompt: str, encoding: Encoding) -> List[int]:

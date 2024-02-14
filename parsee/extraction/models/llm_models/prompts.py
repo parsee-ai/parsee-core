@@ -1,4 +1,4 @@
-from src.datasets.dataset_dataclasses import DatasetRow
+from parsee.datasets.dataset_dataclasses import DatasetRow
 
 
 class Prompt:

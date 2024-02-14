@@ -7,13 +7,13 @@ from decimal import Decimal
 from dataclasses import dataclass
 from hashlib import sha256
 
-from src.extraction.extractor_dataclasses import ExtractedSource, ParseeLocation, ParseeMeta, ParseeAnswer, ParseeBucket
-from src.utils.enums import ElementType, DocumentType
-from src.extraction.ml.tasks.mappings.utils import calc_buckets
-from src.extraction.templates.mappings import MappingSchema
-from src.extraction.ml.tasks.mappings.utils import get_table_signature
-from src.utils.helper import get_mean_for_column, clean_spaces, is_number_cell, clean_numeric_value, composition_percentages, delete_trailing_zeros, is_year_cell, \
-    contained_words, clean_number_for_matching
+from parsee.extraction.extractor_dataclasses import ExtractedSource, ParseeLocation, ParseeMeta, ParseeAnswer, ParseeBucket
+from parsee.utils.enums import ElementType, DocumentType
+from parsee.extraction.tasks.mappings.utils import calc_buckets
+from parsee.templates.mappings import MappingSchema
+from parsee.extraction.tasks.mappings.utils import get_table_signature
+from parsee.utils.helper import get_mean_for_column, clean_spaces, is_number_cell, clean_numeric_value, composition_percentages, delete_trailing_zeros, is_year_cell, \
+    words_contained, clean_number_for_matching
 
 
 # returns the number of text chars between 2 elements
@@ -452,7 +452,7 @@ class StructuredTable(ExtractedEl):
                 if contain_numbers:
                     text_pieces.append(f"(col {k}): {val_obj.val}")
                 else:
-                    if val_obj.val is not None and not is_number_cell(val_obj.val) and len(contained_words(val_obj.val)) > 0:
+                    if val_obj.val is not None and not is_number_cell(val_obj.val) and len(words_contained(val_obj.val)) > 0:
                         text_pieces.append(str(val_obj.val))
         if contain_numbers:
             text = " ".join(text_pieces)

@@ -7,7 +7,7 @@ from typing import List, Dict, Tuple, Union, Optional
 from hashlib import sha256
 from decimal import Decimal
 
-from src.utils.enums import DocumentType
+from parsee.utils.enums import DocumentType
 
 
 ID_NOT_AVAILABLE = "[NOT_SPECIFIED]"

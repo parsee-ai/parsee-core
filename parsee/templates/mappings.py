@@ -2,7 +2,7 @@ from pydantic.dataclasses import dataclass
 from typing import Union, List, Dict
 from decimal import Decimal
 
-from src.utils.enums import AggregationMethod
+from parsee.utils.enums import AggregationMethod
 
 
 @dataclass

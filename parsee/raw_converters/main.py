@@ -5,14 +5,13 @@ from decimal import Decimal
 from typing import Tuple, Union, List, Dict
 
 from pdf_reader.custom_dataclasses import RelativeAreaPrediction
-from src.extraction.raw_converters.pdf_extraction_aws import PdfAWSConverter
-from src.utils.enums import DocumentType, ConversionMethod
-from src.extraction.extractor_elements import StandardDocumentFormat
-from src.extraction.raw_converters.json_to_raw import load_document_from_json
-from src.extraction.raw_converters.html_extraction import HtmlConverter
-from src.extraction.raw_converters.pdf_extraction import PdfConverter
-from src.utils.settings import temp_path
-from src.utils.helper import get_source_identifier
+from parsee.utils.enums import DocumentType, ConversionMethod
+from parsee.extraction.extractor_elements import StandardDocumentFormat
+from parsee.raw_converters.json_to_raw import load_document_from_json
+from parsee.raw_converters.html_extraction import HtmlConverter
+from parsee.raw_converters.pdf_extraction import PdfConverter
+from parsee.utils.settings import temp_path
+from parsee.utils.helper import get_source_identifier
 
 
 def determine_document_type(file_path: str) -> DocumentType:

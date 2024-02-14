@@ -1,12 +1,12 @@
 from decimal import Decimal
 from typing import List, Tuple, Dict, Union
 
-from src.extraction.extractor_elements import ExtractedEl, StructuredTable, ExtractedSource, StructuredRow, \
+from parsee.extraction.extractor_elements import ExtractedEl, StructuredTable, ExtractedSource, StructuredRow, \
     StructuredTableCell
 from pdf_reader.main import get_elements_from_pdf
-from src.extraction.raw_converters.interfaces import RawToJsonConverter
-from src.utils.enums import DocumentType, ElementType
-from src.utils.settings import PRICING_CONVERSION
+from parsee.raw_converters.interfaces import RawToJsonConverter
+from parsee.utils.enums import DocumentType, ElementType
+from parsee.utils.settings import PRICING_CONVERSION
 from pdf_reader.custom_dataclasses import RelativeAreaPrediction
 
 

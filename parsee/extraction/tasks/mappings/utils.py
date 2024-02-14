@@ -1,8 +1,8 @@
 from typing import *
 from decimal import Decimal
 
-from src.extraction.extractor_dataclasses import ParseeBucket
-from src.extraction.templates.mappings import MappingSchema
+from parsee.extraction.extractor_dataclasses import ParseeBucket
+from parsee.templates.mappings import MappingSchema
 
 
 def calc_buckets(key_value_pairs: List[Tuple[str, any]], mappings: List[ParseeBucket], mapping_schema: MappingSchema) -> Dict[str, Decimal]:

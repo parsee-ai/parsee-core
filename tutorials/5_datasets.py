@@ -5,12 +5,12 @@ In the following we will illustrate this process for LLMs.
 You can also use Parsee Cloud (at https://app.parsee.ai) to easily create datasets and label/correct data in a graphical user interface.
 Once we have a dataset, we can also run comparisons between different models (see tutorial 6).
 """
-from src.extraction.templates.helpers import StructuringItem, MetaItem, create_template
-from src.extraction.extractor_dataclasses import AssignedAnswer, AssignedMeta
-from src.extraction.raw_converters.main import load_document
-from src.datasets.main import create_dataset_rows
-from src.datasets.writers.disk_writer import CsvDiskWriter
-from src.utils.enums import *
+from parsee.templates.helpers import StructuringItem, MetaItem, create_template
+from parsee.extraction.extractor_dataclasses import AssignedAnswer, AssignedMeta
+from parsee.raw_converters.main import load_document
+from parsee.datasets.main import create_dataset_rows
+from parsee.datasets.writers.disk_writer import CsvDiskWriter
+from parsee.utils.enums import *
 
 # Let's use the invoice example again, with the two questions: invoice total and issuer of invoice
 meta_currency = MetaItem("What is the currency?", OutputType.LIST, list_values=["USD", "EUR", "Other"])

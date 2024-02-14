@@ -1,6 +1,6 @@
 from typing import *
 
-from src.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
+from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
 
 
 class VectorStore:

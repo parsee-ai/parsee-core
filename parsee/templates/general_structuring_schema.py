@@ -2,7 +2,7 @@ import json
 from typing import List, Optional, Dict, Union, Any
 from pydantic.dataclasses import dataclass
 
-from src.utils.enums import OutputType, ContextType, SearchStrategy
+from parsee.utils.enums import OutputType, ContextType, SearchStrategy
 
 
 @dataclass

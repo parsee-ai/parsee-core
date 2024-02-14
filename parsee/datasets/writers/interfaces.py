@@ -1,5 +1,5 @@
 from typing import *
-from src.datasets.dataset_dataclasses import BaseDatasetRow, Transformation, ColumnSettings
+from parsee.datasets.dataset_dataclasses import BaseDatasetRow, Transformation, ColumnSettings
 
 
 class DatasetWriter:

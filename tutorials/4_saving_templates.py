@@ -1,8 +1,8 @@
 import os
 
-from src.cloud.api import ParseeCloud
-from src.extraction.templates.helpers import StructuringItem, MetaItem, create_template
-from src.utils.enums import *
+from parsee.cloud.api import ParseeCloud
+from parsee.templates.helpers import StructuringItem, MetaItem, create_template
+from parsee.utils.enums import *
 # Extraction templates define all the aspects of an extraction job in a JSON file
 # You can create extraction templates easily in Python (see examples 0,1 and 2) or for free on parsee cloud: https://app.parsee.ai
 # In the following we will show you how to save templates to parsee cloud and load them from the cloud locally

@@ -1,11 +1,11 @@
 from typing import *
 import re
 
-from src.extraction.ml.tasks.element_classification.element_classifier import ElementClassifier, ElementSchema, StandardDocumentFormat, ParseeLocation
-from src.storage.interfaces import StorageManager
-from src.utils.helper import is_number_cell, clean_numeric_value
-from src.extraction.ml.models.llm_models.llm_base_model import LLMBaseModel
-from src.extraction.ml.tasks.element_classification.features import LLMLocationFeatureBuilder
+from parsee.extraction.tasks.element_classification.element_classifier import ElementClassifier, ElementSchema, StandardDocumentFormat, ParseeLocation
+from parsee.storage.interfaces import StorageManager
+from parsee.utils.helper import is_number_cell, clean_numeric_value
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
+from parsee.extraction.tasks.element_classification.features import LLMLocationFeatureBuilder
 
 
 class ElementClassifierLLM(ElementClassifier):

@@ -1,7 +1,7 @@
 from typing import *
 
-from src.datasets.dataset_dataclasses import DatasetRow, DatasetColumn, Transformation, ColumnData, ColumnSettings
-from src.extraction.ml.models.model_dataclasses import MlModelSpecification
+from parsee.datasets.dataset_dataclasses import DatasetRow, DatasetColumn, Transformation, ColumnData, ColumnSettings
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
 
 
 class DatasetReader:

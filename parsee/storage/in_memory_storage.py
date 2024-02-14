@@ -2,11 +2,11 @@ from typing import *
 from decimal import Decimal
 from copy import deepcopy
 
-from src.storage.interfaces import StorageManager
-from src.storage.vector_stores.simple_faiss import SimpleFaissStore
-from src.extraction.ml.models.model_dataclasses import MlModelSpecification
-from src.extraction.templates.job_template import JobTemplate
-from src.extraction.extractor_dataclasses import AssignedMeta, AssignedLocation, AssignedAnswer, AssignedBucket
+from parsee.storage.interfaces import StorageManager
+from parsee.storage.vector_stores.simple_faiss import SimpleFaissStore
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
+from parsee.templates.job_template import JobTemplate
+from parsee.extraction.extractor_dataclasses import AssignedMeta, AssignedLocation, AssignedAnswer, AssignedBucket
 
 
 class InMemoryStorageManager(StorageManager):

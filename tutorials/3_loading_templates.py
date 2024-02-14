@@ -1,9 +1,9 @@
 import os
 
-from src.cloud.api import ParseeCloud
-from src.extraction.ml.models.helpers import replicate_config
-from src.extraction.raw_converters.main import load_document
-from src.extraction_jobs import run_job_with_single_model
+from parsee.cloud.api import ParseeCloud
+from parsee.extraction.models.helpers import replicate_config
+from parsee.raw_converters.main import load_document
+from parsee.extraction_jobs import run_job_with_single_model
 # Extraction templates define all the aspects of an extraction job in a JSON file
 # You can create extraction templates easily in Python (see examples 0,1 and 2) or for free on parsee cloud: https://app.parsee.ai
 # In the following we will show you how to save templates to parsee cloud and load them from the cloud locally

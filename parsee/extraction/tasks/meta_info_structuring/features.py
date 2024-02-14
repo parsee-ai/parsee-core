@@ -1,12 +1,12 @@
 from typing import *
 
-from src.extraction.extractor_elements import FinalOutputTableColumn, ExtractedEl, StructuredTable
-from src.extraction.templates.general_structuring_schema import StructuringItemSchema
-from src.extraction.extractor_dataclasses import ParseeMeta
-from src.utils.helper import is_number_cell, is_year_cell, clean_text_for_word_vectors2
-from src.datasets.dataset_dataclasses import DatasetRow, MetaUniqueIdentifier
-from src.extraction.ml.models.llm_models.prompts import Prompt
-from src.extraction.ml.models.llm_models.structuring_schema import get_prompt_schema_item
+from parsee.extraction.extractor_elements import FinalOutputTableColumn, ExtractedEl, StructuredTable
+from parsee.templates.general_structuring_schema import StructuringItemSchema
+from parsee.extraction.extractor_dataclasses import ParseeMeta
+from parsee.utils.helper import is_number_cell, is_year_cell, clean_text_for_word_vectors2
+from parsee.datasets.dataset_dataclasses import DatasetRow, MetaUniqueIdentifier
+from parsee.extraction.models.llm_models.prompts import Prompt
+from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
 
 
 class MetaFeatureBuilder:

@@ -4,12 +4,24 @@ from typing import Tuple, List, Union
 
 from bs4 import BeautifulSoup
 
-from src.extraction.extractor_elements import ExtractedEl, StructuredTable
-from src.utils.helper import get_element_sibling_xpath
-from src.extraction.raw_converters.interfaces import RawToJsonConverter
-from src.extraction.extractor_elements import ExtractedSource, StructuredRow, StructuredTableCell
-from src.utils.enums import DocumentType, ElementType
-from src.utils.settings import PRICING_CONVERSION
+from parsee.extraction.extractor_elements import ExtractedEl, StructuredTable
+from parsee.raw_converters.interfaces import RawToJsonConverter
+from parsee.extraction.extractor_elements import ExtractedSource, StructuredRow, StructuredTableCell
+from parsee.utils.enums import DocumentType, ElementType
+from parsee.utils.settings import PRICING_CONVERSION
+
+
+def get_element_sibling_xpath(element, xpath=""):
+    parent = element.parent
+    if parent is None:
+        return xpath
+    siblings = parent.find_all(element.name, recursive=False)
+    if len(siblings) == 1:
+        xpath = '/' + element.name + xpath
+    else:
+        index = siblings.index(element)
+        xpath = f'/{element.name}[{index}]' + xpath
+    return get_element_sibling_xpath(parent, xpath)
 
 
 class HtmlConverter(RawToJsonConverter):

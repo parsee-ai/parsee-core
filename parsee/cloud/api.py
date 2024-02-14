@@ -2,8 +2,8 @@ import os
 
 import requests
 
-from src.extraction.templates.job_template import JobTemplate
-from src.extraction.templates.job_from_json import from_json_dict
+from parsee.templates.job_template import JobTemplate
+from parsee.templates.job_from_json import from_json_dict
 
 
 class ParseeCloud:
@@ -25,4 +25,4 @@ class ParseeCloud:
         template_json_dict = template.to_json_dict()
         template_json_dict = {**template_json_dict, "public": public}
         request = requests.post(url, json=template_json_dict, headers={"Authorization": self.api_key})
-        return request.content
+        return request.text

@@ -1,14 +1,14 @@
 from typing import *
 import re
 
-from src.extraction.extractor_elements import ExtractedEl, FinalOutputTableColumn
-from src.extraction.ml.tasks.meta_info_structuring.meta_info import MetaInfoClassifier
-from src.extraction.ml.models.llm_models.structuring_schema import get_prompt_schema_item
-from src.extraction.templates.general_structuring_schema import StructuringItemSchema
-from src.extraction.extractor_dataclasses import ParseeMeta
-from src.extraction.ml.models.llm_models.llm_base_model import LLMBaseModel
-from src.storage.interfaces import StorageManager
-from src.extraction.ml.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
+from parsee.extraction.extractor_elements import ExtractedEl, FinalOutputTableColumn
+from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoClassifier
+from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
+from parsee.templates.general_structuring_schema import StructuringItemSchema
+from parsee.extraction.extractor_dataclasses import ParseeMeta
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
+from parsee.storage.interfaces import StorageManager
+from parsee.extraction.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
 
 
 class MetaLLMClassifier(MetaInfoClassifier):

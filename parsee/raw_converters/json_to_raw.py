@@ -2,9 +2,9 @@ import json
 from typing import List
 from pydantic.dataclasses import dataclass
 
-from src.extraction.extractor_elements import ExtractedEl, StructuredTable, StructuredTableCell, StructuredRow, StandardDocumentFormat
-from src.utils.enums import ElementType, DocumentType
-from src.extraction.extractor_dataclasses import ExtractedSource
+from parsee.extraction.extractor_elements import ExtractedEl, StructuredTable, StructuredTableCell, StructuredRow, StandardDocumentFormat
+from parsee.utils.enums import ElementType, DocumentType
+from parsee.extraction.extractor_dataclasses import ExtractedSource
 
 
 def source_from_json(json_dict) -> ExtractedSource:

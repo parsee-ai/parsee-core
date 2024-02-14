@@ -1,8 +1,8 @@
 import re
 from typing import *
 
-from src.utils.helper import clean_numeric_value, words_contained
-from src.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
+from parsee.utils.helper import clean_numeric_value, words_contained
+from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
 
 
 MAIN_QUESTION_STR = "(main question)"

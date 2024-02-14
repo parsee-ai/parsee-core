@@ -1,8 +1,8 @@
 from typing import *
 import os
 
-from src.extraction.ml.models.model_dataclasses import *
-from src.utils.settings import NUM_TOKENS_DEFAULT_OPENAI
+from parsee.extraction.models.model_dataclasses import *
+from parsee.utils.settings import NUM_TOKENS_DEFAULT_OPENAI
 
 
 def gpt_config(openai_api_key: str, token_limit: Optional[int] = None, openai_model_name: Optional[str] = None) -> MlModelSpecification:

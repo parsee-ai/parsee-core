@@ -2,7 +2,7 @@ import json
 from typing import Dict
 from pydantic.tools import parse_obj_as
 
-from src.extraction.templates.job_template import JobTemplate
+from parsee.templates.job_template import JobTemplate
 
 
 def from_json(json_string: str) -> JobTemplate:
