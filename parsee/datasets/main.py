@@ -26,7 +26,7 @@ from parsee.extraction.extractor_dataclasses import AssignedAnswer
 PARTIAL_TABLE_APPEND = "_partial"
 
 
-def create_dataset_entries(source_identifier: str, template: JobTemplate, document: StandardDocumentFormat, writer: DatasetWriter, storage: StorageManager):
+def create_dataset_entries(source_identifier: str, template: JobTemplate, document: StandardDocumentFormat, writer: DatasetWriter, storage: StorageManager, loader: ModelLoader):
 
     template = storage.db_values_template(template, False)
     storage.disable_db_updates = True
@@ -35,7 +35,7 @@ def create_dataset_entries(source_identifier: str, template: JobTemplate, docume
 
     indices = [v.source.element_index for k, v in enumerate(document.elements) if v.el_type == ElementType.TABLE]
 
-    location_classifiers = element_classifiers_from_schema(template.detection, storage, template.detection.settings)
+    location_classifiers = element_classifiers_from_schema(template.detection, loader, template.detection.settings)
     if len(location_classifiers) > 0:
         location_classifier = location_classifiers[0]
         features = location_classifier.feature_builder.make_features(source_identifier, template.id, indices, document.elements)
@@ -58,7 +58,7 @@ def create_dataset_entries(source_identifier: str, template: JobTemplate, docume
         all_meta_ids = list(set(reduce(lambda acc, x: acc + x.metaInfoIds, template.detection.items, [])))
         meta_ids_by_main_class = reduce(lambda acc, x: {**acc, x.id: x.metaInfoIds}, template.detection.items, {})
         if len(all_meta_ids) > 0:
-            meta_classifiers = meta_classifiers_from_items([x for x in template.meta if x.id in all_meta_ids], storage, template.detection.settings)
+            meta_classifiers = meta_classifiers_from_items([x for x in template.meta if x.id in all_meta_ids], loader, template.detection.settings)
             for meta_classifier in meta_classifiers:
                 values_predicted = meta_classifier.predict_meta(structured_table_cols, document.elements)
                 for k, output_col in enumerate(structured_table_cols):
@@ -78,7 +78,7 @@ def create_dataset_entries(source_identifier: str, template: JobTemplate, docume
         for output_table in structured_tables:
             detection_item = [x for x in template.detection.items if output_table.detected_class == x.id][0]
             if detection_item.mapRows is not None and output_table.li_identifier not in li_added:
-                mapping_classifier = mapping_classifiers_from_schema(template.detection, storage, template.detection.settings)[0]
+                mapping_classifier = mapping_classifiers_from_schema(template.detection, loader, template.detection.settings)[0]
                 mappings, schema = mapping_classifier.classify_elements(output_table)
                 if schema is not None:
                     li_added.add(output_table.li_identifier)
