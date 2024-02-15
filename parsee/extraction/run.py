@@ -11,15 +11,17 @@ from parsee.extraction.final_structuring import get_structured_tables_from_locat
 from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_classifiers_from_items, question_classifiers_from_schema, mapping_classifiers_from_schema, ModelLoader
 
 
-def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, storage: Optional[StorageManager] = None, custom_model_loader: Optional[ModelLoader] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
-    storage = InMemoryStorageManager([model]) if storage is None else storage
-    model_loader = ModelLoader(storage) if custom_model_loader is None else custom_model_loader
+def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
+    model_loader = custom_model_loader
+    if model_loader is None:
+        storage = InMemoryStorageManager([model])
+        model_loader = ModelLoader(storage)
     # update the models
     job_template.set_default_model(model)
-    return structure_data(doc, job_template, storage, model_loader, {})
+    return structure_data(doc, job_template, model_loader, {})
 
 
-def structure_data(doc: StandardDocumentFormat, job_template: JobTemplate, storage: StorageManager, model_loader: ModelLoader, params: Dict[str, Any]) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
+def structure_data(doc: StandardDocumentFormat, job_template: JobTemplate, model_loader: ModelLoader, params: Dict[str, Any]) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
 
     # add manual answers to params
     params = {**params, **job_template.detection.settings, **job_template.questions.settings}
