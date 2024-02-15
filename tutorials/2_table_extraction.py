@@ -3,7 +3,7 @@ import os
 from parsee.templates.helpers import TableItem, MetaItem, create_template
 from parsee.extraction.models.helpers import gpt_config, replicate_config
 from parsee.converters.main import load_document
-from parsee.extraction_jobs import run_job_with_single_model
+from parsee.extraction.run import run_job_with_single_model
 from parsee.utils.enums import *
 
 # TABLE EXTRACTION
@@ -26,14 +26,15 @@ table_item = TableItem("Profit & Loss Statement", "Revenues, Cost of goods sold,
 job_template = create_template(None, [table_item])
 
 # define a model
-open_ai_api_key = os.getenv("OPENAI_KEY") # enter your key manually here instead of loading from an .env file
-gpt_model = gpt_config(open_ai_api_key)
+# requires an API key from replicate: https://replicate.com/
+replicate_api_key = os.getenv("REPLICATE_KEY")
+replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
 
 # load a document
-file_path = "./tests/fixtures/documents/html/MSFT_FY_2007.html" # modify file path here (use absolute file paths if possible), for this example we are using one of the example files included in this repo
+file_path = "../tests/fixtures/MSFT_FY_2007.html" # modify file path here (use absolute file paths if possible), for this example we are using one of the example files included in this repo
 document = load_document(file_path)
 
 # Step 4: run the extraction
-_, column_output, _ = run_job_with_single_model(document, job_template, gpt_model)
+_, column_output, _ = run_job_with_single_model(document, job_template, replicate_model)
 
 print(column_output)

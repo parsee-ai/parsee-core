@@ -30,7 +30,7 @@ class MappingClassifierLLM(MappingClassifier):
         output = []
         for idx, _ in enumerate(table.line_items):
             prompt = self.feature_builder.make_prompt(table, schema, idx)
-            answer, amount = self.llm.make_prompt_request(prompt)
+            answer, amount = self.llm.make_prompt_request(str(prompt))
             self.storage.log_expense(self.llm.classifier_name, amount, f"mapping:{table.detected_class}")
             output.append(self.parse_answer(answer, schema, idx, table.li_identifier))
         return output

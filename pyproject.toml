@@ -19,6 +19,7 @@ replicate = "^0.23.1"
 beautifulsoup4 = "^4.11.1"
 parsee-pdf-reader = "^0.1.0"
 sentence-transformers = "^2.2.2"
+lxml = "^4.9.1"
 
 [tool.poetry.dev-dependencies]
 

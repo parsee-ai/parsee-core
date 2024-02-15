@@ -88,7 +88,7 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
             f"The possible buckets are the following (each bucket name and description is preceded by the ID in square brackets): {bucket_str}", False
         )
 
-    def make_prompt(self, table: FinalOutputTable, schema: MappingSchema, kv_index: int):
+    def make_prompt(self, table: FinalOutputTable, schema: MappingSchema, kv_index: int) -> Prompt:
 
         features = self.make_features(None, None, table, schema.id, kv_index)
 

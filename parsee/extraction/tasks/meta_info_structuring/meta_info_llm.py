@@ -41,7 +41,7 @@ class MetaLLMClassifier(MetaInfoClassifier):
         for column in columns:
             prompt = self.feature_builder.make_prompt(column, elements, self.items)
 
-            prompt_answer, amount = self.llm.make_prompt_request(prompt)
+            prompt_answer, amount = self.llm.make_prompt_request(str(prompt))
 
             self.storage.log_expense(self.llm.classifier_name, amount, "meta LLM")
 

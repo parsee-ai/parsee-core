@@ -6,10 +6,9 @@ You can also run extractions for one or several documents on Parsee Cloud (https
 correct and see the output in a graphical user interface, and then create datasets from there.
 """
 from parsee.datasets.evaluation.main import evaluate_llm_performance
-from parsee.datasets.readers.disk_reader import CsvDiskReader
+from parsee.datasets.readers.disk_reader import SimpleCsvDiskReader
 from parsee.templates.helpers import StructuringItem, MetaItem, create_template
 from parsee.extraction.models.helpers import gpt_config, replicate_config
-from parsee.storage.in_memory_storage import InMemoryStorageManager
 from parsee.utils.enums import *
 
 # Let's first use the dataset we created in the previous example and run it for two different models
@@ -22,7 +21,7 @@ invoice_issuer = StructuringItem("Who is the issuer of the invoice?", OutputType
 job_template = create_template([invoice_total, invoice_issuer])
 
 # let's create a dataset reader
-reader = CsvDiskReader(dataset_path, None, None)
+reader = SimpleCsvDiskReader(dataset_path)
 
 # let's define the models we want to evaluate
 open_ai_api_key = os.getenv("OPENAI_KEY") # enter your key manually here instead of loading from an .env file

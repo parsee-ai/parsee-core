@@ -3,7 +3,7 @@ import os
 from parsee.cloud.api import ParseeCloud
 from parsee.extraction.models.helpers import replicate_config
 from parsee.converters.main import load_document
-from parsee.extraction_jobs import run_job_with_single_model
+from parsee.extraction.run import run_job_with_single_model
 # Extraction templates define all the aspects of an extraction job in a JSON file
 # You can create extraction templates easily in Python (see examples 0,1 and 2) or for free on parsee cloud: https://app.parsee.ai
 # In the following we will show you how to save templates to parsee cloud and load them from the cloud locally
@@ -29,7 +29,7 @@ print(template.title)
 
 # run an extraction job with a sample document
 # Step 3: load a document
-file_path = "./tests/fixtures/documents/pdf/Midjourney_Invoice-DBD682ED-0005.pdf"
+file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"
 document = load_document(file_path)
 
 # let's see if some other model can also predict the right answer

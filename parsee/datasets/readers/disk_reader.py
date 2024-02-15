@@ -39,7 +39,7 @@ def determine_columns(dataset_path: str) -> List[DatasetColumn]:
     return output
 
 
-class CustomCsvDiskReader(DatasetReader):
+class SimpleCsvDiskReader(DatasetReader):
 
     def __init__(self, dataset_path: str):
         self.rows_in_file = num_rows_in_file(dataset_path)
