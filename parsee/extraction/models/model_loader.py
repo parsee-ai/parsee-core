@@ -22,19 +22,22 @@ class ModelLoader:
     def __init__(self, storage: StorageManager):
         self.storage = storage
 
+    def get_model_spec(self, model_name: Optional[str]) -> Union[MlModelSpecification, None]:
+        filtered = [x for x in self.storage.get_available_models() if x.internal_name == model_name]
+        if len(filtered) == 0:
+            return None
+        return filtered[0]
+
     def get_question_model(self, model_name: Optional[str], items: List[GeneralQueryItemSchema], all_meta_items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[QuestionModel, None]:
 
         if model_name == "assigned":
             return AssignedQuestionModel(items, all_meta_items, **params)
         else:
-            filtered = [x for x in self.storage.get_available_models() if x.internal_name == model_name]
-            if len(filtered) == 0:
-                return None
-            model = filtered[0]
-            if model.model_type == ModelType.GPT:
-                return LLMQuestionModel(items, all_meta_items, self.storage, ChatGPTModel(model), **params)
-            elif model.model_type == ModelType.REPLICATE:
-                return LLMQuestionModel(items, all_meta_items, self.storage, ReplicateModel(model), **params)
+            spec = self.get_model_spec(model_name)
+            if spec.model_type == ModelType.GPT:
+                return LLMQuestionModel(items, all_meta_items, self.storage, ChatGPTModel(spec), **params)
+            elif spec.model_type == ModelType.REPLICATE:
+                return LLMQuestionModel(items, all_meta_items, self.storage, ReplicateModel(spec), **params)
         return None
     
     def get_element_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementClassifier, None]:
@@ -42,14 +45,11 @@ class ModelLoader:
             return AssignedElementClassifier(items, **params)
         else:
             # search model
-            filtered = [x for x in self.storage.get_available_models() if x.internal_name == model_name]
-            if len(filtered) == 0:
-                return None
-            model = filtered[0]
-            if model.model_type == ModelType.GPT:
-                return ElementClassifierLLM(items, self.storage, ChatGPTModel(model), **params)
-            elif model.model_type == ModelType.REPLICATE:
-                return ElementClassifierLLM(items, self.storage, ReplicateModel(model), **params)
+            spec = self.get_model_spec(model_name)
+            if spec.model_type == ModelType.GPT:
+                return ElementClassifierLLM(items, self.storage, ChatGPTModel(spec), **params)
+            elif spec.model_type == ModelType.REPLICATE:
+                return ElementClassifierLLM(items, self.storage, ReplicateModel(spec), **params)
         return None
     
     def get_meta_model(self, model_name: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoClassifier, None]:
@@ -58,14 +58,11 @@ class ModelLoader:
             return None
         else:
             # search model
-            filtered = [x for x in self.storage.get_available_models() if x.internal_name == model_name]
-            if len(filtered) == 0:
-                raise Exception("unsupported model")
-            model = filtered[0]
-            if model.model_type == ModelType.GPT:
-                return MetaLLMClassifier(items, ChatGPTModel(model), self.storage, **params)
-            elif model.model_type == ModelType.REPLICATE:
-                return MetaLLMClassifier(items, ReplicateModel(model), self.storage, **params)
+            spec = self.get_model_spec(model_name)
+            if spec.model_type == ModelType.GPT:
+                return MetaLLMClassifier(items, ChatGPTModel(spec), self.storage, **params)
+            elif spec.model_type == ModelType.REPLICATE:
+                return MetaLLMClassifier(items, ReplicateModel(spec), self.storage, **params)
         return None
     
     def get_mapping_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingClassifier, None]:
@@ -73,14 +70,11 @@ class ModelLoader:
             return None # TODO
         else:
             # search model
-            filtered = [x for x in self.storage.get_available_models() if x.internal_name == model_name]
-            if len(filtered) == 0:
-                raise Exception("unsupported model")
-            model = filtered[0]
-            if model.model_type == ModelType.GPT:
-                return MappingClassifierLLM(items, self.storage, ChatGPTModel(model), **params)
-            elif model.model_type == ModelType.REPLICATE:
-                return MappingClassifierLLM(items, self.storage, ReplicateModel(model), **params)
+            spec = self.get_model_spec(model_name)
+            if spec.model_type == ModelType.GPT:
+                return MappingClassifierLLM(items, self.storage, ChatGPTModel(spec), **params)
+            elif spec.model_type == ModelType.REPLICATE:
+                return MappingClassifierLLM(items, self.storage, ReplicateModel(spec), **params)
         return None
 
 
