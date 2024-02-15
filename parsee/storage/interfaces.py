@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List, Dict, Tuple
+from typing import *
 
 from parsee.extraction.extractor_elements import StandardDocumentFormat, FinalOutputTableColumn, ParseeAnswer
 from parsee.utils.enums import DocumentType

@@ -19,23 +19,6 @@ class QuestionModel:
         raise NotImplemented
 
 
-class SimpleQuestionModel(QuestionModel):
-
-    classifier_name = "manual"
-
-    def __init__(self, items: List[GeneralQueryItemSchema], meta_items: List[StructuringItemSchema], manual_answers_questions: Dict[str, List[ParseeAnswer]], **kwargs):
-        super().__init__(items, meta_items)
-        self.manual_answers = manual_answers_questions
-
-    def predict_answers(self, document: StandardDocumentFormat) -> List[ParseeAnswer]:
-        output: List[ParseeAnswer] = []
-
-        for item in self.items:
-            if item.id in self.manual_answers:
-                output += self.manual_answers[item.id]
-        return output
-
-
 class AssignedQuestionModel(QuestionModel):
 
     classifier_name = "manual"

@@ -4,7 +4,7 @@ from parsee.extraction.extractor_dataclasses import ParseeAnswer
 from parsee.datasets.readers.interfaces import DatasetReader
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.templates.job_template import JobTemplate
-from parsee.extraction.models.choose_model import get_question_model_from_spec
+from parsee.extraction.models.model_loader import get_question_model_from_spec
 from parsee.storage.interfaces import StorageManager
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 

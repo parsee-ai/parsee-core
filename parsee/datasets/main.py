@@ -12,7 +12,7 @@ from parsee.storage.interfaces import StorageManager
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 from parsee.extraction.tasks.element_classification.element_classifier_llm import LLMLocationFeatureBuilder
 from parsee.utils.enums import ElementType
-from parsee.extraction.models.choose_model import element_classifiers_from_schema, meta_classifiers_from_items, mapping_classifiers_from_schema, question_classifiers_from_schema
+from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_classifiers_from_items, mapping_classifiers_from_schema, question_classifiers_from_schema, ModelLoader
 from parsee.extraction.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
 from parsee.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
 from parsee.extraction.tasks.mappings.features import LLMMappingFeatureBuilder
@@ -90,7 +90,7 @@ def create_dataset_entries(source_identifier: str, template: JobTemplate, docume
         writer.write_rows(mapping_features, "mapping")
 
 
-def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, document: StandardDocumentFormat, writer: DatasetWriter, storage: StorageManager, max_tokens_prompt=4000):
+def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, document: StandardDocumentFormat, writer: DatasetWriter, storage: StorageManager, model_loader: ModelLoader, max_tokens_prompt=4000):
 
     template = storage.db_values_template(template, False)
     storage.disable_db_updates = True
@@ -98,7 +98,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
 
     # LOCATIONS
     location_prompt_builder = LLMLocationFeatureBuilder()
-    location_classifiers = element_classifiers_from_schema(template.detection, storage, template.detection.settings)
+    location_classifiers = element_classifiers_from_schema(template.detection, model_loader, template.detection.settings)
     rows = []
     if len(location_classifiers) > 0:
         location_classifier = location_classifiers[0]
@@ -127,7 +127,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
             all_meta_ids = list(set(reduce(lambda acc, x: acc + x.metaInfoIds, template.detection.items, [])))
             meta_ids_by_main_class = reduce(lambda acc, x: {**acc, x.id: x.metaInfoIds}, template.detection.items, {})
             if len(all_meta_ids) > 0:
-                meta_classifiers = meta_classifiers_from_items([x for x in template.meta if x.id in all_meta_ids], storage, template.detection.settings)
+                meta_classifiers = meta_classifiers_from_items([x for x in template.meta if x.id in all_meta_ids], model_loader, template.detection.settings)
                 for meta_classifier in meta_classifiers:
                     meta_values_all = meta_classifier.predict_meta(structured_table_cols, document.elements)
                     for k, output_col in enumerate(structured_table_cols):
@@ -151,7 +151,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
             for output_table in structured_tables:
                 detection_item = [x for x in template.detection.items if output_table.detected_class == x.id][0]
                 if detection_item.mapRows is not None and output_table.li_identifier not in li_added:
-                    mapping_classifier = mapping_classifiers_from_schema(template.detection, storage, template.detection.settings)[0]
+                    mapping_classifier = mapping_classifiers_from_schema(template.detection, model_loader, template.detection.settings)[0]
                     mappings, schema = mapping_classifier.classify_elements(output_table)
                     if schema is not None:
                         li_added.add(output_table.li_identifier)
@@ -168,7 +168,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
 
     # GENERAL QUERIES
     question_feature_builder = GeneralQueriesPromptBuilder(storage)
-    question_classifiers = question_classifiers_from_schema(template.questions, template.meta, storage, {})
+    question_classifiers = question_classifiers_from_schema(template.questions, template.meta, model_loader, {})
     if len(question_classifiers) > 0:
         question_rows = []
         question_classifier = question_classifiers[0]
@@ -188,12 +188,13 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
             writer.write_rows(question_rows, "questions")
 
 
-def create_dataset_rows(template: JobTemplate, document: StandardDocumentFormat, assigned_answers: List[AssignedAnswer], storage: Optional[StorageManager] = None, max_tokens_prompt=4000) -> List[DatasetRow]:
+def create_dataset_rows(template: JobTemplate, document: StandardDocumentFormat, assigned_answers: List[AssignedAnswer], storage: Optional[StorageManager] = None, max_tokens_prompt=4000, custom_model_loader: Optional[ModelLoader] = None) -> List[DatasetRow]:
     encoding = tiktoken.get_encoding("cl100k_base")
     storage = InMemoryStorageManager(None) if storage is None else storage
+    model_loader = ModelLoader(storage) if custom_model_loader is None else custom_model_loader
     template = storage.db_values_template(template, False)
     question_feature_builder = GeneralQueriesPromptBuilder(storage)
-    question_models = question_classifiers_from_schema(template.questions, template.meta, storage, {"truth_questions": assigned_answers})
+    question_models = question_classifiers_from_schema(template.questions, template.meta, model_loader, {"truth_questions": assigned_answers})
     question_rows = []
     if len(question_models) > 0:
         question_model = question_models[0]

@@ -18,7 +18,7 @@ class InMemoryStorageManager(StorageManager):
 
     def __init__(self, available_models: Optional[List[MlModelSpecification]]):
         super().__init__(SimpleFaissStore())
-        self.models = available_models
+        self.models = available_models if available_models is not None else []
         self.truth_questions = []
         self.truth_locations = []
 
