@@ -45,5 +45,4 @@ class AggregationMethod(Enum):
 class ModelType(Enum):
     GPT = "gpt"
     CUSTOM = "custom"
-    XBRL = "xbrl"
     REPLICATE = "replicate"
