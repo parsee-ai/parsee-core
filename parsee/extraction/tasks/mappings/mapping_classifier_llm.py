@@ -6,7 +6,7 @@ from parsee.storage.interfaces import StorageManager
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
 from parsee.extraction.tasks.mappings.features import LLMMappingFeatureBuilder
 from parsee.extraction.extractor_elements import FinalOutputTable
-from parsee.extraction.extractor_dataclasses import ID_NOT_AVAILABLE
+from parsee.utils.constants import ID_NOT_AVAILABLE
 
 
 class MappingClassifierLLM(MappingClassifier):

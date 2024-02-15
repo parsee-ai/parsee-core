@@ -2,7 +2,7 @@ from typing import *
 from dataclasses import dataclass
 from enum import Enum
 
-from parsee.extraction.extractor_dataclasses import ID_NOT_CONFIGURED
+from parsee.utils.constants import ID_NOT_CONFIGURED
 
 
 TRUTH_PREFIX = "TRUTH"

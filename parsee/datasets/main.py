@@ -6,7 +6,7 @@ import tiktoken
 
 from parsee.datasets.writers.interfaces import DatasetWriter
 from parsee.extraction.extractor_elements import StandardDocumentFormat
-from parsee.extraction.extractor_dataclasses import ID_NOT_AVAILABLE
+from parsee.utils.constants import ID_NOT_AVAILABLE
 from parsee.templates.job_template import JobTemplate
 from parsee.storage.interfaces import StorageManager
 from parsee.storage.in_memory_storage import InMemoryStorageManager

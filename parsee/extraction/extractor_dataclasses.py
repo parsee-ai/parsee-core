@@ -10,10 +10,6 @@ from decimal import Decimal
 from parsee.utils.enums import DocumentType
 
 
-ID_NOT_AVAILABLE = "[NOT_SPECIFIED]"
-ID_NOT_CONFIGURED = "[NOT_CONFIGURED]"
-
-
 @dataclass
 class ParseeBucket:
     schema_id: str
