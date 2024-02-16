@@ -3,7 +3,7 @@ import os
 import requests
 
 from parsee.templates.job_template import JobTemplate
-from parsee.templates.job_from_json import from_json_dict
+from parsee.templates.template_from_json import from_json_dict
 
 
 class ParseeCloud:
