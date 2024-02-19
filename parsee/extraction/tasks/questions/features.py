@@ -24,8 +24,6 @@ class GeneralQueriesPromptBuilder:
             return self.storage.vector_store.find_closest_elements(document, schema_item.title, schema_item.keywords, False)
         elif schema_item.searchStrategy == SearchStrategy.START:
             return document.elements
-        elif schema_item.searchStrategy == SearchStrategy.FULL:
-            return document.elements
         else:
             raise NotImplemented
 
@@ -68,6 +66,6 @@ class GeneralQueriesPromptBuilder:
         prompt = Prompt(general_info, main_question,
                         'Please at the end of each answer also provide the numbers of the text fragments you used to answer in square brackets.',
                         full_example,
-                        self.get_elements_text(elements), structuring_item.searchStrategy == SearchStrategy.FULL)
+                        self.get_elements_text(elements))
 
         return prompt

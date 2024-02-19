@@ -248,7 +248,7 @@ class LLMMetaFeatureBuilder(MetaFeatureBuilder):
                 '''
 
         prompt = Prompt("We want to recognize certain information in a table, more specifically in a single column.", f'Please identify the following information based on the provided text: {self.text_main(items)}',
-                        'It is very important that you only answer with the number of the question and then one of the valid values for that question afterwards.', self.example(items), available_data, False)
+                        'It is very important that you only answer with the number of the question and then one of the valid values for that question afterwards.', self.example(items), available_data)
 
         return prompt
 

@@ -85,7 +85,7 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
             f"{'' if features.get_feature('item_before') == '' else 'For reference, the item before the relevant item in the table is the following: '+features.get_feature('item_before')+'.'}" +
             f"{'' if features.get_feature('item_after') == '' else 'Also for reference, the item after the relevant item in the table is the following: '+features.get_feature('item_after')+'.'}",
             f"Each bucket has an ID, only use the ID of the bucket in your answer and nothing else. Your answer could be for example: {self.item_id_string(schema.buckets[0])}",
-            f"The possible buckets are the following (each bucket name and description is preceded by the ID in square brackets): {bucket_str}", False
+            f"The possible buckets are the following (each bucket name and description is preceded by the ID in square brackets): {bucket_str}"
         )
 
     def make_prompt(self, table: FinalOutputTable, schema: MappingSchema, kv_index: int) -> Prompt:

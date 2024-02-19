@@ -110,7 +110,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
                 filtered = [x for x in locations if x.detected_class == detection_item.id]
 
                 prompt = location_prompt_builder.make_prompt(detection_item, document, storage)
-                real_prompt = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
+                real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
                 answer = location_prompt_builder.build_raw_answer(filtered)
 
                 row = DatasetRow(source_identifier, template.id, detection_item.id, {"prompt": real_prompt})
@@ -133,7 +133,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
                     for k, output_col in enumerate(structured_table_cols):
                         meta_items_filtered = [x for x in template.meta if x.id in meta_ids_by_main_class[output_col.detected_class]]
                         prompt = meta_prompt_builder.make_prompt(output_col, document.elements, meta_items_filtered)
-                        real_prompt = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
+                        real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
                         meta_values = meta_values_all[k]
                         row = DatasetRow(source_identifier, template.id, output_col.detected_class, {"prompt": real_prompt})
                         prompt_answer = meta_prompt_builder.build_raw_answer(meta_items_filtered, meta_values)
@@ -157,7 +157,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
                         li_added.add(output_table.li_identifier)
                         for kv_index, _ in enumerate(output_table.line_items):
                             prompt = mapping_prompt_builder.make_prompt(output_table, schema, kv_index)
-                            real_prompt = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
+                            real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
                             bucket_choice = [x for x in mappings if x.kv_index == kv_index][0] if len([x for x in mappings if x.kv_index == kv_index]) > 0 else ParseeBucket(schema.id, ID_NOT_AVAILABLE, output_table.li_identifier, "manual", 1, kv_index, 0, Decimal(1))
                             prompt_answer = mapping_prompt_builder.build_raw_answer(bucket_choice, schema)
                             row = DatasetRow(source_identifier, template.id, detection_item.id, {"prompt": real_prompt})
@@ -177,7 +177,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
             for item in question_classifier.items:
                 meta_items_filtered = [x for x in template.meta if x.id in item.metaInfoIds]
                 prompt = question_feature_builder.build_prompt(item, meta_items_filtered, document)
-                real_prompt = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
+                real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
                 answers_filtered = [x for x in answers if x.class_id == item.id]
                 if len(answers_filtered) > 0:
                     # join together in case the answer has multiple blocks
@@ -203,7 +203,7 @@ def create_dataset_rows(template: JobTemplate, document: StandardDocumentFormat,
             for item in question_model.items:
                 meta_items_filtered = [x for x in template.meta if x.id in item.metaInfoIds]
                 prompt = question_feature_builder.build_prompt(item, meta_items_filtered, document)
-                real_prompt = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
+                real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
                 answers_filtered = [x for x in answers if x.class_id == item.id]
                 if len(answers_filtered) > 0:
                     # join together in case the answer has multiple blocks

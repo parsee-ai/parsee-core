@@ -153,14 +153,10 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
 
     def make_prompt(self, item: ElementSchema, document: StandardDocumentFormat, storage: StorageManager) -> Prompt:
 
-        summarize_if_overflow = False
         if item.searchStrategy == SearchStrategy.VECTOR:
             closest_elements = storage.vector_store.find_closest_elements(document, item.title, item.keywords, True)
         elif item.searchStrategy == SearchStrategy.START:
             closest_elements = [el for el in document.elements if el.el_type == ElementType.TABLE]
-        elif item.searchStrategy == SearchStrategy.FULL:
-            closest_elements = [el for el in document.elements if el.el_type == ElementType.TABLE]
-            summarize_if_overflow = True
         else:
             raise NotImplemented
 
@@ -171,6 +167,6 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
 
         prompt = Prompt("", f'we want to find an item labeled "{item.title}".{additional_info_str}', f"""We are providing data in the following with the element_index and the text, such as [ELEMENT_INDEX] "TEXT" [end of item].
                 Using the text, identify "{item.title}" and return the element which you think is most likely representing "{item.title}" (it can be only one item).
-                It is very important that you only return the element_index and nothing else.""", "Your response could be for example: [10] or [241]", self.get_elements_text(features), summarize_if_overflow)
+                It is very important that you only return the element_index and nothing else.""", "Your response could be for example: [10] or [241]", self.get_elements_text(features))
 
         return prompt

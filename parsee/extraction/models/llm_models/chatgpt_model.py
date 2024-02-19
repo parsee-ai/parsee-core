@@ -9,7 +9,6 @@ import openai
 import tiktoken
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
-from parsee.extraction.models.llm_models.prompts import Prompt, SummarizationPrompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 
 
@@ -52,7 +51,7 @@ class ChatGPTModel(LLMBaseModel):
             )
 
             answer = response['choices'][0]["message"]["content"]
-            final_cost = 0 if self.model.api_key is not None else Decimal(int(response["usage"]['total_tokens']) * (self.model.price_per_1k_tokens/1000))
+            final_cost = Decimal(int(response["usage"]['total_tokens']) * (self.model.price_per_1k_tokens/1000)) if self.model.price_per_1k_tokens is not None else Decimal(0)
             return answer, final_cost
         except Exception as e:
             if retries < self.max_retries:
@@ -62,4 +61,5 @@ class ChatGPTModel(LLMBaseModel):
                 return "", Decimal(0)
 
     def make_prompt_request(self, prompt: str) -> Tuple[str, Decimal]:
-        return self._call_api(truncate_prompt(prompt, self.encoding, self.max_tokens_question))
+        final_prompt, _ = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
+        return self._call_api(final_prompt)

@@ -9,7 +9,6 @@ import tiktoken
 import replicate
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
-from parsee.extraction.models.llm_models.prompts import Prompt, SummarizationPrompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 
 
@@ -33,7 +32,7 @@ class ReplicateModel(LLMBaseModel):
             slices.append(current_slice)
         return slices
 
-    def _call_api(self, prompt: str, retries: int = 0, wait: int =5 ) -> Tuple[str, Decimal]:
+    def _call_api(self, prompt: str, retries: int = 0, wait: int = 5) -> str:
         try:
             response = replicate.run(self.model.internal_name, input={
                 "prompt": prompt,
@@ -45,14 +44,17 @@ class ReplicateModel(LLMBaseModel):
                 "frequency_penalty": 0
             })
             answer = "".join(response)
-            final_cost = Decimal(0) # TODO
-            return answer, final_cost
+            return answer
         except Exception as e:
             if retries < self.max_retries:
                 time.sleep(wait * 2 ** retries)
                 return self._call_api(prompt, retries + 1)
             else:
-                return "", Decimal(0)
+                return ""
 
     def make_prompt_request(self, prompt: str) -> Tuple[str, Decimal]:
-        return self._call_api(truncate_prompt(prompt, self.encoding, self.max_tokens_question))
+        final_prompt, num_tokens_input = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
+        response = self._call_api(final_prompt)
+        tokens_response = len(get_tokens_encoded(response, self.encoding))
+        final_cost = ((tokens_response + num_tokens_input) * (self.model.price_per_1k_tokens/1000)) if self.model.price_per_1k_tokens is not None else Decimal(0)
+        return response, final_cost

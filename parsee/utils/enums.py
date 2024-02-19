@@ -29,7 +29,6 @@ class ContextType(Enum):
 class SearchStrategy(Enum):
     VECTOR = "vector"
     START = "start"
-    FULL = "full"
 
 
 class RunMethod(Enum):
