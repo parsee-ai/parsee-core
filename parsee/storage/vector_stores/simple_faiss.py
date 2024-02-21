@@ -55,9 +55,12 @@ class SimpleFaissStore(VectorStore):
 
         return [x["element_indices"] for x in data], index
 
+    def get_index(self, document: StandardDocumentFormat, tables_only: bool):
+        return self.make_index(document, tables_only)
+
     def find_closest_elements(self, document: StandardDocumentFormat, search_element_title: str, keywords: Optional[str], tables_only: bool = True) -> List[ExtractedEl]:
 
-        element_indices, index = self.make_index(document, tables_only)
+        element_indices, index = self.get_index(document, tables_only)
 
         query = f"{search_element_title}" + (f"; {keywords}" if keywords is not None else "")
 
