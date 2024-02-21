@@ -29,8 +29,9 @@ class ModelLoader:
         return filtered[0]
 
     def get_question_model(self, model_name: Optional[str], items: List[GeneralQueryItemSchema], all_meta_items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[QuestionModel, None]:
-
-        if model_name == "assigned":
+        if model_name is None:
+            return None
+        elif model_name == "assigned":
             return AssignedQuestionModel(items, all_meta_items, **params)
         else:
             spec = self.get_model_spec(model_name)
@@ -41,7 +42,9 @@ class ModelLoader:
         return None
     
     def get_element_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementClassifier, None]:
-        if model_name == "assigned":
+        if model_name is None:
+            return None
+        elif model_name == "assigned":
             return AssignedElementClassifier(items, **params)
         else:
             # search model
@@ -53,7 +56,9 @@ class ModelLoader:
         return None
     
     def get_meta_model(self, model_name: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoClassifier, None]:
-        if model_name == "assigned":
+        if model_name is None:
+            return None
+        elif model_name == "assigned":
             # for assigned, no model is needed
             return None
         else:
@@ -66,7 +71,9 @@ class ModelLoader:
         return None
     
     def get_mapping_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingClassifier, None]:
-        if model_name == "assigned":
+        if model_name is None:
+            return None
+        elif model_name == "assigned":
             return None # TODO
         else:
             # search model
