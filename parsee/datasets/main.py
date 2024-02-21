@@ -168,7 +168,7 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
 
     # GENERAL QUERIES
     question_feature_builder = GeneralQueriesPromptBuilder(storage)
-    question_classifiers = question_classifiers_from_schema(template.questions, template.meta, model_loader, {})
+    question_classifiers = question_classifiers_from_schema(template.questions, template.meta, model_loader, template.questions.settings)
     if len(question_classifiers) > 0:
         question_rows = []
         question_classifier = question_classifiers[0]
