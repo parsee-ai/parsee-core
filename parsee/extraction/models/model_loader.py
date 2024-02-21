@@ -15,6 +15,16 @@ from parsee.extraction.tasks.mappings.mapping_classifier_llm import MappingClass
 from parsee.storage.interfaces import StorageManager
 from parsee.utils.enums import ModelType
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
+
+
+def get_llm_base_model(spec: MlModelSpecification) -> LLMBaseModel:
+    if spec.model_type == ModelType.GPT:
+        return ChatGPTModel(spec)
+    elif spec.model_type == ModelType.REPLICATE:
+        return ReplicateModel(spec)
+    else:
+        raise Exception("llm base model not found")
 
 
 class ModelLoader:
@@ -34,12 +44,7 @@ class ModelLoader:
         elif model_name == "assigned":
             return AssignedQuestionModel(items, all_meta_items, **params)
         else:
-            spec = self.get_model_spec(model_name)
-            if spec.model_type == ModelType.GPT:
-                return LLMQuestionModel(items, all_meta_items, self.storage, ChatGPTModel(spec), **params)
-            elif spec.model_type == ModelType.REPLICATE:
-                return LLMQuestionModel(items, all_meta_items, self.storage, ReplicateModel(spec), **params)
-        return None
+            return LLMQuestionModel(items, all_meta_items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
     
     def get_element_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementClassifier, None]:
         if model_name is None:
@@ -47,13 +52,7 @@ class ModelLoader:
         elif model_name == "assigned":
             return AssignedElementClassifier(items, **params)
         else:
-            # search model
-            spec = self.get_model_spec(model_name)
-            if spec.model_type == ModelType.GPT:
-                return ElementClassifierLLM(items, self.storage, ChatGPTModel(spec), **params)
-            elif spec.model_type == ModelType.REPLICATE:
-                return ElementClassifierLLM(items, self.storage, ReplicateModel(spec), **params)
-        return None
+            return ElementClassifierLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
     
     def get_meta_model(self, model_name: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoClassifier, None]:
         if model_name is None:
@@ -62,13 +61,7 @@ class ModelLoader:
             # for assigned, no model is needed
             return None
         else:
-            # search model
-            spec = self.get_model_spec(model_name)
-            if spec.model_type == ModelType.GPT:
-                return MetaLLMClassifier(items, ChatGPTModel(spec), self.storage, **params)
-            elif spec.model_type == ModelType.REPLICATE:
-                return MetaLLMClassifier(items, ReplicateModel(spec), self.storage, **params)
-        return None
+            return MetaLLMClassifier(items, get_llm_base_model(self.get_model_spec(model_name)), self.storage, **params)
     
     def get_mapping_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingClassifier, None]:
         if model_name is None:
@@ -76,13 +69,7 @@ class ModelLoader:
         elif model_name == "assigned":
             return None # TODO
         else:
-            # search model
-            spec = self.get_model_spec(model_name)
-            if spec.model_type == ModelType.GPT:
-                return MappingClassifierLLM(items, self.storage, ChatGPTModel(spec), **params)
-            elif spec.model_type == ModelType.REPLICATE:
-                return MappingClassifierLLM(items, self.storage, ReplicateModel(spec), **params)
-        return None
+            return MappingClassifierLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
 
 
 def question_classifiers_from_schema(schema: GeneralQuerySchema, all_meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, Any]) -> List[QuestionModel]:

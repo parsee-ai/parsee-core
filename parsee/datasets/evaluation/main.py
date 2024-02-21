@@ -4,7 +4,7 @@ from parsee.extraction.extractor_dataclasses import ParseeAnswer
 from parsee.datasets.readers.interfaces import DatasetReader
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.templates.job_template import JobTemplate
-from parsee.extraction.models.model_loader import get_question_model_from_spec
+from parsee.extraction.models.model_loader import ModelLoader, LLMQuestionModel
 from parsee.storage.interfaces import StorageManager
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 
@@ -93,12 +93,19 @@ class EvaluationResult:
 def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None) -> Dict:
 
     storage = InMemoryStorageManager(models) if storage is None else storage
+    loader = ModelLoader(storage)
     ev = EvaluationResult()
+
+    for spec in models:
+        if spec.model_type == "custom":
+            raise Exception("custom models not allowed here")
 
     for row, _ in reader.row_generator():
 
         for k, model_spec in enumerate(models):
-            model = get_question_model_from_spec(model_spec, template.questions.items, template.meta, storage, {})
+            model: LLMQuestionModel = loader.get_question_model(model_spec.internal_name, template.questions.items, template.meta, {})
+            if model is None:
+                raise Exception("model not found")
             schema_items = [x for x in template.questions.items if x.id == row.element_identifier]
             if len(schema_items) == 0:
                 raise Exception("item not found in schema")
