@@ -39,7 +39,7 @@ class MetaFeatureBuilder:
 
         # collect text from various places
         words_list = {"before": text_before, "li_and_values": "", "top_li": "", "top_data": "", "top_column_all": "", "top_column_pos_0": "", "top_column_pos_1": "", "top_column_pos_2": "",
-                      "other_li": "", "other_values": "", "neighbor_col_top_left": "", "neighbor_col_top_right": "", "total_header_values": ""}
+                      "other_li": "", "other_values": "", "neighbor_col_top_left": "", "neighbor_col_top_right": "", "total_header_values": "", "top_li_reworked": ""}
 
         # determine words of line items and values
         cell_list = []
@@ -54,12 +54,9 @@ class MetaFeatureBuilder:
         # determine words on top of line items
         cell_list = []
         for row in structured_table.header_rows:
-            if row.has_values(max_col_index=min(structured_table.numeric_cols_indices) - 1):
-                for col_index, cell_obj in enumerate(row.final_values):
-                    if col_index < min(structured_table.numeric_cols_indices):
-                        # check that cell obj is not contained in first value column
-                        if cell_obj != row.final_values[structured_table.numeric_cols_indices[0]]:
-                            cell_list.append(cell_obj)
+            for col_index, cell_obj in enumerate(row.final_values):
+                if col_index < min(structured_table.numeric_cols_indices):
+                    cell_list.append(cell_obj)
         words_list['top_li'] = get_words_from_cells(cell_list)
 
         # determine words on top of data
@@ -69,6 +66,17 @@ class MetaFeatureBuilder:
                 if col_index >= min(structured_table.numeric_cols_indices):
                     cell_list.append(cell_obj)
         words_list['top_data'] = get_words_from_cells(cell_list)
+
+        # top line items reworked
+        cell_list = []
+        for row in structured_table.header_rows:
+            if row.has_values(max_col_index=min(structured_table.numeric_cols_indices) - 1):
+                for col_index, cell_obj in enumerate(row.final_values):
+                    if col_index < min(structured_table.numeric_cols_indices):
+                        # check that cell obj is not contained in first value column
+                        if cell_obj != row.final_values[structured_table.numeric_cols_indices[0]]:
+                            cell_list.append(cell_obj)
+        words_list['top_li_reworked'] = get_words_from_cells(cell_list)
 
         # total header data
         cell_list = []
@@ -233,8 +241,9 @@ class LLMMetaFeatureBuilder(MetaFeatureBuilder):
 
         available_data = f'''
                 The current column index is: {col_idx}. \n
-                On top of the column (in the header part) there is this text: "{features.get_feature('top_column_all')}"\n
-                The content of the table is the following (excluding any numbers): {features.get_feature('li_and_values')}
+                On top of the column (in the header part), there is this text: "{features.get_feature('top_column_all')}"\n
+                The content of the table is the following (excluding any numbers): {features.get_feature('li_and_values')}\n
+                On top of the line items, there is this text: "{features.get_feature('top_li_reworked')}\n"
 
                 Before the table starts, there is this text: "{features.get_feature('before')}"\n
                 '''
