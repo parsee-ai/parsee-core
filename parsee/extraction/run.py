@@ -8,7 +8,7 @@ from parsee.extraction.extractor_elements import StandardDocumentFormat, FinalOu
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeBucket
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 from parsee.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
-from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_classifiers_from_items, question_classifiers_from_schema, mapping_classifiers_from_schema, ModelLoader
+from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_models_from_items, question_models_from_schema, mapping_classifiers_from_schema, ModelLoader
 
 
 def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
@@ -26,11 +26,11 @@ def structure_data(doc: StandardDocumentFormat, job_template: JobTemplate, model
     # add manual answers to params
     params = {**params, **job_template.detection.settings, **job_template.questions.settings}
 
-    question_classifiers = question_classifiers_from_schema(job_template.questions, job_template.meta, model_loader, params)
+    question_models = question_models_from_schema(job_template.questions, job_template.meta, model_loader, params)
 
     answers: List[ParseeAnswer] = []
-    for classifier_question in question_classifiers:
-        answers += classifier_question.predict_answers(doc)
+    for question_model in question_models:
+        answers += question_model.predict_answers(doc)
 
     classifiers_loc = element_classifiers_from_schema(job_template.detection, model_loader, params)
 
@@ -44,9 +44,9 @@ def structure_data(doc: StandardDocumentFormat, job_template: JobTemplate, model
     all_meta_ids = list(set(reduce(lambda acc, x: acc+x.metaInfoIds, job_template.detection.items, [])))
     meta_ids_by_main_class = reduce(lambda acc, x: {**acc, x.id: x.metaInfoIds}, job_template.detection.items, {})
     if len(all_meta_ids) > 0:
-        meta_classifiers = meta_classifiers_from_items([x for x in job_template.meta if x.id in all_meta_ids], model_loader, params)
-        for meta_classifier in meta_classifiers:
-            meta_predictions_list = meta_classifier.predict_meta(output_values, doc.elements)
+        meta_models = meta_models_from_items([x for x in job_template.meta if x.id in all_meta_ids], model_loader, params)
+        for meta_model in meta_models:
+            meta_predictions_list = meta_model.predict_meta(output_values, doc.elements)
             for k, meta_predictions in enumerate(meta_predictions_list):
                 output_values[k].meta += [x for x in meta_predictions if x.class_id in meta_ids_by_main_class[output_values[k].detected_class]]
 

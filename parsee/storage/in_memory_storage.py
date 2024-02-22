@@ -43,13 +43,13 @@ class InMemoryStorageManager(StorageManager):
         template_new.detection.settings = {**template_new.detection.settings, "assigned": self.truth_locations}
         template_new.questions.settings = {**template_new.questions.settings, "assigned": self.truth_questions}
 
-        # adjust classifiers
+        # adjust models
         for item in template_new.detection.items:
-            item.classifier = "assigned"
+            item.model = "assigned"
             item.mappingModel = "assigned"
         for item in template_new.meta:
-            item.classifier = "assigned"
+            item.model = "assigned"
         for item in template_new.questions.items:
-            item.classifier = "assigned"
+            item.model = "assigned"
 
         return template_new

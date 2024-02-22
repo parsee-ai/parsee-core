@@ -9,7 +9,7 @@ from parsee.datasets.dataset_dataclasses import DatasetRow
 
 class QuestionModel:
 
-    classifier_name = ""
+    model_name = ""
 
     def __init__(self, items: List[GeneralQueryItemSchema], meta_items: List[StructuringItemSchema]):
         self.items = items
@@ -21,7 +21,7 @@ class QuestionModel:
 
 class AssignedQuestionModel(QuestionModel):
 
-    classifier_name = "manual"
+    model_name = "manual"
 
     def __init__(self, items: List[GeneralQueryItemSchema], meta_items: List[StructuringItemSchema], truth_questions: List[AssignedAnswer], **kwargs):
         super().__init__(items, meta_items)
@@ -31,7 +31,7 @@ class AssignedQuestionModel(QuestionModel):
         output: List[ParseeAnswer] = []
 
         for answer in self.answers:
-            meta_values = [ParseeMeta(self.classifier_name, meta.column_index if meta.column_index is not None else 0, answer.sources, meta.class_id, meta.class_value, 1) for meta in answer.meta]
-            output.append(ParseeAnswer(self.classifier_name, answer.sources, answer.class_id, answer.class_value, build_raw_value(answer.class_value, meta_values, answer.sources), True, meta_values))
+            meta_values = [ParseeMeta(self.model_name, meta.column_index if meta.column_index is not None else 0, answer.sources, meta.class_id, meta.class_value, 1) for meta in answer.meta]
+            output.append(ParseeAnswer(self.model_name, answer.sources, answer.class_id, answer.class_value, build_raw_value(answer.class_value, meta_values, answer.sources), True, meta_values))
 
         return output

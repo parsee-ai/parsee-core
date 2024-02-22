@@ -19,7 +19,7 @@ class EvaluationResult:
             return
         if source_identifier not in self.answers:
             self.answers[source_identifier] = {}
-        key = "assigned" if is_assigned else answers[0].classifier
+        key = "assigned" if is_assigned else answers[0].model
         if key not in self.answers[source_identifier]:
             self.answers[source_identifier][key] = {}
         obj = self.answers[source_identifier][key]

@@ -15,7 +15,7 @@ class ParseeBucket:
     schema_id: str
     bucket_id: str
     li_identifier: str
-    classifier_name: str
+    model: str
     prob: float
     kv_index: int
     definition_idx: int
@@ -64,7 +64,7 @@ def source_from_json(json_dict: Dict) -> ExtractedSource:
 
 @dataclass
 class ParseeLocation:
-    classifier: str
+    model: str
     partial_prob: float
     detected_class: str
     prob: float
@@ -83,7 +83,7 @@ class AssignedLocation:
 
 @dataclass
 class ParseeMeta:
-    classifier: str
+    model: str
     column_index: int
     source: List[ExtractedSource]
     class_id: str
@@ -91,11 +91,11 @@ class ParseeMeta:
     prob: float
 
     def to_json_dict(self):
-        return {"classifier": self.classifier, "class_id": self.class_id, "value": self.class_value, "prob": self.prob}
+        return {"model": self.model, "class_id": self.class_id, "value": self.class_value, "prob": self.prob}
 
 
 def meta_from_json(json_dict: Dict, col_idx: int, source: List[ExtractedSource]) -> ParseeMeta:
-    return ParseeMeta(json_dict["classifier"], col_idx, source, json_dict["class_id"], json_dict["value"], json_dict["prob"])
+    return ParseeMeta(json_dict["model"], col_idx, source, json_dict["class_id"], json_dict["value"], json_dict["prob"])
 
 
 @dataclass
@@ -107,7 +107,7 @@ class AssignedMeta:
 
 @dataclass
 class ParseeAnswer:
-    classifier: str
+    model: str
     sources: List[ExtractedSource]
     class_id: str
     class_value: str

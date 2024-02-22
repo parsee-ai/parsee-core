@@ -3,10 +3,10 @@ from typing import *
 from parsee.templates.element_schema import ElementDetectionSchema, ElementSchema
 from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQuerySchema, GeneralQueryItemSchema
 from parsee.extraction.tasks.element_classification.element_classifier import ElementClassifier, AssignedElementClassifier
-from parsee.extraction.tasks.questions.question_classifier import QuestionModel, AssignedQuestionModel
+from parsee.extraction.tasks.questions.question_model import QuestionModel, AssignedQuestionModel
 from parsee.extraction.models.llm_models.chatgpt_model import ChatGPTModel
 from parsee.extraction.models.llm_models.replicate_model import ReplicateModel
-from parsee.extraction.tasks.questions.question_classifier_llm import LLMQuestionModel
+from parsee.extraction.tasks.questions.question_model_llm import LLMQuestionModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoClassifier
 from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMClassifier
 from parsee.extraction.tasks.element_classification.element_classifier_llm import ElementClassifierLLM
@@ -72,17 +72,17 @@ class ModelLoader:
             return MappingClassifierLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
 
 
-def question_classifiers_from_schema(schema: GeneralQuerySchema, all_meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, Any]) -> List[QuestionModel]:
+def question_models_from_schema(schema: GeneralQuerySchema, all_meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, Any]) -> List[QuestionModel]:
 
-    # group items by classifier
-    items_by_classifier: Dict[str, List[GeneralQueryItemSchema]] = {}
+    # group items by model
+    items_by_model: Dict[str, List[GeneralQueryItemSchema]] = {}
     for item in schema.items:
-        if item.classifier not in items_by_classifier:
-            items_by_classifier[item.classifier] = []
-        items_by_classifier[item.classifier].append(item)
+        if item.model not in items_by_model:
+            items_by_model[item.model] = []
+        items_by_model[item.model].append(item)
 
     models: List[QuestionModel] = []
-    for model_name, items in items_by_classifier.items():
+    for model_name, items in items_by_model.items():
         model = model_loader.get_question_model(model_name, items, all_meta_items, params)
         if model is None and model_name != "assigned":
             raise Exception(f"following model was not found: {model_name}")
@@ -93,12 +93,12 @@ def question_classifiers_from_schema(schema: GeneralQuerySchema, all_meta_items:
 
 def element_classifiers_from_schema(schema: ElementDetectionSchema, model_loader: ModelLoader, params: Dict[str, any]) -> List[ElementClassifier]:
 
-    # group items by classifier
+    # group items by model
     items_by_classifier: Dict[str, List[ElementSchema]] = {}
     for item in schema.items:
-        if item.classifier not in items_by_classifier:
-            items_by_classifier[item.classifier] = []
-        items_by_classifier[item.classifier].append(item)
+        if item.model not in items_by_classifier:
+            items_by_classifier[item.model] = []
+        items_by_classifier[item.model].append(item)
 
     models: List[ElementClassifier] = []
     for model_name, items in items_by_classifier.items():
@@ -110,17 +110,17 @@ def element_classifiers_from_schema(schema: ElementDetectionSchema, model_loader
     return models
 
 
-def meta_classifiers_from_items(meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, str]) -> List[MetaInfoClassifier]:
+def meta_models_from_items(meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, str]) -> List[MetaInfoClassifier]:
 
-    # group items by classifier
-    items_by_classifier: Dict[str, List[StructuringItemSchema]] = {}
+    # group items by model
+    items_by_model: Dict[str, List[StructuringItemSchema]] = {}
     for item in meta_items:
-        if item.classifier not in items_by_classifier:
-            items_by_classifier[item.classifier] = []
-        items_by_classifier[item.classifier].append(item)
+        if item.model not in items_by_model:
+            items_by_model[item.model] = []
+        items_by_model[item.model].append(item)
 
     models: List[MetaInfoClassifier] = []
-    for model_name, items in items_by_classifier.items():
+    for model_name, items in items_by_model.items():
         model = model_loader.get_meta_model(model_name, items, params)
         if model is None and model_name != "assigned":
             raise Exception(f"following model was not found: {model_name}")
@@ -131,7 +131,7 @@ def meta_classifiers_from_items(meta_items: List[StructuringItemSchema], model_l
 
 def mapping_classifiers_from_schema(schema: ElementDetectionSchema, model_loader: ModelLoader, params: Dict[str, str]) -> List[MappingClassifier]:
 
-    # group items by classifier
+    # group items by model
     items_by_classifier: Dict[str, List[ElementSchema]] = {}
     for item in schema.items:
         if item.mapRows is not None:

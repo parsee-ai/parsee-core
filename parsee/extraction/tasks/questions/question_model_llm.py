@@ -1,7 +1,7 @@
 from typing import *
 
 from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
-from parsee.extraction.tasks.questions.question_classifier import QuestionModel
+from parsee.extraction.tasks.questions.question_model import QuestionModel
 from parsee.extraction.tasks.questions.features import GeneralQueriesPromptBuilder
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta
 from parsee.storage.interfaces import StorageManager
@@ -18,7 +18,7 @@ class LLMQuestionModel(QuestionModel):
         super().__init__(items, meta_items)
         self.storage = storage
         self.llm = llm
-        self.classifier_name = llm.classifier_name
+        self.model_name = llm.model_name
         self.prompt_builder = GeneralQueriesPromptBuilder(storage)
 
     def parse_prompt_answer(self, item: GeneralQueryItemSchema, prompt_answer: str, total_elements: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
@@ -54,17 +54,17 @@ class LLMQuestionModel(QuestionModel):
                         parsed, parse_successful = prompt_item.get_value(val)
 
                         if parse_successful:
-                            detected_meta.append(ParseeMeta(self.classifier_name, 0, sources_full, meta_item.id, parsed, 0.8))
+                            detected_meta.append(ParseeMeta(self.model_name, 0, sources_full, meta_item.id, parsed, 0.8))
 
             if main_answer is not None:
 
-                output.append(ParseeAnswer(self.classifier_name, sources_full, item.id, main_answer, answer_block, parse_successful, detected_meta))
+                output.append(ParseeAnswer(self.model_name, sources_full, item.id, main_answer, answer_block, parse_successful, detected_meta))
 
         return output
 
     def predict_for_prompt(self, prompt: str, schema_item: GeneralQueryItemSchema, max_element_index: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
         prompt_answer, amount = self.llm.make_prompt_request(str(prompt))
-        self.storage.log_expense(self.llm.classifier_name, amount, schema_item.id)
+        self.storage.log_expense(self.llm.model_name, amount, schema_item.id)
         return self.parse_prompt_answer(schema_item, prompt_answer, max_element_index, document)
 
     def predict_answers(self, document: StandardDocumentFormat) -> List[ParseeAnswer]:

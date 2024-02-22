@@ -45,7 +45,7 @@ class FinalOutputTableColumn:
         self.key_value_pairs = []
         self.sources = []
         self.meta = []
-        self.classifier = location.classifier
+        self.classifier = location.model
         self.fully_structured = {}
         self.li_identifier = None
         self.set_identifiers()

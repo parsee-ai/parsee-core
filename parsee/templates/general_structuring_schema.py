@@ -12,7 +12,7 @@ class StructuringItemSchema:
     id: str
     title: str
     additionalInfo: str
-    classifier: Optional[str]
+    model: Optional[str]
     searchStrategy: SearchStrategy
     example: Union[None, str]
     keywords: Union[None, str]
@@ -33,7 +33,7 @@ class StructuringItemSchema:
 
     def to_json_dict(self) -> Dict:
         return {"type": self.type.value, "context": self.context.value, "id": self.id, "title": self.title, "additionalInfo": self.additionalInfo,
-                "classifier": self.classifier, "searchStrategy": self.searchStrategy.value, "example": self.example, "keywords": self.keywords, "valuesList": self.valuesList,
+                "model": self.model, "searchStrategy": self.searchStrategy.value, "example": self.example, "keywords": self.keywords, "valuesList": self.valuesList,
                 "defaultValue": self.defaultValue, "customArgsJson": self.customArgsJson
                 }
 

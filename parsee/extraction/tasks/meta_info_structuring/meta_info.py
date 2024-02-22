@@ -8,7 +8,7 @@ from parsee.extraction.tasks.meta_info_structuring.features import MetaFeatureBu
 
 class MetaInfoClassifier:
 
-    classifier_name = ""
+    model_name = ""
     feature_builder: MetaFeatureBuilder
 
     def __init__(self, items: List[StructuringItemSchema]):

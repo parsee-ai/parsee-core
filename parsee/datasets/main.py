@@ -12,7 +12,7 @@ from parsee.storage.interfaces import StorageManager
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 from parsee.extraction.tasks.element_classification.element_classifier_llm import LLMLocationFeatureBuilder
 from parsee.utils.enums import ElementType
-from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_classifiers_from_items, mapping_classifiers_from_schema, question_classifiers_from_schema, ModelLoader
+from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_models_from_items, mapping_classifiers_from_schema, question_models_from_schema, ModelLoader
 from parsee.extraction.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
 from parsee.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
 from parsee.extraction.tasks.mappings.features import LLMMappingFeatureBuilder
@@ -58,12 +58,12 @@ def create_dataset_entries(source_identifier: str, template: JobTemplate, docume
         all_meta_ids = list(set(reduce(lambda acc, x: acc + x.metaInfoIds, template.detection.items, [])))
         meta_ids_by_main_class = reduce(lambda acc, x: {**acc, x.id: x.metaInfoIds}, template.detection.items, {})
         if len(all_meta_ids) > 0:
-            meta_classifiers = meta_classifiers_from_items([x for x in template.meta if x.id in all_meta_ids], loader, template.detection.settings)
-            for meta_classifier in meta_classifiers:
-                values_predicted = meta_classifier.predict_meta(structured_table_cols, document.elements)
+            meta_models = meta_models_from_items([x for x in template.meta if x.id in all_meta_ids], loader, template.detection.settings)
+            for meta_model in meta_models:
+                values_predicted = meta_model.predict_meta(structured_table_cols, document.elements)
                 for k, output_col in enumerate(structured_table_cols):
                     meta_values = [x for x in values_predicted[k] if x.class_id in meta_ids_by_main_class[output_col.detected_class]]
-                    features = meta_classifier.feature_builder.make_features(source_identifier, template.id, output_col, document.elements, None, None)
+                    features = meta_model.feature_builder.make_features(source_identifier, template.id, output_col, document.elements, None, None)
                     dict_values = {x.class_id: x.class_value for x in meta_values}
                     features.assign_truth_values(dict_values)
                     meta_features.append(features)
@@ -127,9 +127,9 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
             all_meta_ids = list(set(reduce(lambda acc, x: acc + x.metaInfoIds, template.detection.items, [])))
             meta_ids_by_main_class = reduce(lambda acc, x: {**acc, x.id: x.metaInfoIds}, template.detection.items, {})
             if len(all_meta_ids) > 0:
-                meta_classifiers = meta_classifiers_from_items([x for x in template.meta if x.id in all_meta_ids], model_loader, template.detection.settings)
-                for meta_classifier in meta_classifiers:
-                    meta_values_all = meta_classifier.predict_meta(structured_table_cols, document.elements)
+                meta_models = meta_models_from_items([x for x in template.meta if x.id in all_meta_ids], model_loader, template.detection.settings)
+                for meta_model in meta_models:
+                    meta_values_all = meta_model.predict_meta(structured_table_cols, document.elements)
                     for k, output_col in enumerate(structured_table_cols):
                         meta_items_filtered = [x for x in template.meta if x.id in meta_ids_by_main_class[output_col.detected_class]]
                         prompt = meta_prompt_builder.make_prompt(output_col, document.elements, meta_items_filtered)
@@ -168,13 +168,13 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
 
     # GENERAL QUERIES
     question_feature_builder = GeneralQueriesPromptBuilder(storage)
-    question_classifiers = question_classifiers_from_schema(template.questions, template.meta, model_loader, template.questions.settings)
-    if len(question_classifiers) > 0:
+    question_models = question_models_from_schema(template.questions, template.meta, model_loader, template.questions.settings)
+    if len(question_models) > 0:
         question_rows = []
-        question_classifier = question_classifiers[0]
-        answers = question_classifier.predict_answers(document)
+        question_model = question_models[0]
+        answers = question_model.predict_answers(document)
         if len(answers) > 0:
-            for item in question_classifier.items:
+            for item in question_model.items:
                 meta_items_filtered = [x for x in template.meta if x.id in item.metaInfoIds]
                 prompt = question_feature_builder.build_prompt(item, meta_items_filtered, document)
                 real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
@@ -194,7 +194,7 @@ def create_dataset_rows(template: JobTemplate, document: StandardDocumentFormat,
     model_loader = ModelLoader(storage) if custom_model_loader is None else custom_model_loader
     template = storage.db_values_template(template, False)
     question_feature_builder = GeneralQueriesPromptBuilder(storage)
-    question_models = question_classifiers_from_schema(template.questions, template.meta, model_loader, {"truth_questions": assigned_answers})
+    question_models = question_models_from_schema(template.questions, template.meta, model_loader, {"truth_questions": assigned_answers})
     question_rows = []
     if len(question_models) > 0:
         question_model = question_models[0]

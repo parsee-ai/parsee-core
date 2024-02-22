@@ -21,10 +21,10 @@ def truncate_prompt(prompt: str, encoding: Encoding, max_tokens: int) -> Tuple[s
 
 class LLMBaseModel:
 
-    classifier_name: str
+    model_name: str
 
     def __init__(self, name: str):
-        self.classifier_name = name
+        self.model_name = name
 
     def make_prompt_request(self, prompt: str) -> Tuple[str, Decimal]:
         raise NotImplemented

@@ -12,7 +12,7 @@ class ElementClassifierLLM(ElementClassifier):
 
     def __init__(self, items: List[ElementSchema], storage: StorageManager, llm: LLMBaseModel, **kwargs):
         super().__init__(items)
-        self.classifier_name = llm.classifier_name
+        self.classifier_name = llm.model_name
         self.llm = llm
         self.max_search_items = 10
         self.storage = storage
@@ -40,7 +40,7 @@ class ElementClassifierLLM(ElementClassifier):
             prompt = self.feature_builder.make_prompt(item, document, self.storage)
 
             answer, amount = self.llm.make_prompt_request(str(prompt))
-            self.storage.log_expense(self.llm.classifier_name, amount, item.id)
+            self.storage.log_expense(self.llm.model_name, amount, item.id)
 
             best_idx = self.parse_prompt_answer(answer)
 

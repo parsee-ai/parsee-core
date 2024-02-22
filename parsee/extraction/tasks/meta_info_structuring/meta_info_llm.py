@@ -16,7 +16,7 @@ class MetaLLMClassifier(MetaInfoClassifier):
     def __init__(self, items: List[StructuringItemSchema], llm: LLMBaseModel, storage: StorageManager, **kwargs):
         super().__init__(items)
         self.storage = storage
-        self.classifier_name = llm.classifier_name if llm is not None else "llm"
+        self.classifier_name = llm.model_name if llm is not None else "llm"
         self.default_prob_answer = 0.8
         self.elements = []
         self.llm = llm
@@ -43,7 +43,7 @@ class MetaLLMClassifier(MetaInfoClassifier):
 
             prompt_answer, amount = self.llm.make_prompt_request(str(prompt))
 
-            self.storage.log_expense(self.llm.classifier_name, amount, "meta LLM")
+            self.storage.log_expense(self.llm.model_name, amount, "meta LLM")
 
             prediction_dict = self.parse_prompt_answer(prompt_answer)
 
