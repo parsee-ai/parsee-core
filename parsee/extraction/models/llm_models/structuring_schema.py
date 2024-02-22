@@ -14,7 +14,7 @@ class PromptSchemaItem:
         self.example = example
         self.default_value = default_value if default_value is not None and default_value.strip() != "" else None
 
-    def is_valid_input(self, val: Union[str, None]):
+    def is_valid_input(self, val: Union[str, None]) -> bool:
         return val is not None and val.strip() != ""
 
     def get_example(self) -> str:
@@ -73,7 +73,7 @@ class PositiveIntegerItem(PromptSchemaItem):
         super().__init__([], example, default_value)
 
     def get_example(self) -> str:
-        return self.example if self.is_valid_input(self.example) is not None else "123"
+        return self.example if self.is_valid_input(self.example) else "123"
 
     def get_default_value(self) -> Union[str, None]:
         return self.default_value if self.default_value is not None else None
