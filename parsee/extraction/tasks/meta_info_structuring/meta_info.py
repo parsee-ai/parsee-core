@@ -6,7 +6,7 @@ from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
 from parsee.extraction.tasks.meta_info_structuring.features import MetaFeatureBuilder
 
 
-class MetaInfoClassifier:
+class MetaInfoModel:
 
     model_name = ""
     feature_builder: MetaFeatureBuilder

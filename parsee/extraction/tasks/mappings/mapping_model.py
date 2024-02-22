@@ -9,9 +9,9 @@ from parsee.extraction.tasks.mappings.features import MappingFeatureBuilder
 from parsee.extraction.extractor_elements import FinalOutputTable
 
 
-class MappingClassifier:
+class MappingModel:
 
-    classifier_name = ""
+    model_name = ""
     feature_builder: MappingFeatureBuilder
 
     def __init__(self, items: List[ElementSchema], **kwargs):

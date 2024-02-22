@@ -7,9 +7,9 @@ from parsee.extraction.extractor_dataclasses import ParseeLocation, AssignedLoca
 from parsee.extraction.tasks.element_classification.features import LocationFeatureBuilder
 
 
-class ElementClassifier:
+class ElementModel:
 
-    classifier_name = ""
+    model_name = ""
     feature_builder: LocationFeatureBuilder
 
     def __init__(self, items: List[ElementSchema], **kwargs):
@@ -19,11 +19,11 @@ class ElementClassifier:
         raise NotImplemented
 
 
-class AssignedElementClassifier(ElementClassifier):
+class AssignedElementModel(ElementModel):
 
     def __init__(self, items: List[ElementSchema], truth_locations: List[AssignedLocation], **kwargs):
         super().__init__(items)
-        self.classifier_name = "manual"
+        self.model_name = "manual"
         self.assigned = truth_locations
 
         self.feature_builder = LocationFeatureBuilder()
@@ -35,8 +35,8 @@ class AssignedElementClassifier(ElementClassifier):
             id_tuple = (answer.class_id, answer.is_partial, answer.element_index)
             if id_tuple not in added:
                 el = document.elements[answer.element_index]
-                meta_values = [ParseeMeta(self.classifier_name, meta.column_index if meta.column_index is not None else 0, [el.source], meta.class_id, meta.class_value, 1) for meta in answer.meta]
-                output.append(ParseeLocation(self.classifier_name, float(answer.is_partial), answer.class_id, 2, el.source, meta_values))
+                meta_values = [ParseeMeta(self.model_name, meta.column_index if meta.column_index is not None else 0, [el.source], meta.class_id, meta.class_value, 1) for meta in answer.meta]
+                output.append(ParseeLocation(self.model_name, float(answer.is_partial), answer.class_id, 2, el.source, meta_values))
                 added.add(id_tuple)
 
         return output

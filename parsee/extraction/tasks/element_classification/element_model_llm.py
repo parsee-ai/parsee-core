@@ -1,18 +1,18 @@
 from typing import *
 import re
 
-from parsee.extraction.tasks.element_classification.element_classifier import ElementClassifier, ElementSchema, StandardDocumentFormat, ParseeLocation
+from parsee.extraction.tasks.element_classification.element_model import ElementModel, ElementSchema, StandardDocumentFormat, ParseeLocation
 from parsee.storage.interfaces import StorageManager
 from parsee.utils.helper import is_number_cell, clean_numeric_value
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
 from parsee.extraction.tasks.element_classification.features import LLMLocationFeatureBuilder
 
 
-class ElementClassifierLLM(ElementClassifier):
+class ElementModelLLM(ElementModel):
 
     def __init__(self, items: List[ElementSchema], storage: StorageManager, llm: LLMBaseModel, **kwargs):
         super().__init__(items)
-        self.classifier_name = llm.model_name
+        self.model_name = llm.model_name
         self.llm = llm
         self.max_search_items = 10
         self.storage = storage
@@ -46,6 +46,6 @@ class ElementClassifierLLM(ElementClassifier):
 
             if best_idx is not None and 0 <= best_idx < len(document.elements):
                 el = document.elements[best_idx]
-                location = ParseeLocation(self.classifier_name, PARTIAL_PROB, item.id, self.prob, el.source, [])
+                location = ParseeLocation(self.model_name, PARTIAL_PROB, item.id, self.prob, el.source, [])
                 output.append(location)
         return output

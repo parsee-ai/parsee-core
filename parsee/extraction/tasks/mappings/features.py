@@ -7,7 +7,7 @@ from parsee.utils.helper import clean_text_for_word_vectors2
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.templates.mappings import MappingBucket
 from parsee.datasets.dataset_dataclasses import DatasetRow
-from parsee.extraction.tasks.mappings.mapping_classifier import MappingSchema
+from parsee.extraction.tasks.mappings.mapping_model import MappingSchema
 
 
 class MappingFeatureBuilder:

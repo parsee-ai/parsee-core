@@ -36,7 +36,7 @@ class FinalOutputTableColumn:
     fully_structured: Dict[str, any]
     sources: List[ExtractedSource]
     meta: List[ParseeMeta]
-    classifier: str
+    model: str
     locations: List[ParseeLocation]
 
     def __init__(self, location: ParseeLocation, element: StructuredTable, col_idx: int, col_idx_local: int, col_idx_org: int):
@@ -45,7 +45,7 @@ class FinalOutputTableColumn:
         self.key_value_pairs = []
         self.sources = []
         self.meta = []
-        self.classifier = location.model
+        self.model = location.model
         self.fully_structured = {}
         self.li_identifier = None
         self.set_identifiers()

@@ -2,16 +2,16 @@ from typing import *
 
 from parsee.templates.element_schema import ElementDetectionSchema, ElementSchema
 from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQuerySchema, GeneralQueryItemSchema
-from parsee.extraction.tasks.element_classification.element_classifier import ElementClassifier, AssignedElementClassifier
+from parsee.extraction.tasks.element_classification.element_model import ElementModel, AssignedElementModel
 from parsee.extraction.tasks.questions.question_model import QuestionModel, AssignedQuestionModel
 from parsee.extraction.models.llm_models.chatgpt_model import ChatGPTModel
 from parsee.extraction.models.llm_models.replicate_model import ReplicateModel
 from parsee.extraction.tasks.questions.question_model_llm import LLMQuestionModel
-from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoClassifier
-from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMClassifier
-from parsee.extraction.tasks.element_classification.element_classifier_llm import ElementClassifierLLM
-from parsee.extraction.tasks.mappings.mapping_classifier import MappingClassifier
-from parsee.extraction.tasks.mappings.mapping_classifier_llm import MappingClassifierLLM
+from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoModel
+from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMModel
+from parsee.extraction.tasks.element_classification.element_model_llm import ElementModelLLM
+from parsee.extraction.tasks.mappings.mapping_model import MappingModel
+from parsee.extraction.tasks.mappings.mapping_model_llm import MappingModelLLM
 from parsee.storage.interfaces import StorageManager
 from parsee.utils.enums import ModelType
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -46,30 +46,30 @@ class ModelLoader:
         else:
             return LLMQuestionModel(items, all_meta_items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
     
-    def get_element_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementClassifier, None]:
+    def get_element_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementModel, None]:
         if model_name is None:
             return None
         elif model_name == "assigned":
-            return AssignedElementClassifier(items, **params)
+            return AssignedElementModel(items, **params)
         else:
-            return ElementClassifierLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
+            return ElementModelLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
     
-    def get_meta_model(self, model_name: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoClassifier, None]:
+    def get_meta_model(self, model_name: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoModel, None]:
         if model_name is None:
             return None
         elif model_name == "assigned":
             # for assigned, no model is needed
             return None
         else:
-            return MetaLLMClassifier(items, get_llm_base_model(self.get_model_spec(model_name)), self.storage, **params)
+            return MetaLLMModel(items, get_llm_base_model(self.get_model_spec(model_name)), self.storage, **params)
     
-    def get_mapping_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingClassifier, None]:
+    def get_mapping_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingModel, None]:
         if model_name is None:
             return None
         elif model_name == "assigned":
             return None # TODO
         else:
-            return MappingClassifierLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
+            return MappingModelLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
 
 
 def question_models_from_schema(schema: GeneralQuerySchema, all_meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, Any]) -> List[QuestionModel]:
@@ -91,17 +91,17 @@ def question_models_from_schema(schema: GeneralQuerySchema, all_meta_items: List
     return models
 
 
-def element_classifiers_from_schema(schema: ElementDetectionSchema, model_loader: ModelLoader, params: Dict[str, any]) -> List[ElementClassifier]:
+def element_models_from_schema(schema: ElementDetectionSchema, model_loader: ModelLoader, params: Dict[str, any]) -> List[ElementModel]:
 
     # group items by model
-    items_by_classifier: Dict[str, List[ElementSchema]] = {}
+    items_by_model: Dict[str, List[ElementSchema]] = {}
     for item in schema.items:
-        if item.model not in items_by_classifier:
-            items_by_classifier[item.model] = []
-        items_by_classifier[item.model].append(item)
+        if item.model not in items_by_model:
+            items_by_model[item.model] = []
+        items_by_model[item.model].append(item)
 
-    models: List[ElementClassifier] = []
-    for model_name, items in items_by_classifier.items():
+    models: List[ElementModel] = []
+    for model_name, items in items_by_model.items():
         model = model_loader.get_element_model(model_name, items, params)
         if model is None and model_name != "assigned":
             raise Exception(f"following model was not found: {model_name}")
@@ -110,7 +110,7 @@ def element_classifiers_from_schema(schema: ElementDetectionSchema, model_loader
     return models
 
 
-def meta_models_from_items(meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, str]) -> List[MetaInfoClassifier]:
+def meta_models_from_items(meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, str]) -> List[MetaInfoModel]:
 
     # group items by model
     items_by_model: Dict[str, List[StructuringItemSchema]] = {}
@@ -119,7 +119,7 @@ def meta_models_from_items(meta_items: List[StructuringItemSchema], model_loader
             items_by_model[item.model] = []
         items_by_model[item.model].append(item)
 
-    models: List[MetaInfoClassifier] = []
+    models: List[MetaInfoModel] = []
     for model_name, items in items_by_model.items():
         model = model_loader.get_meta_model(model_name, items, params)
         if model is None and model_name != "assigned":
@@ -129,18 +129,18 @@ def meta_models_from_items(meta_items: List[StructuringItemSchema], model_loader
     return models
 
 
-def mapping_classifiers_from_schema(schema: ElementDetectionSchema, model_loader: ModelLoader, params: Dict[str, str]) -> List[MappingClassifier]:
+def mapping_models_from_schema(schema: ElementDetectionSchema, model_loader: ModelLoader, params: Dict[str, str]) -> List[MappingModel]:
 
     # group items by model
-    items_by_classifier: Dict[str, List[ElementSchema]] = {}
+    items_by_model: Dict[str, List[ElementSchema]] = {}
     for item in schema.items:
         if item.mapRows is not None:
-            if item.mappingModel not in items_by_classifier:
-                items_by_classifier[item.mappingModel] = []
-            items_by_classifier[item.mappingModel].append(item)
+            if item.mappingModel not in items_by_model:
+                items_by_model[item.mappingModel] = []
+            items_by_model[item.mappingModel].append(item)
 
-    models: List[MappingClassifier] = []
-    for model_name, items in items_by_classifier.items():
+    models: List[MappingModel] = []
+    for model_name, items in items_by_model.items():
         model = model_loader.get_mapping_model(model_name, items, params)
         if model is None and model_name != "assigned":
             raise Exception(f"following model was not found: {model_name}")

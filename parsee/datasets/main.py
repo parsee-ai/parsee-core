@@ -10,14 +10,14 @@ from parsee.utils.constants import ID_NOT_AVAILABLE
 from parsee.templates.job_template import JobTemplate
 from parsee.storage.interfaces import StorageManager
 from parsee.storage.in_memory_storage import InMemoryStorageManager
-from parsee.extraction.tasks.element_classification.element_classifier_llm import LLMLocationFeatureBuilder
+from parsee.extraction.tasks.element_classification.element_model_llm import LLMLocationFeatureBuilder
 from parsee.utils.enums import ElementType
-from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_models_from_items, mapping_classifiers_from_schema, question_models_from_schema, ModelLoader
+from parsee.extraction.models.model_loader import element_models_from_schema, meta_models_from_items, mapping_models_from_schema, question_models_from_schema, ModelLoader
 from parsee.extraction.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
 from parsee.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
 from parsee.extraction.tasks.mappings.features import LLMMappingFeatureBuilder
 from parsee.extraction.tasks.questions.features import GeneralQueriesPromptBuilder
-from parsee.extraction.tasks.mappings.mapping_classifier import ParseeBucket
+from parsee.extraction.tasks.mappings.mapping_model import ParseeBucket
 from parsee.extraction.models.llm_models.llm_base_model import truncate_prompt
 from parsee.datasets.dataset_dataclasses import DatasetRow
 from parsee.extraction.extractor_dataclasses import AssignedAnswer
@@ -35,11 +35,11 @@ def create_dataset_entries(source_identifier: str, template: JobTemplate, docume
 
     indices = [v.source.element_index for k, v in enumerate(document.elements) if v.el_type == ElementType.TABLE]
 
-    location_classifiers = element_classifiers_from_schema(template.detection, loader, template.detection.settings)
-    if len(location_classifiers) > 0:
-        location_classifier = location_classifiers[0]
-        features = location_classifier.feature_builder.make_features(source_identifier, template.id, indices, document.elements)
-        locations = location_classifier.classify_elements(document)
+    location_models = element_models_from_schema(template.detection, loader, template.detection.settings)
+    if len(location_models) > 0:
+        location_model = location_models[0]
+        features = location_model.feature_builder.make_features(source_identifier, template.id, indices, document.elements)
+        locations = location_model.classify_elements(document)
 
         for feature_entry in features:
             new_entry = {}
@@ -78,12 +78,12 @@ def create_dataset_entries(source_identifier: str, template: JobTemplate, docume
         for output_table in structured_tables:
             detection_item = [x for x in template.detection.items if output_table.detected_class == x.id][0]
             if detection_item.mapRows is not None and output_table.li_identifier not in li_added:
-                mapping_classifier = mapping_classifiers_from_schema(template.detection, loader, template.detection.settings)[0]
-                mappings, schema = mapping_classifier.classify_elements(output_table)
+                mapping_model = mapping_models_from_schema(template.detection, loader, template.detection.settings)[0]
+                mappings, schema = mapping_model.classify_elements(output_table)
                 if schema is not None:
                     li_added.add(output_table.li_identifier)
                     for kv_index, _ in enumerate(output_table.line_items):
-                        features = mapping_classifier.feature_builder.make_features(source_identifier, template.id, output_table, detection_item.mapRows.id, kv_index)
+                        features = mapping_model.feature_builder.make_features(source_identifier, template.id, output_table, detection_item.mapRows.id, kv_index)
                         bucket_choice = [x for x in mappings if x.kv_index == kv_index][0] if len([x for x in mappings if x.kv_index == kv_index]) > 0 else ParseeBucket(schema.id, ID_NOT_AVAILABLE, output_table.li_identifier, "manual", 1, kv_index, 0, Decimal(1))
                         features.assign_truth_values({"bucket_id": bucket_choice.bucket_id, "definition_idx": bucket_choice.definition_idx, "multiplier": bucket_choice.multiplier})
                         mapping_features.append(features)
@@ -98,11 +98,11 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
 
     # LOCATIONS
     location_prompt_builder = LLMLocationFeatureBuilder()
-    location_classifiers = element_classifiers_from_schema(template.detection, model_loader, template.detection.settings)
+    location_models = element_models_from_schema(template.detection, model_loader, template.detection.settings)
     rows = []
-    if len(location_classifiers) > 0:
-        location_classifier = location_classifiers[0]
-        locations = location_classifier.classify_elements(document)
+    if len(location_models) > 0:
+        location_model = location_models[0]
+        locations = location_model.classify_elements(document)
 
         if len(locations) > 0:
 
@@ -151,8 +151,8 @@ def create_llm_dataset_entries(source_identifier: str, template: JobTemplate, do
             for output_table in structured_tables:
                 detection_item = [x for x in template.detection.items if output_table.detected_class == x.id][0]
                 if detection_item.mapRows is not None and output_table.li_identifier not in li_added:
-                    mapping_classifier = mapping_classifiers_from_schema(template.detection, model_loader, template.detection.settings)[0]
-                    mappings, schema = mapping_classifier.classify_elements(output_table)
+                    mapping_model = mapping_models_from_schema(template.detection, model_loader, template.detection.settings)[0]
+                    mappings, schema = mapping_model.classify_elements(output_table)
                     if schema is not None:
                         li_added.add(output_table.li_identifier)
                         for kv_index, _ in enumerate(output_table.line_items):

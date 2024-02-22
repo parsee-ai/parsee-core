@@ -8,7 +8,7 @@ from parsee.extraction.extractor_elements import StandardDocumentFormat, FinalOu
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeBucket
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 from parsee.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
-from parsee.extraction.models.model_loader import element_classifiers_from_schema, meta_models_from_items, question_models_from_schema, mapping_classifiers_from_schema, ModelLoader
+from parsee.extraction.models.model_loader import element_models_from_schema, meta_models_from_items, question_models_from_schema, mapping_models_from_schema, ModelLoader
 
 
 def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
@@ -32,11 +32,11 @@ def structure_data(doc: StandardDocumentFormat, job_template: JobTemplate, model
     for question_model in question_models:
         answers += question_model.predict_answers(doc)
 
-    classifiers_loc = element_classifiers_from_schema(job_template.detection, model_loader, params)
+    models_loc = element_models_from_schema(job_template.detection, model_loader, params)
 
     locations = []
-    for classifier_loc in classifiers_loc:
-        locations += classifier_loc.classify_elements(doc)
+    for model_loc in models_loc:
+        locations += model_loc.classify_elements(doc)
 
     output_values = get_structured_tables_from_locations(job_template, doc, locations)
 
@@ -53,10 +53,10 @@ def structure_data(doc: StandardDocumentFormat, job_template: JobTemplate, model
     # run mapping
     all_mappings: List[ParseeBucket] = []
     tables = final_tables_from_columns(output_values)
-    mapping_classifiers = mapping_classifiers_from_schema(job_template.detection, model_loader, params)
-    for classifier_mapping in mapping_classifiers:
+    mapping_models = mapping_models_from_schema(job_template.detection, model_loader, params)
+    for model_mapping in mapping_models:
         for table in tables:
-            mappings, mapping_schema = classifier_mapping.classify_elements(table)
+            mappings, mapping_schema = model_mapping.classify_elements(table)
             if mapping_schema is not None:
                 for col in table.columns:
                     col.apply_mappings(mappings, mapping_schema)

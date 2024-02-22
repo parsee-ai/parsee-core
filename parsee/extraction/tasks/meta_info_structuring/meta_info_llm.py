@@ -2,7 +2,7 @@ from typing import *
 import re
 
 from parsee.extraction.extractor_elements import ExtractedEl, FinalOutputTableColumn
-from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoClassifier
+from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoModel
 from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
 from parsee.templates.general_structuring_schema import StructuringItemSchema
 from parsee.extraction.extractor_dataclasses import ParseeMeta
@@ -11,12 +11,12 @@ from parsee.storage.interfaces import StorageManager
 from parsee.extraction.tasks.meta_info_structuring.features import LLMMetaFeatureBuilder
 
 
-class MetaLLMClassifier(MetaInfoClassifier):
+class MetaLLMModel(MetaInfoModel):
 
     def __init__(self, items: List[StructuringItemSchema], llm: LLMBaseModel, storage: StorageManager, **kwargs):
         super().__init__(items)
         self.storage = storage
-        self.classifier_name = llm.model_name if llm is not None else "llm"
+        self.model_name = llm.model_name if llm is not None else "llm"
         self.default_prob_answer = 0.8
         self.elements = []
         self.llm = llm
@@ -50,7 +50,7 @@ class MetaLLMClassifier(MetaInfoClassifier):
             output: List[ParseeMeta] = []
             for key, values in prediction_dict.items():
                 value, parse_success = values
-                output.append(ParseeMeta(self.classifier_name, column.col_idx, column.sources, key, value, self.default_prob_answer if parse_success else 0))
+                output.append(ParseeMeta(self.model_name, column.col_idx, column.sources, key, value, self.default_prob_answer if parse_success else 0))
             all_output.append(output)
 
         return all_output
