@@ -52,7 +52,11 @@ class ModelLoader:
         elif model_name == "assigned":
             return AssignedElementModel(items, **params)
         else:
-            return ElementModelLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
+            spec = self.get_model_spec(model_name)
+            if spec is None or spec.model_type == ModelType.CUSTOM:
+                # custom models have to be handled with a custom ModelLoader class
+                return None
+            return ElementModelLLM(items, self.storage, get_llm_base_model(spec), **params)
     
     def get_meta_model(self, model_name: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoModel, None]:
         if model_name is None:
@@ -61,7 +65,11 @@ class ModelLoader:
             # for assigned, no model is needed
             return None
         else:
-            return MetaLLMModel(items, get_llm_base_model(self.get_model_spec(model_name)), self.storage, **params)
+            spec = self.get_model_spec(model_name)
+            if spec is None or spec.model_type == ModelType.CUSTOM:
+                # custom models have to be handled with a custom ModelLoader class
+                return None
+            return MetaLLMModel(items, get_llm_base_model(spec), self.storage, **params)
     
     def get_mapping_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingModel, None]:
         if model_name is None:
@@ -69,7 +77,11 @@ class ModelLoader:
         elif model_name == "assigned":
             return None # TODO
         else:
-            return MappingModelLLM(items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
+            spec = self.get_model_spec(model_name)
+            if spec is None or spec.model_type == ModelType.CUSTOM:
+                # custom models have to be handled with a custom ModelLoader class
+                return None
+            return MappingModelLLM(items, self.storage, get_llm_base_model(spec), **params)
 
 
 def question_models_from_schema(schema: GeneralQuerySchema, all_meta_items: List[StructuringItemSchema], model_loader: ModelLoader, params: Dict[str, Any]) -> List[QuestionModel]:
