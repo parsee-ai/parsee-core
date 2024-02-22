@@ -148,7 +148,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
     def get_elements_text(self, features: List[DatasetRow]):
         llm_text = ""
         for feature_entry in features:
-            llm_text += f"[{feature_entry.element_identifier}] text before table: {feature_entry.get_feature('text_before')}; text inside of table: {feature_entry.get_feature('text')} [end of item] \n"
+            llm_text += f"[{feature_entry.element_identifier}] text before table: {feature_entry.get_feature('text_before')}; line items in table: {feature_entry.get_feature('text')} [end of item] \n"
         return llm_text
 
     def make_prompt(self, item: ElementSchema, document: StandardDocumentFormat, storage: StorageManager) -> Prompt:
