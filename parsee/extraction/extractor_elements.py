@@ -411,7 +411,7 @@ class StructuredTable(ExtractedEl):
     other_rows = None
     numeric_cols_indices = None
     numeric_rows_indices = None
-
+    empty_columns: List[int]
 
     def __str__(self):
         return str(self.rows)
@@ -448,12 +448,15 @@ class StructuredTable(ExtractedEl):
         for row_idx, row in enumerate(self.rows):
             if contain_numbers:
                 text_pieces.append(f"(row {row_idx}) \n")
+            col_idx = 0
             for k, val_obj in enumerate(row.final_values):
-                if contain_numbers:
-                    text_pieces.append(f"(col {k}): {val_obj.val}")
-                else:
-                    if val_obj.val is not None and not is_number_cell(val_obj.val) and len(words_contained(val_obj.val)) > 0:
-                        text_pieces.append(str(val_obj.val))
+                if k not in self.empty_columns:
+                    if contain_numbers:
+                        text_pieces.append(f"(col {col_idx}): {val_obj.val}")
+                    else:
+                        if val_obj.val is not None and not is_number_cell(val_obj.val) and len(words_contained(val_obj.val)) > 0:
+                            text_pieces.append(str(val_obj.val))
+                    col_idx += 1
         if contain_numbers:
             text = " ".join(text_pieces)
         else:
@@ -544,6 +547,8 @@ class StructuredTable(ExtractedEl):
     # detect line items, clean values, detect header rows
     def structure_table(self):
 
+        self.empty_columns = []
+
         # min number of numeric cells per column
         min_numeric = 1
 
@@ -556,6 +561,8 @@ class StructuredTable(ExtractedEl):
             num_text = len([x for x in col_value_types if x == "text"])
             if num_numeric > min_numeric and num_numeric > num_text:
                 numeric_cols.append(col_index)
+            if len(set(col_value_types)) == 1 and col_value_types[0] == "null":
+                self.empty_columns.append(col_index)
 
         # check if numeric columns can be consolidated because of duplicates
         numeric_cols = list(sorted(numeric_cols))
