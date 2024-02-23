@@ -44,6 +44,10 @@ class ModelLoader:
         elif model_name == "assigned":
             return AssignedQuestionModel(items, all_meta_items, **params)
         else:
+            spec = self.get_model_spec(model_name)
+            if spec is None or spec.model_type == ModelType.CUSTOM:
+                # custom models have to be handled with a custom ModelLoader class
+                return None
             return LLMQuestionModel(items, all_meta_items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
     
     def get_element_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementModel, None]:
