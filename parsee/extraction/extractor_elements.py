@@ -437,7 +437,7 @@ class StructuredTable(ExtractedEl):
         for row in self.rows:
             if insert_li_break_text is not None:
                 text_pieces.append(insert_li_break_text)
-            for val_obj in row.values:
+            for val_obj in row.final_values:
                 if val_obj.val is not None:
                     text_pieces.append(str(val_obj.val))
         return " ".join(text_pieces)
@@ -448,7 +448,7 @@ class StructuredTable(ExtractedEl):
         for row_idx, row in enumerate(self.rows):
             if contain_numbers:
                 text_pieces.append(f"(row {row_idx}) \n")
-            for k, val_obj in enumerate(row.values):
+            for k, val_obj in enumerate(row.final_values):
                 if contain_numbers:
                     text_pieces.append(f"(col {k}): {val_obj.val}")
                 else:
@@ -466,7 +466,7 @@ class StructuredTable(ExtractedEl):
 
         for row in self.rows:
             temp_row = []
-            for cell_obj in row.values:
+            for cell_obj in row.final_values:
                 temp_row.append({"colspan": cell_obj.colspan, "val": cell_obj.val})
             rows.append(temp_row)
 
