@@ -27,7 +27,7 @@ class LocationFeatureBuilder:
         el_text = element.get_text()
         num_words = len(words_contained(el_text))
         el_dict['type'] = element.el_type.value
-        el_dict['text'] = element.get_text_llm(False)
+        el_dict['text'] = element.get_text_llm(True)
         el_dict['text_clean'] = clean_text_for_word_vectors2(el_text, remove_special_chars=True, remove_all_numbers=True)
         el_dict['num_words'] = num_words
         el_dict["percent_numbers"] = composition_percentages(el_text)['numbers']
@@ -166,7 +166,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
         features = self.make_features(None, None, all_element_indices, document.elements, False)
 
         prompt = Prompt("", f'we want to find an item labeled "{item.title}".{additional_info_str}', f"""We are providing data in the following with the element_index and the text, such as [ELEMENT_INDEX] "TEXT" [end of item].
-                Using the text, identify "{item.title}" and return the element which you think is most likely representing "{item.title}" (it can be only one item).
-                It is very important that you only return the element_index and nothing else.""", "Your response could be for example: [10] or [241]", self.get_elements_text(features))
+                Using the text, identify "{item.title}" and return the elements which you think are most likely representing "{item.title}" (it can be one item or several together).
+                It is very important that you only return the element_index and nothing else.""", "Your response could be for example: [10] or [241],[1204] ", self.get_elements_text(features))
 
         return prompt
