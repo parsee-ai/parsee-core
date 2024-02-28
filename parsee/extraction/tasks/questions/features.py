@@ -33,9 +33,9 @@ class GeneralQueriesPromptBuilder:
             llm_text += f"[{el.source.element_index}]: {el.get_text_llm(True)}\n"
         return llm_text
 
-    def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat) -> Prompt:
+    def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat, relevant_elements_custom: Optional[List[ExtractedEl]] = None) -> Prompt:
 
-        elements = self.get_relevant_elements(structuring_item, document)
+        elements = self.get_relevant_elements(structuring_item, document) if relevant_elements_custom is None else relevant_elements_custom
 
         general_info = "You are supposed to answer a question based on text fragments that are provided. " \
                        "The fragments start with a number and then the actual text. The lower the number of the fragment, " \
