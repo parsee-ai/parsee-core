@@ -136,7 +136,7 @@ class BaseDatasetRow:
         values = []
         for col_name in self.column_names():
             if col_name in self._dict_values.keys():
-                col_value = self._dict_values[col_name].replace('\x00', " ") # remove unreadable chars
+                col_value = str(self._dict_values[col_name]).replace('\x00', " ") # remove unreadable chars
                 values.append(col_value)
         return values
 
