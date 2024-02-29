@@ -28,7 +28,7 @@ class GeneralQueriesPromptBuilder:
             raise NotImplemented
 
     def get_elements_text(self, elements: List[ExtractedEl]):
-        llm_text = ""
+        llm_text = " (For the following data, if tables have empty cells, they are omitted)\n"
         for el in elements:
             llm_text += f"[{el.source.element_index}]: {el.get_text_llm(True)}\n"
         return llm_text
