@@ -17,6 +17,7 @@ class LocationFeatureBuilder:
 
     def __init__(self):
         self.memory = {}
+        self.number_replacement = "xnumberx"
 
     def _get_base_features(self, element_index: int, element: ExtractedEl) -> Dict[str, any]:
 
@@ -27,8 +28,8 @@ class LocationFeatureBuilder:
         el_text = element.get_text()
         num_words = len(words_contained(el_text))
         el_dict['type'] = element.el_type.value
-        el_dict['text'] = element.get_text_llm(True)
-        el_dict['text_clean'] = clean_text_for_word_vectors2(el_text, remove_special_chars=True, remove_all_numbers=True)
+        el_dict['text'] = element.get_text_llm(False)
+        el_dict['text_clean'] = clean_text_for_word_vectors2(el_text, remove_special_chars=True, remove_all_numbers=True, number_token=self.number_replacement)
         el_dict['num_words'] = num_words
         el_dict["percent_numbers"] = composition_percentages(el_text)['numbers']
 
@@ -140,6 +141,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
 
     def __init__(self):
         super().__init__()
+        self.number_replacement = "[number]"
 
     def build_raw_answer(self, locations: List[ParseeLocation]) -> str:
         sorted_ids = list(sorted([x.source.element_index for x in locations]))

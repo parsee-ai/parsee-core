@@ -104,8 +104,7 @@ def words_contained(cell_str, lower=False) -> List[str]:
 
 
 # cleans text for word embeddings
-def clean_text_for_word_vectors2(text, base_year=None, remove_special_chars=False, remove_all_numbers=False):
-    number_token = " xnumberx "
+def clean_text_for_word_vectors2(text, base_year=None, remove_special_chars=False, remove_all_numbers=False, number_token=" xnumberx "):
 
     if text is None:
         return ""

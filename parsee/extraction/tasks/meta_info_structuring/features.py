@@ -15,13 +15,13 @@ class MetaFeatureBuilder:
 
     def __init__(self):
         self.memory = {}
+        self.cell_start_delimiter = "xcellstartx"
+        self.row_start_delimiter = "xrowstartx"
+        self.cell_self_append = "xselfx"
+        self.number_replacement = "xnumberx"
 
     # returns features for meta info ml of table using word embeddings
     def get_meta_features_table(self, structured_table: StructuredTable, col_index_chosen: int, text_before: int, base_year: Union[int, None]) -> Dict[str, any]:
-
-        cell_start_delimiter = "xcellstartx"
-        row_start_delimiter = "xrowstartx"
-        cell_self_append = "xselfx"
 
         def get_words_from_cells(cell_obj_list, repeat=False):
             objects_used = []
@@ -82,10 +82,10 @@ class MetaFeatureBuilder:
         cell_list = []
         for row in structured_table.header_rows:
             if row.has_values():
-                cell_list.append(row_start_delimiter)
+                cell_list.append(self.row_start_delimiter)
                 for col_index, cell_obj in enumerate(row.final_values):
                     if col_index in structured_table.numeric_cols_indices:
-                        delim = cell_start_delimiter if col_index != col_index_chosen else cell_start_delimiter + cell_self_append
+                        delim = self.cell_start_delimiter if col_index != col_index_chosen else self.cell_start_delimiter + self.cell_self_append
                         cell_list.append(delim)
                         cell_list.append(cell_obj)
         words_list['total_header_values'] = get_words_from_cells(cell_list, True)
@@ -177,7 +177,7 @@ class MetaFeatureBuilder:
 
         # make final values
         for key, values in words_list.items():
-            words_list[key] = clean_text_for_word_vectors2(values, base_year)
+            words_list[key] = clean_text_for_word_vectors2(values, base_year, number_token=self.number_replacement)
 
         return words_list
     
@@ -209,14 +209,19 @@ class LLMMetaFeatureBuilder(MetaFeatureBuilder):
 
     def __init__(self):
         super().__init__()
+        self.cell_start_delimiter = "(cell start)"
+        self.row_start_delimiter = "(row start)"
+        self.cell_self_append = "(cell main)"
+        self.number_replacement = "[number]"
 
     def build_raw_answer(self, items: List[StructuringItemSchema], results: List[ParseeMeta]) -> str:
         output = ""
         for k, item in enumerate(items):
             if k > 0:
                 output += "\n"
+            schema_item = get_prompt_schema_item(item)
             meta_items_filtered = [x for x in results if x.class_id == item.id]
-            val = "n/a" if len(meta_items_filtered) == 0 else meta_items_filtered[0].class_value
+            val = "n/a" if len(meta_items_filtered) == 0 else schema_item.parsed_to_raw(meta_items_filtered[0].class_value)
             output += f"{k+1}) {val}"
         return output
 

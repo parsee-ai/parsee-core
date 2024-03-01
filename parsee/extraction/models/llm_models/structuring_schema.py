@@ -17,7 +17,7 @@ class PromptSchemaItem:
     def is_valid_input(self, val: Union[str, None]) -> bool:
         return val is not None and val.strip() != ""
 
-    def get_example(self) -> str:
+    def get_example(self, clean_value: bool = False) -> str:
         raise NotImplemented
 
     def get_possible_values_str(self) -> str:
@@ -28,6 +28,9 @@ class PromptSchemaItem:
 
     def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
         return value, True
+
+    def parsed_to_raw(self, value: str) -> str:
+        return value
 
 
 class ListClassificationItem(PromptSchemaItem):
@@ -41,8 +44,8 @@ class ListClassificationItem(PromptSchemaItem):
     def format_list_choice(self, val):
         return f"$ {val} $"
 
-    def get_example(self) -> str:
-        return self.format_list_choice(self.possible_values[0])
+    def get_example(self, clean_value: bool = False) -> str:
+        return self.format_list_choice(self.possible_values[0]) if not clean_value else self.possible_values[0]
 
     def get_possible_values_str(self) -> str:
         return "possible values (separated by $ symbols): " + ", ".join(
@@ -66,13 +69,16 @@ class ListClassificationItem(PromptSchemaItem):
         idx = self.possible_lowercase.index(value)
         return self.possible_values[idx], True
 
+    def parsed_to_raw(self, value: str) -> str:
+        return self.format_list_choice(value)
+
 
 class PositiveIntegerItem(PromptSchemaItem):
 
     def __init__(self, example: Optional[str] = None, default_value: Optional[str] = None):
         super().__init__([], example, default_value)
 
-    def get_example(self) -> str:
+    def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "123"
 
     def get_default_value(self) -> Union[str, None]:
@@ -93,7 +99,7 @@ class TextItem(PromptSchemaItem):
     def __init__(self, example: Optional[str] = None, default_value: Optional[str] = None):
         super().__init__([], example, default_value)
 
-    def get_example(self) -> str:
+    def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "answer to question"
 
     def get_default_value(self) -> Union[str, None]:
@@ -108,7 +114,7 @@ class NumericItem(PromptSchemaItem):
     def __init__(self, example: Optional[str] = None, default_value: Optional[str] = None):
         super().__init__([], example, default_value)
 
-    def get_example(self) -> str:
+    def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "123"
 
     def get_default_value(self) -> Union[str, None]:
@@ -129,7 +135,7 @@ class EntityItem(PromptSchemaItem):
     def __init__(self, example: Optional[str] = None, default_value: Optional[str] = None):
         super().__init__([], example, default_value)
 
-    def get_example(self) -> str:
+    def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "answer to question"
 
     def get_default_value(self) -> Union[str, None]:
@@ -150,7 +156,7 @@ class DateItem(PromptSchemaItem):
     def __init__(self, example: Optional[str] = None, default_value: Optional[str] = None):
         super().__init__([], example, default_value)
 
-    def get_example(self) -> str:
+    def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "2023-11-24"
 
     def get_default_value(self) -> Union[str, None]:

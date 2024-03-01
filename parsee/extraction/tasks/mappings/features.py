@@ -16,6 +16,7 @@ class MappingFeatureBuilder:
 
     def __init__(self):
         self._memory = {}
+        self.number_replacement = "xnumberx"
 
     def get_text_all(self, table: FinalOutputTable, schema_id: str) -> str:
 
@@ -41,7 +42,7 @@ class MappingFeatureBuilder:
         line_item_org = table.line_items[kv_index]
         total_items = len(table.line_items)
 
-        self._memory[unique_identifier] = {"class_id": table.detected_class, "caption_org": line_item_org, "caption_cleaned": clean_text_for_word_vectors2(line_item_org, None, True, True), "item_idx": kv_index, "total_items": total_items}
+        self._memory[unique_identifier] = {"class_id": table.detected_class, "caption_org": line_item_org, "caption_cleaned": clean_text_for_word_vectors2(line_item_org, None, True, True, self.number_replacement), "item_idx": kv_index, "total_items": total_items}
 
         return self._memory[unique_identifier]
 
@@ -64,6 +65,7 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
 
     def __init__(self):
         super().__init__()
+        self.number_replacement = "[number]"
 
     def build_raw_answer(self, bucket_choice: ParseeBucket, schema: MappingSchema) -> str:
         mapping_bucket = [x for x in schema.buckets if x.id == bucket_choice.bucket_id]
@@ -81,7 +83,7 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
             bucket_str += f"{self.item_id_string(schema_item)}: {schema_item.caption}\n"
         return Prompt(
             "You are supposed to classify a line-item from a table into exactly one of several possible buckets.",
-            f"The item is called: '{features.get_feature('caption_org')}'. You are only supposed to classify this item.\n",
+            f"The item is called: '{features.get_feature('caption_org')}' (index of item in table: {features.get_feature('item_idx')}). You are only supposed to classify this item.\n",
             f"{'' if features.get_feature('item_before') == '' else 'For reference, the item before the relevant item in the table is the following: '+features.get_feature('item_before')+'.'}" +
             f"{'' if features.get_feature('item_after') == '' else 'Also for reference, the item after the relevant item in the table is the following: '+features.get_feature('item_after')+'.'}",
             f"Each bucket has an ID, only use the ID of the bucket in your answer and nothing else. Your answer could be for example: {self.item_id_string(schema.buckets[0])}",

@@ -8,17 +8,6 @@ from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
 MAIN_QUESTION_STR = "(main question)"
 
 
-def build_raw_value(main_value: any, meta: List[ParseeMeta], sources: List[ExtractedSource]):
-    if len(meta) > 0:
-        output = f"{MAIN_QUESTION_STR}: {main_value}"
-        for meta_item in meta:
-            output += f"\n({meta_item.class_id}): {meta_item.class_value}"
-    else:
-        output = f"{main_value}"
-    output += "\nSources: " + ",".join(f"[{x.element_index}]" for x in sources)
-    return output
-
-
 def get_cleaned_list(values: List[str]):
     values_cleaned = []
     for x in values:

@@ -4,7 +4,7 @@ from functools import reduce
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
 from parsee.templates.general_structuring_schema import GeneralQueryItemSchema, StructuringItemSchema
-from parsee.extraction.tasks.questions.utils import build_raw_value
+from parsee.extraction.tasks.questions.utils import MAIN_QUESTION_STR
 from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
 from parsee.utils.enums import DocumentType, SearchStrategy
 from parsee.storage.interfaces import StorageManager
@@ -17,6 +17,20 @@ class GeneralQueriesPromptBuilder:
 
     def __init__(self, storage: StorageManager):
         self.storage = storage
+
+    def build_raw_value(self, main_value: any, meta: List[ParseeMeta], sources: List[ExtractedSource], item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema]):
+        schema_item = get_prompt_schema_item(item)
+        if len(meta_items) > 0:
+            output = f"{MAIN_QUESTION_STR}: {main_value}"
+            for meta_item in meta_items:
+                meta_schema_item = get_prompt_schema_item(meta_item)
+                meta_answers = [x for x in meta if x.class_id == meta_item.id]
+                answer_chosen = meta_answers[0].class_value if len(meta_answers) > 0 else "n/a"
+                output += f"\n({meta_item.id}): {meta_schema_item.parsed_to_raw(answer_chosen)}"
+        else:
+            output = f"{schema_item.parsed_to_raw(main_value)}"
+        output += "\nSources: " + ",".join(f"[{x.element_index}]" for x in sources)
+        return output
 
     def get_relevant_elements(self, schema_item: GeneralQueryItemSchema, document: StandardDocumentFormat) -> List[ExtractedEl]:
 
@@ -51,8 +65,8 @@ class GeneralQueriesPromptBuilder:
 
         # build full example
         source_examples = [ExtractedSource(DocumentType.PDF, None, None, 241, None), ExtractedSource(DocumentType.PDF, None, None, 423, None)]
-        meta_examples = [ParseeMeta("test", 0, source_examples, x.id, get_prompt_schema_item(x).get_example(), 0.8) for x in relevant_meta_items]
-        example_output = build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples)
+        meta_examples = [ParseeMeta("test", 0, source_examples, x.id, get_prompt_schema_item(x).get_example(True), 0.8) for x in relevant_meta_items]
+        example_output = self.build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples, structuring_item, meta_items)
 
         full_example = f"Your answer could look like this: {example_output}" if len(relevant_meta_items) == 0 else f"One possible answer block could be: {example_output}"
 

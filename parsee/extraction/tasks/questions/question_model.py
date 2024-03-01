@@ -3,8 +3,6 @@ from typing import *
 from parsee.extraction.extractor_elements import StandardDocumentFormat
 from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQueryItemSchema
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, AssignedAnswer, ParseeMeta
-from parsee.extraction.tasks.questions.utils import build_raw_value
-from parsee.datasets.dataset_dataclasses import DatasetRow
 
 
 class QuestionModel:
@@ -32,6 +30,6 @@ class AssignedQuestionModel(QuestionModel):
 
         for answer in self.answers:
             meta_values = [ParseeMeta(self.model_name, meta.column_index if meta.column_index is not None else 0, answer.sources, meta.class_id, meta.class_value, 1) for meta in answer.meta]
-            output.append(ParseeAnswer(self.model_name, answer.sources, answer.class_id, answer.class_value, build_raw_value(answer.class_value, meta_values, answer.sources), True, meta_values))
+            output.append(ParseeAnswer(self.model_name, answer.sources, answer.class_id, answer.class_value, "", True, meta_values))
 
         return output
