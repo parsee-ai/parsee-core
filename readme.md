@@ -1,36 +1,96 @@
 # Parsee AI
 
-Parsee AI is an open source data extraction and structuring framework created by <a href="https://github.com/SimFin">SimFin</a>. Parsee is designed to be able to combine different machine learning techniques (not limited to LLMs) in order to achieve maximum precision and minimize costs where possible, in order to extract fully structured data form a large amount of source documents (main focus on PDFs, HTML files and images).
+Parsee AI is an opinionated, high-level, open source data extraction and structuring framework created by <a href="https://github.com/SimFin">SimFin</a>. Our goal is to make the structuring of data from the most common sources of unstructured data (mainly PDFs, HTML files and images) as easy as possible.
 
 Parsee can be used entirely from your local Python environment. We also provide a hosted version of Parsee, where you can edit and share your <a>extraction templates</a> and also run jobs in the cloud: <a href="https://app.parsee.ai">app.parsee.ai</a>.
 
 Parsee is specialized for the extraction of data from a financial domain (tables, numbers etc.) but can be used for other use-cases as well.
 
-## TLDR Version:
+While Parsee has first class support for LLMs, the goal of Parsee is also not to limit itself to LLMs, as at least as of today, custom non-LLM models usually outperform LLMs in terms of speed, accuracy and cost-efficiency given that there is a large enough dataset available. At SimFin for example, we are using Parsee for extracting data from hundreds of documents daily, entirely without LLMs as we have already a substantial dataset built up for our tasks.
 
-pip install parsee
+## Installation:
 
-...
+Recommended install with poetry: https://python-poetry.org/docs/
+
+    poetry add parsee-core
+
+Alternatively:
+
+    pip install parsee-core
+
+## Quick Example
+
+*Goal:*
+
+Given we have some invoices, we want to:
+1) extract the invoice total, but not just the number, also the currency attached to it.
+2) extract the issuer of the invoice
 
 
-## Detailed Overview
+    import os
+    from parsee.templates.helpers import StructuringItem, MetaItem, create_template
+    from parsee.extraction.models.helpers import gpt_config, replicate_config
+    from parsee.converters.main import load_document
+    from parsee.extraction.run import run_job_with_single_model
+    from parsee.utils.enums import *
+    
+    # Step 1: create an extraction template
+    question_to_be_answered = "What is the invoice total?"
+    output_type = OutputType.NUMERIC
+    
+    meta_currency_question = "What is the currency?"
+    meta_currency_output_type = OutputType.LIST # we want the model to use a pre-defined item from a list, this is basically a classification
+    meta_currency_list_values = ["USD", "EUR", "Other"] # any list of strings can be used here
+    
+    meta_item = MetaItem(meta_currency_question, meta_currency_output_type, list_values=meta_currency_list_values)
+    
+    invoice_total = StructuringItem(question_to_be_answered, output_type, meta_info=[meta_item])
+    
+    # let's also define an item for the issuer of the invoice
+    invoice_issuer = StructuringItem("Who is the issuer of the invoice?", OutputType.ENTITY)
+    
+    job_template = create_template([invoice_total, invoice_issuer])
+    
+    # Step 2: define a model
+    # requires an API key from replicate: https://replicate.com/
+    replicate_api_key = os.getenv("REPLICATE_KEY")
+    replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
+    
+    # Step 3: load a document
+    file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"
+    document = load_document(file_path)
+    
+    # Step 4: run the extraction
+    _, _, answers_open_source_model = run_job_with_single_model(document, job_template, replicate_model)
 
-### Step 1: Define an Extraction Template
+If we look at the answers of the model we get the following:
 
-Extraction templates are the cornerstone for every extraction you run in Parsee. An extraction template is basically a JSON file, that defines exactly what information you want to extract from a document. These templates can then easily be shared, duplicated etc. The templates also contain information about the data type you want to have returned, such that you don't have to handle verbose output from LLMs for example.
+    answers_open_source_model[0].class_value
+    >> '11.9'
+    answers_open_source_model[0].meta[0].class_value
+    >> 'USD'
+
+We can also use a different model to run the same extraction:
+    
+    # enter your key manually here or load from an .env file
+    open_ai_api_key = os.getenv("OPENAI_KEY")
+    gpt_model = gpt_config(open_ai_api_key)
+    
+    _, _, answers_gpt = run_job_with_single_model(document, job_template, gpt_model)
 
 
+## Full Tutorials
 
-### Use Cases
+1) Extraction Templates & Basics: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/1_basic_example_meta.py">Python Code.</a>
 
-#### Extracting simple data from an invoice: Invoice total
+2) Meta Items: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/0_basic_example.py">Python Code.</a>
 
-*Main concepts used:* general queries, output data types
+3) Table Extraction: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/2_table_extraction.py">Python Code.</a>
 
-#### Extracting complex data from an invoice: Invoice total and associated currency
+4) Loading Templates from Parsee Cloud: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/3_loading_templates.py">Python Code.</a>
 
-*Main concepts used:* general queries with meta information, such as currencies, time periods and units
+5) Saving Templates: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/4_saving_templates.py">Python Code.</a>
 
-#### Extracting strictly tabular data: Profit & Loss Statement Extraction from annual report of a company
+6) Datasets: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/5_datasets.py">Python Code.</a>
 
-*Main concepts used:* Table detection, column info structuring (meta information), row mapping
+7) Model Evaluations: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/6_model_evaluations.py">Python Code.</a>

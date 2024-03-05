@@ -51,9 +51,6 @@ class PdfConverter(RawToJsonConverter):
     def _make_structured_table(self, source: ExtractedSource, extracted_table_dict) -> StructuredTable:
 
         rows_structured: List[StructuredRow] = []
-        # add meta rows
-        for row in extracted_table_dict['m']:
-            rows_structured.append(self._make_structured_row("header", row))
 
         # add value rows
         for row in extracted_table_dict['i']:
