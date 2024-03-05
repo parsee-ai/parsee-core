@@ -34,7 +34,8 @@ Given we have some invoices, we want to:
     from parsee.extraction.run import run_job_with_single_model
     from parsee.utils.enums import *
     
-    # Step 1: create an extraction template
+Step 1: create an extraction template
+    
     question_to_be_answered = "What is the invoice total?"
     output_type = OutputType.NUMERIC
     
@@ -46,21 +47,26 @@ Given we have some invoices, we want to:
     
     invoice_total = StructuringItem(question_to_be_answered, output_type, meta_info=[meta_item])
     
-    # let's also define an item for the issuer of the invoice
+let's also define an item for the issuer of the invoice
+
     invoice_issuer = StructuringItem("Who is the issuer of the invoice?", OutputType.ENTITY)
     
     job_template = create_template([invoice_total, invoice_issuer])
     
-    # Step 2: define a model
-    # requires an API key from replicate: https://replicate.com/
+Step 2: define a model
+
+In the following we will use the Mixtral model from Replicate, requires an API key: https://replicate.com/
+    
     replicate_api_key = os.getenv("REPLICATE_KEY")
     replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
     
-    # Step 3: load a document
+Step 3: load a document
+
     file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"
     document = load_document(file_path)
     
-    # Step 4: run the extraction
+Step 4: run the extraction
+
     _, _, answers_open_source_model = run_job_with_single_model(document, job_template, replicate_model)
 
 If we look at the answers of the model we get the following:
