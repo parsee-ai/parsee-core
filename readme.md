@@ -8,6 +8,8 @@ Parsee is specialized for the extraction of data from a financial domain (tables
 
 While Parsee has first class support for LLMs, the goal of Parsee is also not to limit itself to LLMs, as at least as of today, custom non-LLM models usually outperform LLMs in terms of speed, accuracy and cost-efficiency given that there is a large enough dataset available. At SimFin for example, we are using Parsee for extracting data from hundreds of documents daily, entirely without LLMs as we have already a substantial dataset built up for our tasks.
 
+For handling tables from PDFs and images properly, we also released our open source PDF table extraction package: https://github.com/parsee-ai/parsee-pdf-reader
+
 ## Installation:
 
 Recommended install with poetry: https://python-poetry.org/docs/
