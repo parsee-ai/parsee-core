@@ -26,6 +26,7 @@ Given we have some invoices, we want to:
 1) extract the invoice total, but not just the number, also the currency attached to it.
 2) extract the issuer of the invoice
 
+Imports
 
     import os
     from parsee.templates.helpers import StructuringItem, MetaItem, create_template
