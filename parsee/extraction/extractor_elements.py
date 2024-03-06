@@ -449,14 +449,16 @@ class StructuredTable(ExtractedEl):
             if contain_numbers:
                 text_pieces.append(f"(row {row_idx}) \n")
             col_idx = 0
+            last_val_written = None
             for k, val_obj in enumerate(row.final_values):
                 if k not in self.empty_columns:
                     if contain_numbers:
                         if val_obj.val is not None and val_obj.val.strip() != "":
                             text_pieces.append(f"(col {col_idx}): {val_obj.val}")
                     else:
-                        if val_obj.val is not None and not is_number_cell(val_obj.val) and len(words_contained(val_obj.val)) > 0:
+                        if val_obj.val is not None and not is_number_cell(val_obj.val) and len(words_contained(val_obj.val)) > 0 and (last_val_written is None or str(val_obj.val) != last_val_written):
                             text_pieces.append(str(val_obj.val))
+                            last_val_written = str(val_obj.val)
                     col_idx += 1
             if contain_numbers:
                 text_pieces.append(f" (row end);\n")
