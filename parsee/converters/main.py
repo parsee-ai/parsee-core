@@ -48,7 +48,7 @@ def save_doc_in_standard_format(source_identifier: str, source_type: DocumentTyp
     doc, amount = doc_to_standard_format(source_identifier, source_type, converter, file_path)
     json_string = json.dumps(doc.to_json_dict())
     tmp = tempfile.NamedTemporaryFile(delete=True)
-    tmp.write(str.encode(json_string))
+    tmp.write(str.encode(json_string, 'utf-8'))
     return tmp, doc, amount
 
 

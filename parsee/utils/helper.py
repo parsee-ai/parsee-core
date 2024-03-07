@@ -207,12 +207,6 @@ def clean_number_for_matching(num) -> int:
     return num
 
 
-def make_hash(content: str) -> str:
-    sha = hashlib.sha256()
-    sha.update(str.encode(content))
-    return sha.hexdigest()
-
-
 def get_source_identifier(file_path: str) -> str:
     BUF_SIZE = 65536
 
