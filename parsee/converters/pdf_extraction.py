@@ -43,9 +43,9 @@ class PdfConverter(RawToJsonConverter):
                 elements.append(element)
         return elements
 
-    def convert(self, file_path: str) -> Tuple[List[ExtractedEl], Decimal]:
+    def convert(self, file_path: str, **kwargs) -> Tuple[List[ExtractedEl], Decimal]:
 
-        pages = get_elements_from_pdf(file_path, self.areas)
+        pages = get_elements_from_pdf(file_path, self.areas, **kwargs)
 
         return self.pages_to_extracted_el(pages), PRICING_PDF_CONVERSION
 
