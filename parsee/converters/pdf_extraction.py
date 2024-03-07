@@ -9,6 +9,7 @@ from parsee.converters.interfaces import RawToJsonConverter
 from parsee.utils.enums import DocumentType, ElementType
 from pdf_reader.custom_dataclasses import RelativeAreaPrediction
 from pdf_reader.custom_dataclasses import ExtractedPage
+from parsee.utils.helper import is_year_cell, is_number_cell
 
 
 PRICING_PDF_CONVERSION = Decimal(os.getenv("PRICING_CONVERSION")) if os.getenv("PRICING_CONVERSION") is not None else Decimal(0)
@@ -52,41 +53,38 @@ class PdfConverter(RawToJsonConverter):
 
         rows_structured: List[StructuredRow] = []
 
+        # determine header end
+        header_end_idx = 0
+        for k, row in enumerate(extracted_table_dict['i']):
+            found_valid = False if row['c'] == '' else True
+            for val in row['v']:
+                if not is_number_cell(val['v']) or is_year_cell(val['v']):
+                    found_valid = False
+                    break
+            if found_valid:
+                header_end_idx = k
+                break
+
         # add value rows
-        for row in extracted_table_dict['i']:
-            rows_structured.append(self._make_structured_row("body", row))
+        for k, row in enumerate(extracted_table_dict['i']):
+            rows_structured.append(self._make_structured_row("body" if k >= header_end_idx else "header", row))
 
         return StructuredTable(source, rows_structured)
 
     def _make_structured_row(self, row_type: str, row) -> StructuredRow:
         row_values: List[StructuredTableCell] = []
-        if type(row) is list:
-            # meta row
-            for val in row:
-                val_obj = self._make_structured_cell_from_dict(val)
-                if val_obj.valid:
-                    row_values.append(val_obj)
-        elif type(row) is dict:
-            # line item
-            li_caption_cell = StructuredTableCell(row['c'])
-            row_values.append(li_caption_cell)
-            for val in row['v']:
-                val_obj = self._make_structured_cell_from_dict(val)
-                if val_obj.valid:
-                    row_values.append(val_obj)
+        li_caption_cell = StructuredTableCell(row['c'])
+        row_values.append(li_caption_cell)
+        for val in row['v']:
+            val_obj = self._make_structured_cell_from_dict(val)
+            if val_obj.valid:
+                row_values.append(val_obj)
         return StructuredRow(row_type, row_values)
 
     def _make_structured_cell_from_dict(self, val_dict) -> StructuredTableCell:
 
         colspan = 1
-        # meta items
-        if "type" in val_dict:
-            if val_dict['type'] == "null":
-                val = ""
-            else:
-                val = str(val_dict['t'])
         # value item
-        else:
-            val = str(val_dict['v']) if val_dict['v'] is not None else ""
+        val = str(val_dict['v']) if val_dict['v'] is not None else ""
 
         return StructuredTableCell(val, colspan)
