@@ -120,6 +120,7 @@ class LocationFeatureBuilder:
                 temp_features["percent_numbers" + key_append] = table_features["percent_numbers"]
                 temp_features["num_words" + key_append] = table_features["num_words"]
                 temp_features["text_clean" + key_append] = table_features["text_clean"]
+                temp_features["text_simple" + key_append] = table_features["text"]
     
                 if tables_added >= table_limit:
                     break
@@ -133,6 +134,7 @@ class LocationFeatureBuilder:
                 temp_features["percent_numbers" + key_append] = 0
                 temp_features["num_words" + key_append] = 0
                 temp_features["text_clean" + key_append] = ""
+                temp_features["text_simple" + key_append] = ""
     
         return temp_features
 
