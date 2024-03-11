@@ -56,7 +56,7 @@ class EvaluationResult:
                             else:
                                 scores_by_source[source][model]["error_log"].append({"doc": source, "class_id": class_id, "type": "main question", "expected": correct_value.class_value, "actual": predicted_value.class_value})
                         elif len(assigned_values.keys()) == 1 and len(predicted_values.keys()) == 1:
-                            predicted_value = predicted_values[predicted_values.keys[0]]
+                            predicted_value = predicted_values[list(predicted_values.keys())[0]]
                             # meta mismatch
                             scores_by_source[source][model]["error_log"].append({"doc": source, "class_id": class_id, "type": "meta", "expected": correct_value.meta_key(), "actual": predicted_value.meta_key()})
                             # check if values match
