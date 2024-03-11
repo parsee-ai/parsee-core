@@ -51,11 +51,15 @@ def parse_answer_blocks(prompt_answer: str) -> List[str]:
 
 def parse_main_and_meta(prompt_answer_block: str) -> Dict[Union[None, str], str]:
 
+    # mistral uses these characters sometimes
+    prompt_answer_block = prompt_answer_block.replace("）", ") ")
+    prompt_answer_block = prompt_answer_block.replace("（", " (")
+
     # go line by line
     by_lines = prompt_answer_block.split("\n")
     output = {}
     for line in by_lines:
-        match = re.search(r'\s*(\(.+\):|:|)([^\n]+)', line)
+        match = re.search(r'\s*(\(.+\)\s*:|:|)([^\n]+)', line)
         if match is not None:
             meta_id = match.group(1) if len(words_contained(match.group(1))) > 0 else None
             value = match.group(2)
