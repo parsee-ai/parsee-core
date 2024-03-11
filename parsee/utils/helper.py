@@ -75,10 +75,10 @@ def clean_numeric_value(cell_str):
     if comma_separator_thousands(cell_str):
         cell_str = re.sub(r',', "", cell_str)
     elif dot_separator_thousands(cell_str):
-        cell_str = re.sub(r'', "", cell_str)
+        cell_str = re.sub(r'\.', "", cell_str)
 
     # now also replace the comma with a dot should it be used in any case
-    cell_str = re.sub(r',', "", cell_str)
+    cell_str = re.sub(r',', ".", cell_str)
 
     if cell_str.replace('.', '', 1).isdigit():
         return Decimal(cell_str) * mult
