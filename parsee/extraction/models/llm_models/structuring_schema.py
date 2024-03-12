@@ -150,11 +150,11 @@ class PercentageItem(PromptSchemaItem):
 
     def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
         val = clean_numeric_value_llm(value)
+        if val is None:
+            return self.get_default_value(), False
         # check if value has to be multiplied
         mult = 1 if "%" in value or val > 1 else 100
         val = val * mult
-        if val is None:
-            return self.get_default_value(), False
         if val.is_integer():
             val = str(int(val))
         else:
