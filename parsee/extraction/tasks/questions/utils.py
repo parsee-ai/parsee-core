@@ -54,6 +54,7 @@ def parse_main_and_meta(prompt_answer_block: str) -> Dict[Union[None, str], str]
     # mistral uses these characters sometimes
     prompt_answer_block = prompt_answer_block.replace("）", ") ")
     prompt_answer_block = prompt_answer_block.replace("（", " (")
+    prompt_answer_block = prompt_answer_block.replace("：", ": ")
 
     # go line by line
     by_lines = prompt_answer_block.split("\n")
