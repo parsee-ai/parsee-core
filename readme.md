@@ -131,6 +131,10 @@ OR
 
 - Invoice total: 21.5
 
+OR
+
+- Invoice total: n/a
+
 If for some reason you want the model to not just respond with one answer, but in case there are maybe several different answers to a questions for a single document, you can add a meta item.
 
 If we define a meta item „invoice date“ and attach it to the invoice total, the model can now theoretically give several answers for the same document, differentiated by their meta ID:
