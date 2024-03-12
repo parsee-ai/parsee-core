@@ -62,7 +62,7 @@ def dot_separator_thousands(cell_str):
     return False
 
 
-def clean_numeric_value(cell_str):
+def clean_numeric_value(cell_str: str):
     if cell_str.strip() == "":
         return None
     mult = 1
