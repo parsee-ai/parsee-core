@@ -53,8 +53,7 @@ class LLMQuestionModel(QuestionModel):
                         prompt_item = get_prompt_schema_item(meta_item)
                         parsed, parse_successful = prompt_item.get_value(val)
 
-                        if parse_successful:
-                            detected_meta.append(ParseeMeta(self.model_name, 0, sources_full, meta_item.id, parsed, 0.8))
+                        detected_meta.append(ParseeMeta(self.model_name, 0, sources_full, meta_item.id, parsed, 0.8 if parse_successful else 0))
 
             if main_answer is not None:
 

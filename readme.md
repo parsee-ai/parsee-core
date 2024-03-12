@@ -105,3 +105,41 @@ We can also use a different model to run the same extraction:
 7) Model Evaluations: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/6_model_evaluations.py">Python Code.</a>
 
 8) Langchain Integration: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/7_langchain_integration.py">Python Code.</a>
+
+## Basic Rules for Extraction Templates
+
+In the following, we will only focus on the "general questions" items of the extraction templates. The logic for table detection/structuring items is quite similar and we will add some more explanations for them in the future.
+
+### Base Logic
+
+In the most basic sense, every question you define under the "general questions" category can have exactly one answer.
+
+If no answer can be found for a question (or meta item), the answer can always be „n/a“, meaning that the parsing of the values was not successful or the model did not have an answer. In that sense, all outputs are "nullable" but will be represented by the string value "n/a" in case they are null.
+
+A question can have more than one answer only when there is a meta item defined, which will create an „axis“ along which the model can give different answers to the same question.
+
+### Example
+
+For the question: What is the invoice total? (output type numeric)
+
+If there is no meta item defined, the model can answer this question only with one number (because of the numeric output type) or with "n/a".
+
+e.g.
+- Invoice total: 10.0
+
+OR
+
+- Invoice total: 21.5
+
+If for some reason you want the model to not just respond with one answer, but in case there are maybe several different answers to a questions for a single document, you can add a meta item.
+
+If we define a meta item „invoice date“ and attach it to the invoice total, the model can now theoretically give several answers for the same document, differentiated by their meta ID:
+
+e.g.
+- (first answer) Invoice total: 10.0 as per 2022-03-01
+
+AND
+
+- (second answer) Invoice total: 24.0 as per 2022-06-01
+
+So you can imagine the meta items as a sort of „key“, in the sense that as long as the meta values differ for 2 items, their keys will be different. All output values can be imagined as key value pairs.

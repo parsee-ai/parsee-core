@@ -7,6 +7,9 @@ from parsee.utils.enums import OutputType
 from parsee.utils.helper import clean_numeric_value_llm, get_entity_value, get_date_regex, clean_numeric_value
 
 
+NOT_AVAILABLE: str = "n/a"
+
+
 class PromptSchemaItem:
 
     def __init__(self, possible_values: List[str], example: Optional[str] = None,
@@ -24,10 +27,10 @@ class PromptSchemaItem:
     def get_possible_values_str(self) -> str:
         raise NotImplemented
 
-    def get_default_value(self) -> Union[str, None]:
-        return self.default_value if self.default_value is not None else None
+    def get_default_value(self) -> str:
+        return self.default_value if self.default_value is not None else NOT_AVAILABLE
 
-    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+    def get_value(self, value: str) -> Tuple[str, bool]:
         return value, True
 
     def parsed_to_raw(self, value: str) -> str:
@@ -52,7 +55,7 @@ class ListClassificationItem(PromptSchemaItem):
         return "possible values (separated by $ symbols): " + ", ".join(
             self.format_list_choice(x) for x in self.possible_values)
 
-    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+    def get_value(self, value: str) -> Tuple[str, bool]:
 
         value = value.lower()
         search = re.search(r'(\$( |)(.+)( |)\$)', value)
@@ -82,13 +85,10 @@ class PositiveIntegerItem(PromptSchemaItem):
     def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "123"
 
-    def get_default_value(self) -> Union[str, None]:
-        return self.default_value if self.default_value is not None else None
-
     def get_possible_values_str(self) -> str:
         return "possible values: positive integer"
 
-    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+    def get_value(self, value: str) -> Tuple[str, bool]:
         val = clean_numeric_value_llm(value)
         if val is None:
             return self.get_default_value(), False
@@ -103,9 +103,6 @@ class TextItem(PromptSchemaItem):
     def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "answer to question"
 
-    def get_default_value(self) -> Union[str, None]:
-        return self.default_value if self.default_value is not None else None
-
     def get_possible_values_str(self) -> str:
         return "possible values: any text"
 
@@ -118,13 +115,10 @@ class NumericItem(PromptSchemaItem):
     def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "123"
 
-    def get_default_value(self) -> Union[str, None]:
-        return self.default_value if self.default_value is not None else None
-
     def get_possible_values_str(self) -> str:
         return "possible values: any number (positive or negative, including decimals)"
 
-    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+    def get_value(self, value: str) -> Tuple[str, bool]:
         val = clean_numeric_value_llm(value)
         if val is None:
             return self.get_default_value(), False
@@ -142,13 +136,10 @@ class PercentageItem(PromptSchemaItem):
             example = example*100
         return str(round(float(example)))+"%"
 
-    def get_default_value(self) -> Union[str, None]:
-        return self.default_value if self.default_value is not None else None
-
     def get_possible_values_str(self) -> str:
         return "possible values: any percentage value"
 
-    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+    def get_value(self, value: str) -> Tuple[str, bool]:
         val = clean_numeric_value_llm(value)
         if val is None:
             return self.get_default_value(), False
@@ -170,13 +161,10 @@ class EntityItem(PromptSchemaItem):
     def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "answer to question"
 
-    def get_default_value(self) -> Union[str, None]:
-        return self.default_value if self.default_value is not None else None
-
     def get_possible_values_str(self) -> str:
         return "possible values: any text"
 
-    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+    def get_value(self, value: str) -> Tuple[str, bool]:
         val = get_entity_value(value)
         if val is None:
             return value.strip().rstrip(".").strip(), True
@@ -191,13 +179,10 @@ class DateItem(PromptSchemaItem):
     def get_example(self, clean_value: bool = False) -> str:
         return self.example if self.is_valid_input(self.example) else "2023-11-24"
 
-    def get_default_value(self) -> Union[str, None]:
-        return self.default_value if self.default_value is not None else None
-
     def get_possible_values_str(self) -> str:
         return "possible values: date in the format: YYYY-MM-DD"
 
-    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+    def get_value(self, value: str) -> Tuple[str, bool]:
         val = get_date_regex(value)
         if val is None:
             return self.get_default_value(), False
