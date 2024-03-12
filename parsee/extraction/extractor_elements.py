@@ -239,11 +239,9 @@ class StructuredLineItem:
 
 
 class ExtractedEl:
-    el_type = None
-    source = None
-    truth_values = None
-    is_valid = True
-    source_id: str = None
+    el_type: ElementType
+    source: ExtractedSource
+    source_id: str
 
     def __init__(self, el_type: ElementType, source: ExtractedSource, text: Union[str, None] = None):
         self.el_type = el_type

@@ -19,6 +19,7 @@ class OutputType(Enum):
     NUMERIC = "numeric"
     ENTITY = "entity"
     DATE = "date"
+    PERCENTAGE = "percentage"
 
 
 class ContextType(Enum):

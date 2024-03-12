@@ -1,9 +1,10 @@
 from typing import List, Optional, Union, Tuple
 import re
+from decimal import Decimal
 
 from parsee.templates.general_structuring_schema import StructuringItemSchema
 from parsee.utils.enums import OutputType
-from parsee.utils.helper import clean_numeric_value_llm, get_entity_value, get_date_regex
+from parsee.utils.helper import clean_numeric_value_llm, get_entity_value, get_date_regex, clean_numeric_value
 
 
 class PromptSchemaItem:
@@ -127,7 +128,38 @@ class NumericItem(PromptSchemaItem):
         val = clean_numeric_value_llm(value)
         if val is None:
             return self.get_default_value(), False
-        return str(float(val)), True
+        return str(val), True
+
+
+class PercentageItem(PromptSchemaItem):
+
+    def __init__(self, example: Optional[str] = None, default_value: Optional[str] = None):
+        super().__init__([], example, default_value)
+
+    def get_example(self, clean_value: bool = False) -> str:
+        example = clean_numeric_value(self.example) if self.is_valid_input(self.example) else Decimal(0.15)
+        if example < 1:
+            example = example*100
+        return str(round(float(example)))+"%"
+
+    def get_default_value(self) -> Union[str, None]:
+        return self.default_value if self.default_value is not None else None
+
+    def get_possible_values_str(self) -> str:
+        return "possible values: any percentage value"
+
+    def get_value(self, value: str) -> Tuple[Union[str, None], bool]:
+        val = clean_numeric_value_llm(value)
+        # check if value has to be multiplied
+        mult = 1 if "%" in value or val > 1 else 100
+        val = val * mult
+        if val is None:
+            return self.get_default_value(), False
+        if val.is_integer():
+            val = str(int(val))
+        else:
+            val = str(val)
+        return val+"%", True
 
 
 class EntityItem(PromptSchemaItem):
@@ -185,4 +217,6 @@ def get_prompt_schema_item(item: StructuringItemSchema) -> PromptSchemaItem:
         return EntityItem(item.example, item.defaultValue)
     elif item.type == OutputType.DATE:
         return DateItem(item.example, item.defaultValue)
+    elif item.type == OutputType.PERCENTAGE:
+        return PercentageItem(item.example, item.defaultValue)
     raise Exception("item not found")
