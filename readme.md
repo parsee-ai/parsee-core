@@ -103,3 +103,5 @@ We can also use a different model to run the same extraction:
 6) Datasets: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/5_datasets.py">Python Code.</a>
 
 7) Model Evaluations: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/6_model_evaluations.py">Python Code.</a>
+
+8) Langchain Integration: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/7_langchain_integration.py">Python Code.</a>
