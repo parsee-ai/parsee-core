@@ -131,7 +131,8 @@ class ParseeAnswer:
     def unique_id(self) -> str:
         return f"{self.class_id}:{self.meta_key()}"
 
-
+    def to_assigned_answer(self) -> AssignedAnswer:
+        return AssignedAnswer(self.class_id, self.class_value, [AssignedMeta(x.class_id, x.class_value) for x in self.meta], self.sources)
 
 
 @dataclass
