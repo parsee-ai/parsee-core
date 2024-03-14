@@ -5,14 +5,14 @@ from dataclasses import dataclass
 from decimal import Decimal
 import math
 
-import openai
+import anthropic
 import tiktoken
 
-from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 
 
-class ChatGPTModel(LLMBaseModel):
+class AnthropicModel(LLMBaseModel):
 
     def __init__(self, model: MlModelSpecification):
         super().__init__(model.name)
@@ -21,27 +21,20 @@ class ChatGPTModel(LLMBaseModel):
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.max_tokens_answer = 1024
         self.max_tokens_question = self.model.max_tokens - self.max_tokens_answer
-        openai.api_key = model.api_key if model.api_key is not None else os.getenv("OPENAI_KEY")
+        self.client = anthropic.Anthropic(api_key=model.api_key if model.api_key is not None else os.getenv("ANTHROPIC_API_KEY"))
 
     def _call_api(self, prompt: str, retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
         try:
-            response = openai.ChatCompletion.create(
+            message = self.client.messages.create(
                 model=self.model.internal_name,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature=0,
                 max_tokens=self.max_tokens_answer,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
             )
 
-            answer = response['choices'][0]["message"]["content"]
-            final_cost = Decimal(int(response["usage"]['total_tokens']) * (self.model.price_per_1k_tokens/1000)) if self.model.price_per_1k_tokens is not None else Decimal(0)
+            answer = message.content[0].text if len(message.content) > 0 else ""
+            final_cost = (Decimal(message.usage.input_tokens+message.usage.output_tokens) * (self.model.price_per_1k_tokens/1000)) if self.model.price_per_1k_tokens is not None else Decimal(0)
             return answer, final_cost
         except Exception as e:
             if retries < self.max_retries:

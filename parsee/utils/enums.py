@@ -46,3 +46,4 @@ class ModelType(Enum):
     GPT = "gpt"
     CUSTOM = "custom"
     REPLICATE = "replicate"
+    ANTHROPIC = "anthropic"
