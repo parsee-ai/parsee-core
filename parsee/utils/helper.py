@@ -7,12 +7,6 @@ import hashlib
 import numpy as np
 
 
-years_abs_strings = []
-current_year = int(time.strftime("%Y"))
-for yyyy in range(1980, current_year + 3):
-    years_abs_strings.append(str(yyyy))
-
-
 def clean_numeric_value_llm(string_val) -> Union[float, None]:
     matches = re.findall(r'(\d+(\d|,|\.|)*\d|\d)', string_val)
     last_numeric = None
@@ -169,11 +163,7 @@ def composition_percentages(cell_str):
 
 
 def is_year_cell(cell_str):
-    pieces = words_contained(cell_str)
-    for p in pieces:
-        if p in years_abs_strings:
-            return True
-    return False
+    return bool(re.search(r'\b(1[0-9]{3}|20[0-2][0-9])\b', cell_str))
 
 
 def get_mean_for_column(column_values: List) -> float:

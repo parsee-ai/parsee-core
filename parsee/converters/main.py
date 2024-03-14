@@ -13,7 +13,8 @@ from parsee.utils.helper import get_source_identifier
 
 
 def determine_document_type(file_path: str) -> DocumentType:
-    if file_path.endswith(".pdf"):
+    file_path = file_path.lower()
+    if file_path.endswith(".pdf") or file_path.endswith(".png") or file_path.endswith(".jpg") or file_path.endswith(".jpeg"):
         return DocumentType.PDF
     elif file_path.endswith(".html") or file_path.endswith(".xml"):
         return DocumentType.HTML
