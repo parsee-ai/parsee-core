@@ -28,6 +28,7 @@ class AnthropicModel(LLMBaseModel):
             message = self.client.messages.create(
                 model=self.model.internal_name,
                 max_tokens=self.max_tokens_answer,
+                temperature=0,
                 messages=[
                     {"role": "user", "content": prompt}
                 ]
