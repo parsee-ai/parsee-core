@@ -35,7 +35,7 @@ class AnthropicModel(LLMBaseModel):
             )
 
             answer = message.content[0].text if len(message.content) > 0 else ""
-            final_cost = (Decimal(message.usage.input_tokens+message.usage.output_tokens) * (self.model.price_per_1k_tokens/1000)) if self.model.price_per_1k_tokens is not None else Decimal(0)
+            final_cost = (Decimal(message.usage.input_tokens+message.usage.output_tokens) * Decimal(self.model.price_per_1k_tokens/1000)) if self.model.price_per_1k_tokens is not None else Decimal(0)
             return answer, final_cost
         except Exception as e:
             if retries < self.max_retries:
