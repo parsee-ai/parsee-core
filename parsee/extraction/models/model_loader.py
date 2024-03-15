@@ -6,6 +6,7 @@ from parsee.extraction.tasks.element_classification.element_model import Element
 from parsee.extraction.tasks.questions.question_model import QuestionModel, AssignedQuestionModel
 from parsee.extraction.models.llm_models.chatgpt_model import ChatGPTModel
 from parsee.extraction.models.llm_models.replicate_model import ReplicateModel
+from parsee.extraction.models.llm_models.anthropic_model import AnthropicModel
 from parsee.extraction.tasks.questions.question_model_llm import LLMQuestionModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMModel
@@ -23,6 +24,8 @@ def get_llm_base_model(spec: MlModelSpecification) -> LLMBaseModel:
         return ChatGPTModel(spec)
     elif spec.model_type == ModelType.REPLICATE:
         return ReplicateModel(spec)
+    elif spec.model_type == ModelType.ANTHROPIC:
+        return AnthropicModel(spec)
     else:
         raise Exception("llm base model not found")
 

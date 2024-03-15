@@ -19,18 +19,8 @@ class ReplicateModel(LLMBaseModel):
         self.model = model
         self.max_retries = 5
         self.encoding = tiktoken.get_encoding("cl100k_base")
-        self.max_tokens_answer = 256
-        self.max_requests_for_summarization = 30
+        self.max_tokens_answer = 1024
         self.max_tokens_question = self.model.max_tokens - self.max_tokens_answer
-
-    def slice_data(self, data: str) -> List[str]:
-        tokens = get_tokens_encoded(data, self.encoding)
-        slices = []
-        num_slices = math.ceil(len(tokens) / self.max_tokens_question)
-        for slice_num in range(0, num_slices):
-            current_slice = self.encoding.decode(tokens[slice_num*self.max_tokens_question:slice_num*self.max_tokens_question+self.max_tokens_question])
-            slices.append(current_slice)
-        return slices
 
     def _call_api(self, prompt: str, retries: int = 0, wait: int = 5) -> str:
         try:
