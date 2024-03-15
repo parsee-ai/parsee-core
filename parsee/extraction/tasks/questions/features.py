@@ -68,11 +68,11 @@ class GeneralQueriesPromptBuilder:
         meta_examples = [ParseeMeta("test", 0, source_examples, x.id, get_prompt_schema_item(x).get_example(True), 0.8) for x in relevant_meta_items]
         example_output = self.build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples, structuring_item, meta_items)
 
-        full_example = f"Your answer could look like this: {example_output}" if len(relevant_meta_items) == 0 else f"One possible answer block could be: {example_output}"
+        full_example = f"Your answer could look like this: {example_output}" if len(relevant_meta_items) == 0 else f"One possible answer block could be (there can be more than one in your response): {example_output}"
 
         # add prompting for meta
         if len(relevant_meta_items) > 0:
-            main_question += "\n We also want to retrieve some meta information. In the following we will present the meta item ID and then the additional question to be answered, format: (META_ID): QUESTION. In the answer please first provide the meta ID (for the main question use 'main question' instead) in brackets and then the answer. If there are several correct answers to the question that are differentiated by their meta values, structure your answer into multiple answer blocks of the same format, one after the other separated by new lines."
+            main_question += "\n We also want to retrieve some meta information. In the following we will present the meta item ID and then the additional question to be answered, format: (META_ID): QUESTION. In the answer please first provide the meta ID (for the main question use 'main question' instead) in brackets and then the answer. If there are several possible answers to the question (with different meta values), structure your answer into multiple answer blocks of the same format, one after the other separated by new lines."
             for meta_item in relevant_meta_items:
                 meta_prompt_item = get_prompt_schema_item(meta_item)
                 main_question += f"\n({meta_item.id}): {meta_item.title} {meta_item.additionalInfo} {meta_prompt_item.get_possible_values_str()}"
