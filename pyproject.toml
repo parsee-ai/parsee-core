@@ -17,7 +17,7 @@ pydantic = "^1.6.2"
 faiss-cpu = [{version = "<1.7.1", platform = "darwin"}, {version = "^1.7.1", platform = "linux"}]
 replicate = "^0.23.1"
 beautifulsoup4 = "^4.11.1"
-parsee-pdf-reader = "^0.1.5.1"
+parsee-pdf-reader = "^0.1.5.2"
 sentence-transformers = "^2.2.2"
 lxml = "^4.9.1"
 anthropic = "^0.20.0"
