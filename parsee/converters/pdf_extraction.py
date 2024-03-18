@@ -19,7 +19,7 @@ class PdfConverter(RawToJsonConverter):
 
     def __init__(self, predicted_areas: Union[None, Dict[int, List[RelativeAreaPrediction]]]):
         super().__init__(DocumentType.PDF)
-        self.service_name = "simfin_pdf"
+        self.service_name = "parsee_pdf"
         self.areas = predicted_areas
 
     def pages_to_extracted_el(self, pages: List[ExtractedPage]) -> List[ExtractedEl]:

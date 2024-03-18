@@ -31,7 +31,7 @@ class HtmlConverter(RawToJsonConverter):
 
     def __init__(self):
         super().__init__(DocumentType.HTML)
-        self.service_name = "simfin_html"
+        self.service_name = "parsee_html"
 
     def convert(self, file_path: str) -> Tuple[List[ExtractedEl], Decimal]:
         with open(file_path) as html_file:
