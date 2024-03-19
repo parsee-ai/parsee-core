@@ -162,7 +162,7 @@ class EntityItem(PromptSchemaItem):
         return self.example if self.is_valid_input(self.example) else "answer to question"
 
     def get_possible_values_str(self) -> str:
-        return "possible values: any text"
+        return "possible values: any text, but please only provide the 'entity' (e.g. a thing, company or person, depending on the question) and nothing else"
 
     def get_value(self, value: str) -> Tuple[str, bool]:
         val = get_entity_value(value)
