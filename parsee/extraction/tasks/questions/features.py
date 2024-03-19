@@ -66,7 +66,7 @@ class GeneralQueriesPromptBuilder:
         # build full example
         source_examples = [ExtractedSource(DocumentType.PDF, None, None, 241, None), ExtractedSource(DocumentType.PDF, None, None, 423, None)]
         meta_examples = [ParseeMeta("test", 0, source_examples, x.id, get_prompt_schema_item(x).get_example(True), 0.8) for x in relevant_meta_items]
-        example_output = self.build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples, structuring_item, meta_items)
+        example_output = self.build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples, structuring_item, relevant_meta_items)
 
         full_example = f"Your answer could look like this: {example_output}" if len(relevant_meta_items) == 0 else f"One possible answer block could be (there can be more than one in your response): {example_output}"
 
