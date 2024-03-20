@@ -31,7 +31,7 @@ replicate_api_key = os.getenv("REPLICATE_KEY")
 replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
 
 # load a document
-file_path = "../tests/fixtures/MSFT_FY_2007.html" # modify file path here (use absolute file paths if possible), for this example we are using one of the example files included in this repo
+file_path = "../tests/fixtures/bayer_filing2.pdf" # modify file path here
 document = load_document(file_path)
 
 # Step 4: run the extraction
