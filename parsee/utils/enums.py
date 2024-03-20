@@ -47,3 +47,4 @@ class ModelType(Enum):
     CUSTOM = "custom"
     REPLICATE = "replicate"
     ANTHROPIC = "anthropic"
+    OLLAMA = "ollama"

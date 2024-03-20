@@ -21,6 +21,7 @@ parsee-pdf-reader = "^0.1.5.7"
 sentence-transformers = "^2.2.2"
 lxml = "^4.9.1"
 anthropic = "^0.20.0"
+ollama = "^0.1.7"
 
 [tool.poetry.dev-dependencies]
 

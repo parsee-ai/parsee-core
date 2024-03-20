@@ -20,3 +20,8 @@ def replicate_config(replicate_api_key: str, model_name: str, token_limit: Optio
 def anthropic_config(anthropic_api_key: str, model_name: str, token_limit: Optional[int] = None):
     token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
     return MlModelSpecification(f"Anthropic model: {model_name}", model_name, ModelType.ANTHROPIC, None, None, token_limit, anthropic_api_key, None, None, None, None, None)
+
+
+def ollama_config(model_name: str, custom_host: Optional[str] = None, token_limit: Optional[int] = None):
+    token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
+    return MlModelSpecification(f"Ollama model: {model_name}", model_name, ModelType.OLLAMA, custom_host, Decimal(0), token_limit, None, None, None, None, None, None)
