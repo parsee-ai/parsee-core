@@ -35,7 +35,7 @@ class EvaluationResult:
             scores_by_source[source] = {}
             reference_item = sc_dict["assigned"]
             for model, by_class in sc_dict.items():
-                scores_by_source[source][model] = {"error_log": []}
+                scores_by_source[source][model] = {"error_log": [], "missing_answers": 0}
                 # check that all questions have been answered
                 scores_by_source[source][model]["completion"] = len(by_class.keys()) / len(reference_item.keys())
                 # check each question
@@ -45,6 +45,8 @@ class EvaluationResult:
                     if class_id not in by_class:
                         continue
                     predicted_values = by_class[class_id]
+                    # check if some answers are missing from the result
+                    scores_by_source[source][model]["missing_answers"] = max(len(assigned_values.keys()) - len(predicted_values.keys()), 0)
                     for meta_key, correct_value in assigned_values.items():
                         if meta_key in predicted_values:
                             if meta_key != "":
@@ -55,8 +57,16 @@ class EvaluationResult:
                                 score += 1
                             else:
                                 scores_by_source[source][model]["error_log"].append({"doc": source, "class_id": class_id, "type": "main question", "expected": correct_value.class_value, "actual": predicted_value.class_value})
-                        elif len(assigned_values.keys()) == 1 and len(predicted_values.keys()) == 1:
-                            predicted_value = predicted_values[list(predicted_values.keys())[0]]
+                        else:
+                            if len(assigned_values.keys()) == 1 and len(predicted_values.keys()) == 1:
+                                predicted_value = predicted_values[list(predicted_values.keys())[0]]
+                            else:
+                                # try to find main answer
+                                filtered_answers = [x for x in predicted_values.values() if x.class_value == correct_value.class_value]
+                                if len(filtered_answers) > 0:
+                                    predicted_value = filtered_answers[0]
+                                else:
+                                    continue
                             # meta mismatch
                             scores_by_source[source][model]["error_log"].append({"doc": source, "class_id": class_id, "type": "meta", "expected": correct_value.meta_key(), "actual": predicted_value.meta_key()})
                             # check if values match
@@ -72,20 +82,21 @@ class EvaluationResult:
         for source, by_source in scores_by_source.items():
             for model, scores in by_source.items():
                 if model not in total_scores:
-                    total_scores[model] = {"completion": 0, "total_correct": 0, "total_correct_meta_found": 0, "error_log": []}
+                    total_scores[model] = {"completion": 0, "total_correct": 0, "total_correct_meta_found": 0, "missing_answers": 0, "error_log": []}
                 for score_key, score_value in scores.items():
                     total_scores[model][score_key] += score_value
         reference_scores = total_scores["assigned"]
         for model, scores_dict in total_scores.items():
             scores_dict_final = {**scores_dict}
-            for score_key, score_value in scores_dict.items():
-                if score_key == "completion":
-                    scores_dict_final[score_key] = scores_dict[score_key] / len(scores_by_source.keys())
-                elif score_key == "error_log":
-                    pass
-                else:
-                    rel_key = score_key+"_percent"
-                    scores_dict_final[rel_key] = score_value / reference_scores[score_key]
+            scores_dict_final["completion"] = scores_dict["completion"] / len(scores_by_source.keys())
+            # calculate completeness: how many items are not "missing" entirely
+            scores_dict_final["completeness"] = (reference_scores["total_correct"] - scores_dict_final["missing_answers"])/reference_scores["total_correct"]
+            # scores INCLUDING missing answers
+            scores_dict_final["total_correct_percent"] = scores_dict_final["total_correct"] / reference_scores["total_correct"]
+            scores_dict_final["total_correct_meta_found_percent"] = scores_dict_final["total_correct_meta_found"] / reference_scores["total_correct_meta_found"]
+            # scores EXCLUDING missing answers
+            scores_dict_final["total_correct_percent_ex_missing"] = scores_dict_final["total_correct"] / (reference_scores["total_correct"]-scores_dict_final["missing_answers"])
+            scores_dict_final["total_correct_meta_found_percent_ex_missing"] = scores_dict_final["total_correct_meta_found"] / (reference_scores["total_correct_meta_found"]-scores_dict_final["missing_answers"])
             total_scores[model] = scores_dict_final
         return total_scores
 
