@@ -57,10 +57,10 @@ class PdfConverter(RawToJsonConverter):
         # determine header end
         header_end_idx = 0
         for k, line_item in enumerate(table.items):
-            found_valid = False if line_item.caption == '' else True
+            found_valid = False
             for v in line_item.values:
-                if not is_number_cell(v.val) or is_year_cell(v.val):
-                    found_valid = False
+                if is_number_cell(v.val) and not is_year_cell(v.val):
+                    found_valid = True
                     break
             if found_valid:
                 header_end_idx = k
