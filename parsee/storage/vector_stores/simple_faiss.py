@@ -19,6 +19,7 @@ class SimpleFaissStore(VectorStore):
         self.encoder = SentenceTransformer('all-MiniLM-L6-v2')
         self.min_chunk_size_characters = 1000
         self.k = 100
+        self.indexes = {}
 
     def make_index(self, document: StandardDocumentFormat, tables_only: bool) -> Tuple[List[List[int]], any]:
         data = []
@@ -55,8 +56,11 @@ class SimpleFaissStore(VectorStore):
 
         return [x["element_indices"] for x in data], index
 
-    def get_index(self, document: StandardDocumentFormat, tables_only: bool):
-        return self.make_index(document, tables_only)
+    def get_index(self, document: StandardDocumentFormat, tables_only: bool) -> Tuple[List[List[int]], any]:
+        key = (document.source_identifier, tables_only)
+        if key not in self.indexes:
+            self.indexes[key] = self.make_index(document, tables_only)
+        return self.indexes[key]
 
     def find_closest_elements(self, document: StandardDocumentFormat, search_element_title: str, keywords: Optional[str], tables_only: bool = True) -> List[ExtractedEl]:
 
