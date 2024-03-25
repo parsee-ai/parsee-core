@@ -36,7 +36,6 @@ class CategoricalTransformation:
 @dataclass
 class WordVectorTransformation:
     tokenizer: any
-    matrix: Optional[any]
     max_words: int
     col_index: int
     vocab_size: Optional[int]

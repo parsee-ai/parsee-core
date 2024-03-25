@@ -24,9 +24,10 @@ class MlModelSpecification:
     def model_path(self) -> Union[None, str]:
         if self.file_path is None:
             return None
-        return os.path.join(self.file_path, "best_model.h5")
+        return self.file_path
 
     def settings_path(self) -> Union[None, str]:
         if self.file_path is None:
             return None
-        return os.path.join(self.file_path, "settings.pkl")
+        model_dir = os.path.dirname(self.file_path)
+        return os.path.join(model_dir, "settings.pkl")
