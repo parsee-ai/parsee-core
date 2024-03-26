@@ -96,12 +96,17 @@ class FinalOutputTableColumn:
         self.build()
 
 
-@dataclass
 class FinalOutputTable:
     detected_class: str
     columns: List[FinalOutputTableColumn]
     li_identifier: str
     line_items: List[str]
+
+    def __init__(self, detected_class: str, columns: List[FinalOutputTableColumn], li_identifier: str):
+        self.detected_class = detected_class
+        self.columns = columns
+        self.li_identifier = li_identifier
+        self.line_items = [x[0] for x in columns[0].key_value_pairs]
 
     def li_number_matching(self) -> List[Tuple[str, Set[int]]]:
         output = []

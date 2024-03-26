@@ -1,4 +1,6 @@
 from typing import *
+import json
+import decimal
 
 from parsee.datasets.dataset_dataclasses import MappingUniqueIdentifier
 from parsee.extraction.extractor_elements import FinalOutputTable
@@ -8,6 +10,7 @@ from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.templates.mappings import MappingBucket
 from parsee.datasets.dataset_dataclasses import DatasetRow
 from parsee.extraction.tasks.mappings.mapping_model import MappingSchema
+from parsee.utils.sample_items import samples
 
 
 class MappingFeatureBuilder:
@@ -74,24 +77,49 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
         return self.item_id_string(mapping_bucket[0])
 
     def item_id_string(self, bucket: MappingBucket):
-        return f"[{bucket.id}]"
+        return f"{bucket.id}"
 
-    def build_prompt(self, features: DatasetRow, schema: MappingSchema) -> Prompt:
+    def format_table(self, table: FinalOutputTable) -> str:
+        output = []
+        for k, line_item in enumerate(table.line_items):
+            row = [f"{self.line_item_formatter(k)}: {line_item}"]
+            for col in table.columns:
+                row.append(str(col.key_value_pairs[k][1]))
+            output.append(row)
+        return json.dumps(output)
 
+    def line_item_formatter(self, line_item_idx: int) -> str:
+        return f"LI{line_item_idx}"
+
+    def full_example(self) -> str:
+        sample_table = samples.table
+        schema = samples.schema
+        output = {}
+        if len(sample_table.line_items) != 3 or len(schema.buckets) != 3:
+            raise Exception("needs 3 items")
+        output[schema.buckets[0].id] = [self.line_item_formatter(0), self.line_item_formatter(1)]
+        output[schema.buckets[1].id] = [self.line_item_formatter(2)],
+        output[schema.buckets[2].id] = []
+        return json.dumps(output)
+
+    def format_schema(self, schema: MappingSchema):
         bucket_str = ""
         for schema_item in schema.buckets:
             bucket_str += f"{self.item_id_string(schema_item)}: {schema_item.caption}\n"
+        return bucket_str
+
+    def build_prompt(self, table: FinalOutputTable, schema: MappingSchema) -> Prompt:
+
         return Prompt(
-            "You are supposed to classify a line-item from a table into exactly one of several possible buckets.",
-            f"The item is called: '{features.get_feature('caption_org')}' (index of item in table: {features.get_feature('item_idx')}). You are only supposed to classify this item.\n",
-            f"{'' if features.get_feature('item_before') == '' else 'For reference, the item before the relevant item in the table is the following: '+features.get_feature('item_before')+'.'}" +
-            f"{'' if features.get_feature('item_after') == '' else 'Also for reference, the item after the relevant item in the table is the following: '+features.get_feature('item_after')+'.'}",
-            f"Each bucket has an ID, only use the ID of the bucket in your answer and nothing else. Your answer could be for example: {self.item_id_string(schema.buckets[0])}",
-            f"The possible buckets are the following (each bucket name and description is preceded by the ID in square brackets): {bucket_str}"
+            "You are supposed to classify line-items from a table into several possible buckets. Each item can only be placed in one bucket.",
+            f"The table with data will be provided as an array of rows, each line item has an ID that will be included in the first cell in at the beginning. The buckets are presented with an ID followed by a descriptive name.", "Format your output as a JSON dictionary, where the keys correspond to the IDs of the buckets and the values are arrays of the line item IDs.",
+            f"For example for the following table: {self.format_table(samples.table)} \n"
+            f"And the following buckets: {self.format_schema(samples.schema)}"
+            f"a valid output would be: {self.full_example()}",
+            f"The actual available buckets are the following: {self.format_schema(schema)}\n"
+            f"The actual table with line items to be classified is the following: {self.format_table(table)}"
         )
 
-    def make_prompt(self, table: FinalOutputTable, schema: MappingSchema, kv_index: int) -> Prompt:
+    def make_prompt(self, table: FinalOutputTable, schema: MappingSchema) -> Prompt:
 
-        features = self.make_features(None, None, table, schema.id, kv_index)
-
-        return self.build_prompt(features, schema)
+        return self.build_prompt(table, schema)
