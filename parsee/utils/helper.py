@@ -221,7 +221,7 @@ def parse_int_simple(string_val: str) -> Union[None, int]:
 
 
 def parse_json_dict(string_val: str) -> Union[None, Dict[str, any]]:
-    match = re.search(r'({.+})', string_val)
+    match = re.search(r'({[\s\S]+})', string_val)
     if match:
         try:
             parsed = json.loads(match.group(1))
