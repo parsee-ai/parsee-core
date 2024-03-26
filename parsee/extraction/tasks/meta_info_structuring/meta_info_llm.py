@@ -30,9 +30,9 @@ class MetaLLMModel(MetaInfoModel):
             if result is not None and len(result.groups()) > 2:
                 number = result.group(2)
                 value_predicted = result.group(3)
-                number_check = (int(number) == k + 1) if number.isdigit() else False
-                if number_check:
-                    output[self.items[k].id] = get_prompt_schema_item(self.items[k]).get_value(value_predicted)
+                if number.isdigit():
+                    item_idx = number-1
+                    output[self.items[item_idx].id] = get_prompt_schema_item(self.items[item_idx]).get_value(value_predicted)
         return output
 
     def predict_meta(self, columns: List[FinalOutputTableColumn], elements: List[ExtractedEl]) -> List[List[ParseeMeta]]:
