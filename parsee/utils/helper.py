@@ -3,6 +3,7 @@ import re
 from decimal import Decimal
 import time
 import hashlib
+import json
 
 import numpy as np
 
@@ -210,3 +211,22 @@ def get_source_identifier(file_path: str) -> str:
             sha.update(data)
 
     return sha.hexdigest()
+
+
+def parse_int_simple(string_val: str) -> Union[None, int]:
+    num = re.sub(r'[^0-9]', '', str(string_val))
+    if num.isdigit():
+        return int(num)
+    return None
+
+
+def parse_json_dict(string_val: str) -> Union[None, Dict[str, any]]:
+    match = re.search(r'({[\s\S]+})', string_val)
+    if match:
+        try:
+            parsed = json.loads(match.group(1))
+            return parsed
+        except Exception as e:
+            return None
+    else:
+        return None

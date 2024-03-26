@@ -186,7 +186,7 @@ def final_tables_from_columns(columns: List[FinalOutputTableColumn]) -> List[Fin
     for col in columns:
         table_id = (col.li_identifier, col.detected_class)
         if table_id not in by_identifier:
-            by_identifier[table_id] = FinalOutputTable(col.detected_class, [col], col.li_identifier, [x[0] for x in col.key_value_pairs])
+            by_identifier[table_id] = FinalOutputTable(col.detected_class, [col], col.li_identifier)
         else:
             by_identifier[table_id].columns.append(col)
 
