@@ -70,11 +70,11 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
         super().__init__()
         self.number_replacement = "[number]"
 
-    def build_raw_answer(self, bucket_choice: ParseeBucket, schema: MappingSchema) -> str:
-        mapping_bucket = [x for x in schema.buckets if x.id == bucket_choice.bucket_id]
-        if len(mapping_bucket) == 0:
-            return "n/a"
-        return self.item_id_string(mapping_bucket[0])
+    def build_raw_answer(self, choices: List[ParseeBucket], schema: MappingSchema) -> str:
+        output = {}
+        for bucket in schema.buckets:
+            output[bucket.id] = [self.line_item_formatter(x.kv_index) for x in choices if x.bucket_id == bucket.id]
+        return json.dumps(output)
 
     def item_id_string(self, bucket: MappingBucket):
         return f"{bucket.id}"
