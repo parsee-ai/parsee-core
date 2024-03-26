@@ -30,8 +30,8 @@ class MetaLLMModel(MetaInfoModel):
             if result is not None and len(result.groups()) > 2:
                 number = result.group(2)
                 value_predicted = result.group(3)
-                if number.isdigit():
-                    item_idx = number-1
+                if number.isdigit() and 0 <= int(number)-1 < len(self.items):
+                    item_idx = int(number)-1
                     output[self.items[item_idx].id] = get_prompt_schema_item(self.items[item_idx]).get_value(value_predicted)
         return output
 
