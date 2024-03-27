@@ -20,14 +20,14 @@ def simple_id(category: str):
 
 class MetaItem(StructuringItemSchema):
 
-    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None):
+    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None, additional_info: Optional[str] = None):
 
         self.model = None
         self.type = output_type
         self.context = ContextType.QUESTIONS
         self.id = simple_id("meta") if assigned_id is None else assigned_id
         self.title = question
-        self.additionalInfo = ""
+        self.additionalInfo = "" if additional_info is None else additional_info
         self.searchStrategy = SearchStrategy.VECTOR
         self.valuesList = list_values
         self.example = example
@@ -38,14 +38,14 @@ class MetaItem(StructuringItemSchema):
 
 class StructuringItem(GeneralQueryItemSchema):
 
-    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, meta_info: Optional[List[MetaItem]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None):
+    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, meta_info: Optional[List[MetaItem]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None, additional_info: Optional[str] = None):
 
         self.model = None
         self.type = output_type
         self.context = ContextType.QUESTIONS
         self.id = simple_id("question") if assigned_id is None else assigned_id
         self.title = question
-        self.additionalInfo = ""
+        self.additionalInfo = "" if additional_info is None else additional_info
         self.searchStrategy = SearchStrategy.VECTOR
         self.valuesList = list_values
         self.metaInfoIds = [] if meta_info is None else [x.id for x in meta_info]
