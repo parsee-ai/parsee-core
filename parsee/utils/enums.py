@@ -4,6 +4,7 @@ from enum import Enum
 class DocumentType(Enum):
     HTML = "html"
     PDF = "pdf"
+    TEXT = "text"
 
 
 class ElementType(Enum):

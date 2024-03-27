@@ -198,6 +198,12 @@ def clean_number_for_matching(num) -> int:
     return num
 
 
+def get_source_identifier_simple(text: str) -> str:
+    sha = hashlib.sha256()
+    sha.update(str.encode(text, 'utf-8'))
+    return sha.hexdigest()
+
+
 def get_source_identifier(file_path: str) -> str:
     BUF_SIZE = 65536
 

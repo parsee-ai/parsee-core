@@ -9,7 +9,8 @@ from parsee.converters.json_to_raw import load_document_from_json
 from parsee.converters.interfaces import RawToJsonConverter
 from parsee.converters.html_extraction import HtmlConverter
 from parsee.converters.pdf_extraction import PdfConverter
-from parsee.utils.helper import get_source_identifier
+from parsee.converters.simple_text import SimpleTextConverter
+from parsee.utils.helper import get_source_identifier, get_source_identifier_simple
 
 
 def determine_document_type(file_path: str) -> DocumentType:
@@ -38,9 +39,16 @@ def load_document(file_path: str) -> StandardDocumentFormat:
     return doc
 
 
+def from_text(text: str) -> StandardDocumentFormat:
+    source_identifier = get_source_identifier_simple(text)
+    converter = SimpleTextConverter(DocumentType.TEXT)
+    doc, _ = doc_to_standard_format(source_identifier, DocumentType.TEXT, converter, text)
+    return doc
+
+
 def doc_to_standard_format(source_identifier: str, source_type: DocumentType, converter: RawToJsonConverter,
-                           file_path: str) -> Tuple[StandardDocumentFormat, Decimal]:
-    elements, amount = converter.convert(file_path)
+                           file_path_or_content: str) -> Tuple[StandardDocumentFormat, Decimal]:
+    elements, amount = converter.convert(file_path_or_content)
     return StandardDocumentFormat(source_type, source_identifier, elements), amount
 
 

@@ -33,8 +33,8 @@ class HtmlConverter(RawToJsonConverter):
         super().__init__(DocumentType.HTML)
         self.service_name = "parsee_html"
 
-    def convert(self, file_path: str) -> Tuple[List[ExtractedEl], Decimal]:
-        with open(file_path) as html_file:
+    def convert(self, file_path_or_content: str) -> Tuple[List[ExtractedEl], Decimal]:
+        with open(file_path_or_content) as html_file:
             html_content = html_file.read()
             return self._extract_elements_from_html_data(html_content), PRICING_HTML_CONVERSION
 

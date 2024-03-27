@@ -18,7 +18,18 @@ replicate_api_key = os.getenv("REPLICATE_KEY")
 replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
 
 # Step 3: load a document
-file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf" # modify file path here (use absolute file paths if possible), for this example we are using one of the example files included in this repo
+# Parsee converts all data (strings, file contents etc.) to a standardized format, the class for this is called StandardDocumentFormat
+# a) let's first create a StandardDocumentFormat object from a simple string
+input_string = "The invoice total amounts to 12,5 Euros and is due on Feb 28th 2024."
+document = from_text(input_string)
+
+# Step 4: run the extraction
+_, _, answers = run_job_with_single_model(document, job_template, replicate_model)
+
+print(answers[0].class_value)
+
+# b) we can also simply load and convert files into the StandardDocumentFormat with the help of the converters that are included in Parsee, let's use an actual PDF invoice now
+file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf" # modify file path here in or
 document = load_document(file_path)
 
 # Step 4: run the extraction
