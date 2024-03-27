@@ -20,7 +20,7 @@ def simple_id(category: str):
 
 class MetaItem(StructuringItemSchema):
 
-    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, assigned_id: Optional[str] = None):
+    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None):
 
         self.model = None
         self.type = output_type
@@ -30,7 +30,7 @@ class MetaItem(StructuringItemSchema):
         self.additionalInfo = ""
         self.searchStrategy = SearchStrategy.VECTOR
         self.valuesList = list_values
-        self.example = None
+        self.example = example
         self.keywords = None
         self.defaultValue = None
         self.customArgsJson = None
@@ -38,7 +38,7 @@ class MetaItem(StructuringItemSchema):
 
 class StructuringItem(GeneralQueryItemSchema):
 
-    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, meta_info: Optional[List[MetaItem]] = None, assigned_id: Optional[str] = None):
+    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, meta_info: Optional[List[MetaItem]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None):
 
         self.model = None
         self.type = output_type
@@ -50,7 +50,7 @@ class StructuringItem(GeneralQueryItemSchema):
         self.valuesList = list_values
         self.metaInfoIds = [] if meta_info is None else [x.id for x in meta_info]
         self.meta_info = meta_info
-        self.example = None
+        self.example = example
         self.keywords = None
         self.valuesList = None
         self.defaultValue = None
