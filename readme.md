@@ -28,16 +28,16 @@ Given we have some invoices, we want to:
 1) extract the invoice total, but not just the number, also the currency attached to it.
 2) extract the issuer of the invoice
 
-Imports
+### Imports
 
     import os
     from parsee.templates.helpers import StructuringItem, MetaItem, create_template
     from parsee.extraction.models.helpers import gpt_config, replicate_config
-    from parsee.converters.main import load_document
+    from parsee.converters.main import load_document, from_text
     from parsee.extraction.run import run_job_with_single_model
     from parsee.utils.enums import *
     
-Step 1: create an extraction template
+### Step 1: create an extraction template
     
     question_to_be_answered = "What is the invoice total?"
     output_type = OutputType.NUMERIC
@@ -56,14 +56,22 @@ let's also define an item for the issuer of the invoice
     
     job_template = create_template([invoice_total, invoice_issuer])
     
-Step 2: define a model
+### Step 2: define a model
 
 In the following we will use the Mixtral model from Replicate, requires an API key: https://replicate.com/
     
     replicate_api_key = os.getenv("REPLICATE_KEY")
     replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
     
-Step 3: load a document
+### Step 3: load a document
+Parsee converts all data (strings, file contents etc.) to a standardized format, the class for this is called StandardDocumentFormat.
+
+#### a) Let's first create a StandardDocumentFormat object from a simple string
+    
+    input_string = "The invoice total amounts to 12,5 Euros and is due on Feb 28th 2024. Invoice to: Some company LLC. Thanks for using the services of CloudCompany Inc."
+    document = from_text(input_string)
+
+#### b) We can also simply load and convert files into the StandardDocumentFormat with the help of the converters that are included in Parsee, let's use an actual PDF invoice now
 
     file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"
     document = load_document(file_path)

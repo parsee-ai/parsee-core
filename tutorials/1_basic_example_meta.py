@@ -2,7 +2,7 @@ import os
 
 from parsee.templates.helpers import StructuringItem, MetaItem, create_template
 from parsee.extraction.models.helpers import gpt_config, replicate_config
-from parsee.converters.main import load_document
+from parsee.converters.main import load_document, from_text
 from parsee.extraction.run import run_job_with_single_model
 from parsee.utils.enums import *
 
@@ -36,6 +36,14 @@ replicate_api_key = os.getenv("REPLICATE_KEY")
 replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
 
 # Step 3: load a document
+# We can use the example string included in the readme for example
+input_string = "The invoice total amounts to 12,5 Euros and is due on Feb 28th 2024. Invoice to: Some company LLC. Thanks for using the services of CloudCompany Inc."
+document = from_text(input_string)
+
+_, _, answers_open_source_model = run_job_with_single_model(document, job_template, replicate_model)
+
+# Step 3: load a document
+# Or we can load an actual PDF invoice
 file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf" # modify file path here (use absolute file paths if possible), for this example we are using one of the example files included in this repo
 document = load_document(file_path)
 
