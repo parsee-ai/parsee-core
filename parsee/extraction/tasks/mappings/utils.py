@@ -8,7 +8,7 @@ from parsee.templates.mappings import MappingSchema
 def calc_buckets(key_value_pairs: List[Tuple[str, any]], mappings: List[ParseeBucket], mapping_schema: MappingSchema) -> Dict[str, Decimal]:
 
     if len(mappings) != len(key_value_pairs):
-        raise Exception("mappings not same length")
+        return {}
 
     output = {}
 
