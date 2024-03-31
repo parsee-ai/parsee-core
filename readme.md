@@ -76,7 +76,7 @@ Parsee converts all data (strings, file contents etc.) to a standardized format,
     file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"
     document = load_document(file_path)
     
-Step 4: run the extraction
+### Step 4: run the extraction
 
     _, _, answers_open_source_model = run_job_with_single_model(document, job_template, replicate_model)
 
