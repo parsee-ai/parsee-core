@@ -105,7 +105,7 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
     def format_schema(self, schema: MappingSchema):
         bucket_str = ""
         for schema_item in schema.buckets:
-            bucket_str += f"{self.item_id_string(schema_item)}: {schema_item.caption}\n"
+            bucket_str += f"{self.item_id_string(schema_item)}: {schema_item.caption}\n" + (f"({schema_item.description})"if schema_item.description is not None and schema_item.description.strip() != "" else "")
         return bucket_str
 
     def build_prompt(self, table: FinalOutputTable, schema: MappingSchema) -> Prompt:
