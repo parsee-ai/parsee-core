@@ -236,3 +236,15 @@ def parse_json_dict(string_val: str) -> Union[None, Dict[str, any]]:
             return None
     else:
         return None
+
+
+def parse_json_array(string_val: str) -> Union[None, List[any]]:
+    result = re.search(r'(\[[^\]]*\])', string_val)
+    if result is not None and len(result.groups()) > 0:
+        try:
+            values_predicted = json.loads(result.group(1))
+            if isinstance(values_predicted, list):
+                return values_predicted
+        except Exception as e:
+            return None
+    return None

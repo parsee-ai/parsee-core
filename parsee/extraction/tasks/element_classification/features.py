@@ -143,7 +143,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
 
     def __init__(self):
         super().__init__()
-        self.number_replacement = "[number]"
+        self.number_replacement = "NUMBER"
 
     def build_raw_answer(self, locations: List[ParseeLocation]) -> str:
         sorted_ids = list(sorted([x.source.element_index for x in locations]))
@@ -170,7 +170,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
         features = self.make_features(None, None, all_element_indices, document.elements, False)
 
         prompt = Prompt("", f'we want to find an item labeled "{item.title}".{additional_info_str}', f"""We are providing data in the following with the element_index and the text, such as [ELEMENT_INDEX] "TEXT" [end of item].
-                Using the text, identify "{item.title}" and return the elements which you think are most likely representing "{item.title}" (it can be one item or several together).
-                It is very important that you only return the element_index and nothing else.""", "Your response could be for example: [10] or [241],[1204] ", self.get_elements_text(features))
+                Using the provided text, identify "{item.title}" and return the tables which you think are most likely representing "{item.title}" (it can be one item alone or several together that form the searched item).
+                Return the ELEMENT_INDEX of all items in a JSON array.""", "Your response could be for example: [10] or [241, 1204] ", self.get_elements_text(features))
 
         return prompt

@@ -3,7 +3,7 @@ import re
 
 from parsee.extraction.tasks.element_classification.element_model import ElementModel, ElementSchema, StandardDocumentFormat, ParseeLocation
 from parsee.storage.interfaces import StorageManager
-from parsee.utils.helper import is_number_cell, clean_numeric_value
+from parsee.utils.helper import is_number_cell, clean_numeric_value, parse_json_array
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
 from parsee.extraction.tasks.element_classification.features import LLMLocationFeatureBuilder
 
@@ -19,21 +19,20 @@ class ElementModelLLM(ElementModel):
         self.prob = 0.8
         self.feature_builder: LLMLocationFeatureBuilder = LLMLocationFeatureBuilder()
 
-    def parse_prompt_answer(self, prompt_answer: str) -> Union[int, None]:
+    def parse_prompt_answer(self, prompt_answer: str) -> List[int]:
         answers = prompt_answer.splitlines()
+        output = []
         for k, answer in enumerate(answers):
-            result = re.search(r'(\[|)(\d+)(\]|)', answer)
-            if result is not None and len(result.groups()) > 2:
-                value_predicted = result.group(2)
-                clean_value = int(clean_numeric_value(value_predicted))
-                if is_number_cell(value_predicted) and clean_value >= 0:
-                    return clean_value
-        return None
+            values_predicted = parse_json_array(answer)
+            if values_predicted is not None:
+                for val in values_predicted:
+                    if isinstance(val, int):
+                        output.append(val)
+        return output
 
     def classify_elements(self, document: StandardDocumentFormat) -> List[ParseeLocation]:
 
         output: List[ParseeLocation] = []
-        PARTIAL_PROB = 0
 
         for item in self.items:
 
@@ -42,10 +41,13 @@ class ElementModelLLM(ElementModel):
             answer, amount = self.llm.make_prompt_request(str(prompt))
             self.storage.log_expense(self.llm.model_name, amount, item.id)
 
-            best_idx = self.parse_prompt_answer(answer)
+            best_indexes = self.parse_prompt_answer(answer)
 
-            if best_idx is not None and 0 <= best_idx < len(document.elements):
-                el = document.elements[best_idx]
-                location = ParseeLocation(self.model_name, PARTIAL_PROB, item.id, self.prob, el.source, [])
-                output.append(location)
+            partial_prob = 0.0 if len(best_indexes) <= 1 else 0.6
+
+            for best_idx in best_indexes:
+                if 0 <= best_idx < len(document.elements):
+                    el = document.elements[best_idx]
+                    location = ParseeLocation(self.model_name, partial_prob, item.id, self.prob, el.source, [])
+                    output.append(location)
         return output
