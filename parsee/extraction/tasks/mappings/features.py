@@ -105,14 +105,14 @@ class LLMMappingFeatureBuilder(MappingFeatureBuilder):
     def format_schema(self, schema: MappingSchema):
         bucket_str = ""
         for schema_item in schema.buckets:
-            bucket_str += f"{self.item_id_string(schema_item)}: {schema_item.caption}\n" + (f"({schema_item.description})"if schema_item.description is not None and schema_item.description.strip() != "" else "")
+            bucket_str += f"{self.item_id_string(schema_item)}: {schema_item.caption}" + (f" ({schema_item.description})"if schema_item.description is not None and schema_item.description.strip() != "" else "") +"\n"
         return bucket_str
 
     def build_prompt(self, table: FinalOutputTable, schema: MappingSchema) -> Prompt:
 
         return Prompt(
-            "You are supposed to classify line-items from a table into several possible buckets. Each item can only be placed in one bucket.",
-            f"The table with data will be provided as an array of rows, each line item has an ID that will be included in the first cell in at the beginning. The buckets are presented with an ID followed by a descriptive name.", "Format your output as a JSON dictionary, where the keys correspond to the IDs of the buckets and the values are arrays of the line item IDs.",
+            "You are supposed to classify line-items from a table into several possible buckets. Each item can only be placed in one bucket. If possible, make sure that buckets that represent a sum of some other items are roughly adding up, using the numbers in the table.",
+            f"The table with data will be provided as an array of rows, each line item has an ID that will be included in the first cell at the beginning. After the first cell, all other cells are the values of the line item for each column. The buckets are presented with an ID followed by a descriptive name.", "Format your output as a JSON dictionary, where the keys correspond to the IDs of the buckets and the values are arrays of the line item IDs.",
             f"For example for the following table: {self.format_table(samples.table)} \n"
             f"And the following buckets: {self.format_schema(samples.schema)}"
             f"a valid output would be: {self.full_example()}",
