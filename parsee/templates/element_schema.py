@@ -13,6 +13,7 @@ class ElementSchema:
     additionalInfo: str
     keywords: str
     takeBestInProximity: bool
+    collapseColumns: bool
     model: Optional[str]
     searchStrategy: SearchStrategy
     mapRows: Union[None, MappingSchema]
@@ -21,7 +22,7 @@ class ElementSchema:
 
     def to_json_dict(self) -> Dict:
         return {"id": self.id, "title": self.title, "additionalInfo": self.additionalInfo, "keywords": self.keywords,
-                "takeBestInProximity": self.takeBestInProximity, "model": self.model, "searchStrategy": self.searchStrategy.value,
+                "takeBestInProximity": self.takeBestInProximity, "collapseColumns": self.collapseColumns, "model": self.model, "searchStrategy": self.searchStrategy.value,
                 "mapRows": self.mapRows.to_json_dict() if self.mapRows is not None else None,
                 "mappingModel": self.mappingModel,
                 "metaInfoIds": self.metaInfoIds

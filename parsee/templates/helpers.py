@@ -72,6 +72,7 @@ class TableItem(ElementSchema):
         self.additionalInfo = item_description
         self.keywords = keywords
         self.takeBestInProximity = False
+        self.collapseColumns = False
         self.model = None
         self.searchStrategy = SearchStrategy.VECTOR
         self.mapRows = row_mapping
