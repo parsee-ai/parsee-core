@@ -57,9 +57,6 @@ def structure_data(doc: StandardDocumentFormat, job_template: JobTemplate, model
     for model_mapping in mapping_models:
         for table in tables:
             mappings, mapping_schema = model_mapping.classify_elements(table)
-            if mapping_schema is not None:
-                for col in table.columns:
-                    col.apply_mappings(mappings, mapping_schema)
             all_mappings += mappings
 
     return all_mappings, output_values, answers
