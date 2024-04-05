@@ -27,7 +27,8 @@ def assemble(job_template: JobTemplate, document: StandardDocumentFormat, locati
         if class_value is not None:
             if class_value not in candidates_by_class:
                 candidates_by_class[class_value] = []
-            candidates_by_class[class_value].append(ElementGroup(class_value, prediction))
+            # find detection item
+            candidates_by_class[class_value].append(ElementGroup(class_value, prediction, detection_schema_by_class[prediction.detected_class].collapseColumns))
 
     predictions_by_element_index = {}
     for pred in locations:

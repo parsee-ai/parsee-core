@@ -33,7 +33,6 @@ class FinalOutputTableColumn:
     li_identifier: Union[str, None]
     kv_identifier: str
     key_value_pairs: List[Tuple[str, any]]
-    fully_structured: Dict[str, any]
     sources: List[ExtractedSource]
     meta: List[ParseeMeta]
     model: str
@@ -46,7 +45,6 @@ class FinalOutputTableColumn:
         self.sources = []
         self.meta = []
         self.model = location.model
-        self.fully_structured = {}
         self.li_identifier = None
         self.set_identifiers()
         self.locations = [location]
@@ -60,11 +58,6 @@ class FinalOutputTableColumn:
 
     def __repr__(self):
         return str(self)
-
-    def apply_mappings(self, mappings: List[ParseeBucket], schema: MappingSchema):
-        buckets = calc_buckets(self.key_value_pairs, mappings, schema)
-        for key, value in buckets.items():
-            self.fully_structured[key] = value
 
     def key_value_pairs_json(self):
         return [{str(key): (str(value) if value is not None else None)} for key, value in self.key_value_pairs]
@@ -95,6 +88,21 @@ class FinalOutputTableColumn:
         self.org_col_indices.append(org_col_idx)
         self.build()
 
+    def can_be_merged(self, col: FinalOutputTableColumn) -> bool:
+        if len(col.key_value_pairs) != len(self.key_value_pairs) or col.li_identifier != self.li_identifier:
+            return False
+        for k, (li, val) in enumerate(self.key_value_pairs):
+            check_li, check_val = col.key_value_pairs[k]
+            if val is not None and check_val is not None:
+                return False
+        return True
+
+    def merge_kv(self, col: FinalOutputTableColumn):
+        # merges key value pairs with key value pairs of other column
+        for k, (li, val) in enumerate(self.key_value_pairs):
+            if val is None:
+                self.key_value_pairs[k] = (li, col.key_value_pairs[k][1])
+        self.set_identifiers()
 
 class FinalOutputTable:
     detected_class: str
@@ -120,9 +128,10 @@ class ElementGroup:
     detected_class: str
     components: List[ParseeLocation]
 
-    def __init__(self, detected_class: str, base_component: ParseeLocation):
+    def __init__(self, detected_class: str, base_component: ParseeLocation, collapse_columns: bool = False):
         self.detected_class = detected_class
         self.components = [base_component]
+        self.collapse_columns = collapse_columns
 
     def prob_combined(self) -> float:
         return float(np.mean([x.prob for x in self.components])) if len(self.components) > 0 else 0
@@ -140,14 +149,17 @@ class ElementGroup:
 
     def structured_values(self, elements: List[ExtractedEl]) -> List[FinalOutputTableColumn]:
 
+        # sort by element index
+        components_sorted = list(sorted(self.components, key=lambda x: x.source.element_index))
+
         # collect all relevant elements
         elements_by_idx = {}
-        for comp in self.components:
+        for comp in components_sorted:
             el = elements[comp.source.element_index]
             elements_by_idx[comp.source.element_index] = el
 
         submissions_by_col = {}
-        for loc_k, location in enumerate(self.components):
+        for loc_k, location in enumerate(components_sorted):
             # check that element is really a table
             if elements_by_idx[location.source.element_index].el_type == ElementType.TEXT:
                 continue
@@ -204,7 +216,16 @@ class ElementGroup:
                 else:
                     submissions_by_col[col_index_final].add_location(location, current_element, col_index_local, col_index_org)
 
-        return list(submissions_by_col.values())
+        # collapse columns from right to left if required and possible
+        to_del = set()
+        if self.collapse_columns:
+            for key_idx in range(len(submissions_by_col.keys())-1,-1,-1):
+                key = list(submissions_by_col.keys())[key_idx]
+                # check if columns can be merged
+                if key_idx > 0 and submissions_by_col[key].can_be_merged(submissions_by_col[list(submissions_by_col.keys())[key_idx-1]]):
+                    submissions_by_col[list(submissions_by_col.keys())[key_idx - 1]].merge_kv(submissions_by_col[key])
+                    to_del.add(key)
+        return [x for k, x in submissions_by_col.items() if k not in to_del]
 
 
 class StructuredLineItem:
