@@ -588,7 +588,7 @@ class StructuredTable(ExtractedEl):
 
             num_numeric = len([x for x in col_value_types if x == "numeric"])
             num_text = len([x for x in col_value_types if x == "text"])
-            if num_numeric > min_numeric and num_numeric > num_text:
+            if num_numeric >= min_numeric and num_numeric > num_text:
                 numeric_cols.append(col_index)
             if len(set(col_value_types)) == 1 and col_value_types[0] == "null":
                 self.empty_columns.append(col_index)
