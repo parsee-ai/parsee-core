@@ -35,9 +35,9 @@ def get_date_regex(string_val) -> Union[str, None]:
         return None
 
 
-def is_negative(cell_str):
+def is_negative(cell_str) -> bool:
     # minus
-    if re.search(r'(-|—|–|‒|―|–|−)( | |)*\d', cell_str.strip()):
+    if re.search(r'(-|—|–|‒|―|–|−)', cell_str):
         return True
     # brackets
     if re.search(r'\([\d ,.%]+(\)|\b)', cell_str.strip()):
@@ -45,19 +45,19 @@ def is_negative(cell_str):
     return False
 
 
-def comma_separator_thousands(cell_str):
+def comma_separator_thousands(cell_str) -> bool:
     if re.search(r'\b[0-9]{1,3}[,][0-9]{3}\b', cell_str):
         return True
     return False
 
 
-def dot_separator_thousands(cell_str):
+def dot_separator_thousands(cell_str) -> bool:
     if re.search(r'\b[0-9]{1,3}[.][0-9]{3}\b', cell_str):
         return True
     return False
 
 
-def clean_numeric_value(cell_str: str):
+def clean_numeric_value(cell_str: str) -> Union[None, Decimal]:
     if cell_str.strip() == "":
         return None
     mult = 1
