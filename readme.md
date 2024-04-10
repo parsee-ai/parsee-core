@@ -62,6 +62,14 @@ In the following we will use the Mixtral model from Replicate, requires an API k
     
     replicate_api_key = os.getenv("REPLICATE_KEY")
     replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
+
+If you intend to use a model that has multimodal capabilities such as GPT 4 or Claude 3, you can enable the multimodal queries by setting the multimodal setting to True (you can also specify how many images should be passed to the modal at most and the maximum size for each image):
+
+    gpt_model = gpt_config(os.getenv("OPENAI_KEY"), None, openai_model_name="gpt-4-turbo", multimodal=True, max_images=3, max_image_size=2000)
+
+or for Anthropic models:
+    
+    anthropic_model = anthropic_config(os.getenv("ANTHROPIC_KEY"), "claude-3-opus-20240229", None, multimodal=True, max_images=1, max_image_size=800)
     
 ### Step 3: load a document
 Parsee converts all data (strings, file contents etc.) to a standardized format, the class for this is called StandardDocumentFormat.
@@ -113,6 +121,8 @@ We can also use a different model to run the same extraction:
 7) Model Evaluations: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/6_model_evaluations.py">Python Code.</a>
 
 8) Langchain Integration: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/7_langchain_integration.py">Python Code.</a>
+
+9) Multimodal Models: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/multimodal_models.py">Python Code.</a>
 
 ## Basic Rules for Extraction Templates
 
