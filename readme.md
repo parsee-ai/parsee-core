@@ -32,7 +32,7 @@ Given we have some invoices, we want to:
 
     import os
     from parsee.templates.helpers import StructuringItem, MetaItem, create_template
-    from parsee.extraction.models.helpers import gpt_config, replicate_config
+    from parsee.extraction.models.helpers import *
     from parsee.converters.main import load_document, from_text
     from parsee.extraction.run import run_job_with_single_model
     from parsee.utils.enums import *
