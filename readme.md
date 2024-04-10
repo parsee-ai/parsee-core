@@ -70,6 +70,10 @@ If you intend to use a model that has multimodal capabilities such as GPT 4 or C
 or for Anthropic models:
     
     anthropic_model = anthropic_config(os.getenv("ANTHROPIC_KEY"), "claude-3-opus-20240229", None, multimodal=True, max_images=1, max_image_size=800)
+
+of course you can also load a locally hosted model with Ollama:
+
+    ollama_model = ollama_config("mistral")
     
 ### Step 3: load a document
 Parsee converts all data (strings, file contents etc.) to a standardized format, the class for this is called StandardDocumentFormat.
