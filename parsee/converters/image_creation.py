@@ -67,10 +67,7 @@ class DiskImageCreator(ImageCreator):
                 images = make_images_from_pdf(document.file_path, temp_dir.name, [max_image_size], None)
                 file_paths = [images[max_image_size][x] for x in page_indexes]
                 output += from_file_paths(file_paths, max_image_size)
-        elif document.source_type == DocumentType.HTML:
-            # TODO
-            raise NotImplemented
         else:
-            raise Exception("unsupported document type, images can only be created from PDFs or HTML files")
+            raise Exception("unsupported document type, images can only be created from PDFs. To create a PDF from a HTML file, use a tool like pdfkit, then run pdfkit.from_file('your_file') and use the output file instead of the HTML.")
 
         return output
