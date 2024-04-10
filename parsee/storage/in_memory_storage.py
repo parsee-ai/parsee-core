@@ -7,6 +7,7 @@ from parsee.storage.vector_stores.simple_faiss import SimpleFaissStore
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.templates.job_template import JobTemplate
 from parsee.extraction.extractor_dataclasses import AssignedMeta, AssignedLocation, AssignedAnswer, AssignedBucket
+from parsee.converters.image_creation import DiskImageCreator
 
 
 class InMemoryStorageManager(StorageManager):
@@ -17,7 +18,7 @@ class InMemoryStorageManager(StorageManager):
     truth_mappings: List[AssignedBucket]
 
     def __init__(self, available_models: Optional[List[MlModelSpecification]]):
-        super().__init__(SimpleFaissStore())
+        super().__init__(SimpleFaissStore(), DiskImageCreator())
         self.models = available_models if available_models is not None else []
         self.truth_questions = []
         self.truth_locations = []

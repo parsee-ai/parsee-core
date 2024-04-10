@@ -245,6 +245,7 @@ class LLMMetaFeatureBuilder(MetaFeatureBuilder):
     def build_prompt(self, features: DatasetRow, col_idx: int, items: List[StructuringItemSchema]) -> Prompt:
 
         available_data = f'''
+                This is the information that is available:\n
                 The current column index is: {col_idx}. \n
                 On top of the column (in the header part), there is this text: "{features.get_feature('top_column_all')}"\n
                 The content of the table is the following (excluding any numbers): {features.get_feature('li_and_values')}\n

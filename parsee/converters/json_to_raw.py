@@ -38,4 +38,4 @@ def load_document_from_json(json_contents) -> StandardDocumentFormat:
     source_identifier = json_contents["source_identifier"]
     elements = load_elements_from_json(json_contents["elements"])
 
-    return StandardDocumentFormat(source_type, source_identifier, elements)
+    return StandardDocumentFormat(source_type, source_identifier, elements, None)

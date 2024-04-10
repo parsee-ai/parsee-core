@@ -4,6 +4,7 @@ from typing import *
 from tiktoken.core import Encoding
 
 from parsee.extraction.models.llm_models.prompts import Prompt
+from parsee.extraction.models.model_dataclasses import MlModelSpecification
 
 
 def get_tokens_encoded(prompt: str, encoding: Encoding) -> List[int]:
@@ -21,10 +22,10 @@ def truncate_prompt(prompt: str, encoding: Encoding, max_tokens: int) -> Tuple[s
 
 class LLMBaseModel:
 
-    model_name: str
+    spec: MlModelSpecification
 
-    def __init__(self, name: str):
-        self.model_name = name
+    def __init__(self, spec: MlModelSpecification):
+        self.spec = spec
 
-    def make_prompt_request(self, prompt: str) -> Tuple[str, Decimal]:
+    def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         raise NotImplemented

@@ -8,14 +8,18 @@ from parsee.extraction.extractor_dataclasses import ParseeBucket
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.datasets.readers.interfaces import ModelReader
 from parsee.storage.vector_stores.interfaces import VectorStore
+from parsee.extraction.extractor_elements import ExtractedEl
+from parsee.converters.image_creation import ImageCreator
 
 
 class StorageManager:
 
     vector_store: VectorStore
+    image_creator: ImageCreator
 
-    def __init__(self, vector_store: VectorStore):
+    def __init__(self, vector_store: VectorStore, image_creator: ImageCreator):
         self.vector_store = vector_store
+        self.image_creator = image_creator
 
     def db_values_template(self, job_template: JobTemplate, strict: bool) -> JobTemplate:
         raise NotImplemented

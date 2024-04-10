@@ -23,4 +23,4 @@ def langchain_loader_to_sdf(loader: BaseLoader, document_type: DocumentType, sou
 
     elements = documents_to_extracted_elements(pages, document_type)
 
-    return StandardDocumentFormat(document_type, source_identifier, elements)
+    return StandardDocumentFormat(document_type, source_identifier, elements, None)
