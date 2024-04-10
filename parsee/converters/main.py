@@ -49,12 +49,14 @@ def from_text(text: str) -> StandardDocumentFormat:
 def doc_to_standard_format(source_identifier: str, source_type: DocumentType, converter: RawToJsonConverter,
                            file_path_or_content: str) -> Tuple[StandardDocumentFormat, Decimal]:
     elements, amount = converter.convert(file_path_or_content)
-    return StandardDocumentFormat(source_type, source_identifier, elements), amount
+    return StandardDocumentFormat(source_type, source_identifier, elements, None if source_type == DocumentType.TEXT else file_path_or_content), amount
 
 
 def save_doc_in_standard_format(source_identifier: str, source_type: DocumentType, converter: RawToJsonConverter, file_path: str) -> \
         Tuple[any, StandardDocumentFormat, Decimal]:
     doc, amount = doc_to_standard_format(source_identifier, source_type, converter, file_path)
+    # unset file path
+    doc.file_path = None
     json_string = json.dumps(doc.to_json_dict())
     tmp = tempfile.NamedTemporaryFile(delete=True)
     tmp.write(str.encode(json_string, 'utf-8'))

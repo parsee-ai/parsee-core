@@ -14,7 +14,7 @@ class MappingModelLLM(MappingModel):
 
     def __init__(self, items: List[ElementSchema], storage: StorageManager, llm: LLMBaseModel, **kwargs):
         super().__init__(items)
-        self.model_name = llm.model_name
+        self.model_name = llm.spec.internal_name
         self.llm = llm
         self.storage = storage
         self.prob = 0.8
@@ -43,6 +43,6 @@ class MappingModelLLM(MappingModel):
     def classify_with_schema(self, table: FinalOutputTable, schema: MappingSchema) -> List[ParseeBucket]:
 
         prompt = self.feature_builder.make_prompt(table, schema)
-        answer, amount = self.llm.make_prompt_request(str(prompt))
+        answer, amount = self.llm.make_prompt_request(prompt)
         self.storage.log_expense(self.llm.model_name, amount, f"mapping:{table.detected_class}")
         return self.parse_answer(table, answer, schema, table.li_identifier)

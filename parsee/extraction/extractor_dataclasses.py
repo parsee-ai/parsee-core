@@ -141,3 +141,9 @@ class AssignedAnswer:
     class_value: str
     meta: List[AssignedMeta]
     sources: List[ExtractedSource]
+
+
+@dataclass
+class Base64Image:
+    media_type: str
+    data: str

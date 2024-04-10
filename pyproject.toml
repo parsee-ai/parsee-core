@@ -22,6 +22,7 @@ sentence-transformers = "^2.2.2"
 lxml = "^4.9.1"
 anthropic = "^0.20.0"
 ollama = "^0.1.7"
+opencv-python = "^4.9.0.80"
 
 [tool.poetry.dev-dependencies]
 

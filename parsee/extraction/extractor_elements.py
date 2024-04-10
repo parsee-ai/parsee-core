@@ -698,6 +698,7 @@ class StandardDocumentFormat:
     source_type: DocumentType
     source_identifier: str
     elements: List[ExtractedEl]
+    file_path: Optional[str]
 
     def to_json_dict(self):
         return {"source_type": self.source_type.value, "source_identifier": self.source_identifier, "elements": [x.to_json_dict() for x in self.elements]}

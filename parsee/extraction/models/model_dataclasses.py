@@ -20,6 +20,9 @@ class MlModelSpecification:
     only_meta: Optional[List[str]]
     only_mappings: Optional[List[str]]
     stats: Optional[Dict]
+    multimodal: bool
+    max_images: Optional[int]
+    max_image_pixels: Optional[int]
 
     def model_path(self) -> Union[None, str]:
         if self.file_path is None:

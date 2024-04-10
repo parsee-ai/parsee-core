@@ -1,6 +1,6 @@
 from typing import *
 
-from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
+from parsee.extraction.extractor_elements import StandardDocumentFormat
 from parsee.extraction.tasks.questions.question_model import QuestionModel
 from parsee.extraction.tasks.questions.features import GeneralQueriesPromptBuilder
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta
@@ -9,7 +9,7 @@ from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
 from parsee.extraction.tasks.questions.utils import parse_sources, parse_answer_blocks, parse_main_and_meta, MAIN_QUESTION_STR
 from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQueryItemSchema
 from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
-from parsee.datasets.dataset_dataclasses import DatasetRow
+from parsee.extraction.models.llm_models.prompts import Prompt
 
 
 class LLMQuestionModel(QuestionModel):
@@ -18,7 +18,7 @@ class LLMQuestionModel(QuestionModel):
         super().__init__(items, meta_items)
         self.storage = storage
         self.llm = llm
-        self.model_name = llm.model_name
+        self.model_name = llm.spec.internal_name
         self.prompt_builder = GeneralQueriesPromptBuilder(storage)
 
     def parse_prompt_answer(self, item: GeneralQueryItemSchema, prompt_answer: str, total_elements: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
@@ -61,16 +61,16 @@ class LLMQuestionModel(QuestionModel):
 
         return output
 
-    def predict_for_prompt(self, prompt: str, schema_item: GeneralQueryItemSchema, max_element_index: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
-        prompt_answer, amount = self.llm.make_prompt_request(str(prompt))
-        self.storage.log_expense(self.llm.model_name, amount, schema_item.id)
+    def predict_for_prompt(self, prompt: Prompt, schema_item: GeneralQueryItemSchema, max_element_index: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
+        prompt_answer, amount = self.llm.make_prompt_request(prompt)
+        self.storage.log_expense(self.llm.spec.internal_name, amount, schema_item.id)
         return self.parse_prompt_answer(schema_item, prompt_answer, max_element_index, document)
 
     def predict_answers(self, document: StandardDocumentFormat) -> List[ParseeAnswer]:
 
         answers: List[ParseeAnswer] = []
         for schema_item in self.items:
-            prompt = self.prompt_builder.build_prompt(schema_item, self.meta, document)
-            answers += self.predict_for_prompt(str(prompt), schema_item, len(document.elements), document)
+            prompt = self.prompt_builder.build_prompt(schema_item, self.meta, document, None, self.llm.spec.multimodal, self.llm.spec.max_images, self.llm.spec.max_image_pixels)
+            answers += self.predict_for_prompt(prompt, schema_item, len(document.elements), document)
 
         return answers

@@ -18,7 +18,7 @@ class GeneralQueriesPromptBuilder:
     def __init__(self, storage: StorageManager):
         self.storage = storage
 
-    def build_raw_value(self, main_value: any, meta: List[ParseeMeta], sources: List[ExtractedSource], item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema]):
+    def build_raw_value(self, main_value: any, meta: List[ParseeMeta], sources: List[ExtractedSource], item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], add_sources: bool = True):
         schema_item = get_prompt_schema_item(item)
         if len(meta_items) > 0:
             output = f"{MAIN_QUESTION_STR}: {main_value}"
@@ -29,7 +29,8 @@ class GeneralQueriesPromptBuilder:
                 output += f"\n({meta_item.id}): {meta_schema_item.parsed_to_raw(answer_chosen)}"
         else:
             output = f"{schema_item.parsed_to_raw(main_value)}"
-        output += "\nSources: " + ",".join(f"[{x.element_index}]" for x in sources)
+        if add_sources:
+            output += "\nSources: " + ",".join(f"[{x.element_index}]" for x in sources)
         return output
 
     def get_relevant_elements(self, schema_item: GeneralQueryItemSchema, document: StandardDocumentFormat) -> List[ExtractedEl]:
@@ -42,19 +43,22 @@ class GeneralQueriesPromptBuilder:
             raise NotImplemented
 
     def get_elements_text(self, elements: List[ExtractedEl]):
-        llm_text = " (For the following data, if tables have empty cells, they are omitted)\n"
+        llm_text = "This is the available data to answer the question (in the following, if tables have empty cells, they are omitted):\n"
         for el in elements:
             llm_text += f"[{el.source.element_index}]: {el.get_text_llm(True)}\n"
         return llm_text
 
-    def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat, relevant_elements_custom: Optional[List[ExtractedEl]] = None) -> Prompt:
+    def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat, relevant_elements_custom: Optional[List[ExtractedEl]] = None, multimodal: bool = False, max_images: Optional[int] = None, max_image_size: Optional[int] = None) -> Prompt:
 
         elements = self.get_relevant_elements(structuring_item, document) if relevant_elements_custom is None else relevant_elements_custom
 
-        general_info = "You are supposed to answer a question based on text fragments that are provided. " \
-                       "The fragments start with a number and then the actual text. The lower the number of the fragment, " \
-                       "the earlier the fragment appeared in the document (reading from left to right, top to bottom). " \
-                       "Please respond as concise as possible."
+        if not multimodal:
+            general_info = "You are supposed to answer a question based on text fragments that are provided. " \
+                           "The fragments start with a number and then the actual text. The lower the number of the fragment, " \
+                           "the earlier the fragment appeared in the document (reading from left to right, top to bottom). " \
+                           "Please respond as concise as possible."
+        else:
+            general_info = "You are supposed to answer a question based on one or several images that are provided below."
 
         prompt_schema_item = get_prompt_schema_item(structuring_item)
 
@@ -66,7 +70,7 @@ class GeneralQueriesPromptBuilder:
         # build full example
         source_examples = [ExtractedSource(DocumentType.PDF, None, None, 241, None), ExtractedSource(DocumentType.PDF, None, None, 423, None)]
         meta_examples = [ParseeMeta("test", 0, source_examples, x.id, get_prompt_schema_item(x).get_example(True), 0.8) for x in relevant_meta_items]
-        example_output = self.build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples, structuring_item, relevant_meta_items)
+        example_output = self.build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples, structuring_item, relevant_meta_items, not multimodal)
 
         full_example = f"Your answer could look like this: {example_output}" if len(relevant_meta_items) == 0 else f"One possible answer block could be (there can be more than one in your response): {example_output}"
 
@@ -78,8 +82,7 @@ class GeneralQueriesPromptBuilder:
                 main_question += f"\n({meta_item.id}): {meta_item.title} {meta_item.additionalInfo} {meta_prompt_item.get_possible_values_str()}"
 
         prompt = Prompt(general_info, main_question,
-                        'Please at the end of each answer also provide the numbers of the text fragments you used to answer in square brackets.',
+                        'Please at the end of each answer also provide the numbers of the text fragments you used to answer in square brackets.' if not multimodal else "",
                         full_example,
-                        self.get_elements_text(elements))
-
+                        self.get_elements_text(elements) if not multimodal else self.storage.image_creator.get_images(document, elements, max_images, max_image_size))
         return prompt

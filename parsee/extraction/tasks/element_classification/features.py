@@ -150,7 +150,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
         return f"[{','.join([str(x) for x in sorted_ids])}]"
 
     def get_elements_text(self, features: List[DatasetRow]):
-        llm_text = ""
+        llm_text = "This is the data to answer the question:\n"
         for feature_entry in features:
             llm_text += f"[{feature_entry.element_identifier}] text before table: {feature_entry.get_feature('text_before')}; line items in table: {feature_entry.get_feature('text')} [end of item] \n"
         return llm_text
