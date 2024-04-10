@@ -44,7 +44,7 @@ _, _, answers_open_source_model = run_job_with_single_model(document, job_templa
 
 # Step 3: load a document
 # Or we can load an actual PDF invoice
-file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf" # modify file path here (use absolute file paths if possible), for this example we are using one of the example files included in this repo
+file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf" # modify file path here
 document = load_document(file_path)
 
 # Step 4: run the extraction
