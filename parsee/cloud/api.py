@@ -7,7 +7,7 @@ from parsee.templates.job_template import JobTemplate
 from parsee.templates.template_from_json import from_json_dict
 from parsee.extraction.extractor_elements import StandardDocumentFormat
 from parsee.converters.json_to_raw import load_document_from_json
-from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta, source_from_json
+from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta, source_from_json, AssignedAnswer, ExtractedSource
 
 
 class ParseeCloud:
@@ -55,10 +55,10 @@ class ParseeCloud:
                 output.append(ParseeAnswer(entry["model"], sources, class_id, class_value, "", True, meta_answers))
         return output
 
-    """
-    upload a PDF, HTML or image file to Parsee Cloud
-    """
     def upload_file(self, file_path: str) -> str:
+        """
+        upload a PDF, HTML or image file to Parsee Cloud
+        """
         with open(file_path, "rb") as f:
             data = f.read()
         file_data = {'file': (os.path.basename(file_path), data)}
@@ -70,3 +70,28 @@ class ParseeCloud:
         data = r.json()
 
         return list(data[0].values())[0]
+
+    def add_assigned_answers(self, template_id: str, source_identifier: str, answers: List[AssignedAnswer]) -> bool:
+        """
+        adds one or more assigned answers to the Parsee Cloud database
+        """
+        failed = False
+        for answer in answers:
+            data = {
+                "sourceIdentifier": source_identifier,
+                "templateId": template_id,
+                "itemId": answer.class_id,
+                "newValue": answer.class_value,
+                "newMeta": [
+                    {"model": "manual", "class_id": meta_item.class_id, "value": meta_item.class_value, "prob": 1.0} for meta_item in answer.meta
+                ],
+                "sources": [source.to_json_dict() for source in answer.sources]
+            }
+
+            url = f"{self.host}/api/extraction/output/general-query"
+
+            r = requests.post(url, json=data, headers=self._headers())
+
+            if r.status_code != 200:
+                failed = True
+        return not failed
