@@ -577,9 +577,8 @@ class StructuredTable(ExtractedEl):
         for row in self.rows:
             row.finalise_values(duplicate_columns)
 
-    def get_numeric_values(self):
+    def get_numeric_values_for_matching(self):
 
-        # determine all numeric values in the table
         numeric_values = []
 
         for row in self.rows:
@@ -587,7 +586,7 @@ class StructuredTable(ExtractedEl):
                 cell = row.final_values[col_index]
                 if cell.cell_type == "numeric" and cell.clean_value() is not None:
                     # do some more transformations, take abs and remove trailing zeros
-                    val_cleaned = delete_trailing_zeros(re.sub(r'[^0-9]', '', str(abs(cell.clean_value()))))
+                    val_cleaned = clean_number_for_matching(cell.clean_value())
                     numeric_values.append(val_cleaned)
 
         return numeric_values
