@@ -54,3 +54,19 @@ class ParseeCloud:
                 sources = [source_from_json(x) for x in entry["sources"]]
                 output.append(ParseeAnswer(entry["model"], sources, class_id, class_value, "", True, meta_answers))
         return output
+
+    """
+    upload a PDF, HTML or image file to Parsee Cloud
+    """
+    def upload_file(self, file_path: str) -> str:
+        with open(file_path, "rb") as f:
+            data = f.read()
+        file_data = {'file': (os.path.basename(file_path), data)}
+
+        extractor_url = f"{self.host}/api/document/upload?method=simple"
+
+        r = requests.post(extractor_url, {}, files=file_data, headers=self._headers())
+
+        data = r.json()
+
+        return list(data[0].values())[0]

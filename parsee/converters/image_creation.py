@@ -1,6 +1,7 @@
 from typing import *
 import tempfile
 import base64
+import shutil
 
 import cv2
 from numpy import ndarray
@@ -67,6 +68,8 @@ class DiskImageCreator(ImageCreator):
                 images = make_images_from_pdf(document.file_path, temp_dir.name, [max_image_size], None)
                 file_paths = [images[max_image_size][x] for x in page_indexes]
                 output += from_file_paths(file_paths, max_image_size)
+                # delete temp dir
+                shutil.rmtree(temp_dir.name)
         else:
             raise Exception("unsupported document type, images can only be created from PDFs. To create a PDF from a HTML file, use a tool like pdfkit, then run pdfkit.from_file('your_file') and use the output file instead of the HTML.")
 
