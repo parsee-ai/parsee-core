@@ -4,7 +4,7 @@ from parsee import *
 
 # BASIC EXAMPLE
 
-# Step 1: create an extraction template
+# Step 1: create an extraction template (you can also use custom prompts, for an example see tutorial 10)
 question_to_be_answered = "What is the invoice total?"
 output_type = OutputType.NUMERIC
 

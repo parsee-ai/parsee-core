@@ -55,6 +55,8 @@ let's also define an item for the issuer of the invoice
     invoice_issuer = StructuringItem("Who is the issuer of the invoice?", OutputType.ENTITY)
     
     job_template = create_template([invoice_total, invoice_issuer])
+
+As an alternative to using extraction templates, you can also run your own custom prompts, more in <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/10_custom_prompts.py">tutorial 10</a>.
     
 ### Step 2: define a model
 
@@ -110,25 +112,27 @@ We can also use a different model to run the same extraction:
 
 ## Full Tutorials
 
-1) Extraction Templates & Basics: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/1_basic_example_meta.py">Python Code.</a>
+0) Extraction Templates & Basics: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/1_basic_example_meta.py">Python Code.</a>
 
-2) Meta Items: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/0_basic_example.py">Python Code.</a>
+1) Meta Items: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/0_basic_example.py">Python Code.</a>
 
-3) Table Extraction: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/2_table_extraction.py">Python Code.</a>
+2) Table Extraction: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/2_table_extraction.py">Python Code.</a>
 
-4) Loading Templates from Parsee Cloud: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/3_loading_templates.py">Python Code.</a>
+3) Loading Templates from Parsee Cloud: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/3_loading_templates.py">Python Code.</a>
 
-5) Saving Templates: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/4_saving_templates.py">Python Code.</a>
+4) Saving Templates: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/4_saving_templates.py">Python Code.</a>
 
-6) Datasets: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/5_datasets.py">Python Code.</a>
+5) Datasets: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/5_datasets.py">Python Code.</a>
 
-7) Model Evaluations: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/6_model_evaluations.py">Python Code.</a>
+6) Model Evaluations: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/6_model_evaluations.py">Python Code.</a>
 
-8) Langchain Integration: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/7_langchain_integration.py">Python Code.</a>
+7) Langchain Integration: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/7_langchain_integration.py">Python Code.</a>
 
-9) Multimodal Models: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/multimodal_models.py">Python Code.</a>
+8) Multimodal Models: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/multimodal_models.py">Python Code.</a>
 
-10) Using Parsee Cloud to Load Images for Multimodal Applications: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/9_loading_images_from_parsee_cloud_for_multimodal_use.py">Python Code.</a>
+9) Using Parsee Cloud to Load Images for Multimodal Applications: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/9_loading_images_from_parsee_cloud_for_multimodal_use.py">Python Code.</a>
+
+10) Custom Prompts: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/10_custom_prompts.py">Python Code.</a>
 
 ## Basic Rules for Extraction Templates
 

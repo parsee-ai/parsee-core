@@ -2,6 +2,7 @@ from typing import *
 from functools import reduce
 
 from parsee.templates.job_template import JobTemplate
+from parsee.templates.helpers import create_template, StructuringItem, OutputType
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.storage.interfaces import StorageManager
 from parsee.extraction.extractor_elements import StandardDocumentFormat, FinalOutputTableColumn
@@ -12,11 +13,30 @@ from parsee.extraction.final_structuring import get_structured_tables_from_locat
 from parsee.extraction.models.model_loader import element_models_from_schema, meta_models_from_items, question_models_from_schema, mapping_models_from_schema, ModelLoader
 
 
-def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None, custom_image_creator: Optional[ImageCreator] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
+def _model_loader(models: List[MlModelSpecification], custom_model_loader: Optional[ModelLoader] = None, custom_image_creator: Optional[ImageCreator] = None) -> ModelLoader:
     model_loader = custom_model_loader
     if model_loader is None:
-        storage = InMemoryStorageManager([model], custom_image_creator)
+        storage = InMemoryStorageManager(models, custom_image_creator)
         model_loader = ModelLoader(storage)
+    return model_loader
+
+
+def run_custom_prompt(doc: StandardDocumentFormat, prompt: str, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None, custom_image_creator: Optional[ImageCreator] = None) -> str:
+    """
+    Runs a custom prompt and returns the unmodified response from the model.
+    Will insert data (either text or images, depending on model type selcted) from your document the same way the extraction via templates works.
+    """
+    template = create_template([StructuringItem(prompt, OutputType.TEXT)])
+    # update the models
+    template.set_default_model(model)
+    _, _, answers_text = structure_data(doc, template, _model_loader([model], custom_model_loader, custom_image_creator), {})
+    if len(answers_text) < 1:
+        return ""
+    return answers_text[0].raw_value
+
+
+def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None, custom_image_creator: Optional[ImageCreator] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
+    model_loader = _model_loader([model], custom_model_loader, custom_image_creator)
     # update the models
     job_template.set_default_model(model)
     return structure_data(doc, job_template, model_loader, {})
