@@ -4,7 +4,8 @@ import base64
 import shutil
 
 import cv2
-from numpy import ndarray
+from numpy import ndarray, frombuffer
+import numpy as np
 
 from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
 from parsee.utils.enums import DocumentType
@@ -24,25 +25,39 @@ def resize(image_cv2: ndarray, max_image_size: Optional[int]) -> ndarray:
     return img_resized
 
 
+def from_bytes(file_content: bytes, media_type: str, max_image_size: int) -> Base64Image:
+    # open and resize image if necessary
+    jpg_as_np = frombuffer(file_content, dtype=np.uint8)
+    img = cv2.imdecode(jpg_as_np, cv2.IMREAD_COLOR)
+    # resize
+    img = resize(img, max_image_size)
+    retval, buffer = cv2.imencode('.jpg', img)
+    encoded_string = base64.b64encode(buffer).decode("utf-8")
+    return Base64Image(media_type, encoded_string)
+
+
+def get_media_type_simple(file_path: str) -> str:
+    if file_path.endswith(".jpg") or file_path.endswith(".jpeg"):
+        return "image/jpeg"
+    elif file_path.endswith(".png"):
+        return "image/png"
+    else:
+        raise Exception("unsupported image type")
+
+
 def from_file_paths(file_paths: List[str], max_image_size: int) -> List[Base64Image]:
     output = []
     for fp in file_paths:
-        # type is always jpeg
-        media_type = "image/jpeg"
-        # open and resize image if necessary
-        img = cv2.imread(fp)
-        # resize
-        img = resize(img, max_image_size)
-        retval, buffer = cv2.imencode('.jpg', img)
-        encoded_string = base64.b64encode(buffer).decode("utf-8")
-        output.append(Base64Image(media_type, encoded_string))
+        media_type = get_media_type_simple(fp)
+        with open(fp, "rb") as f:
+            output.append(from_bytes(f.read(), media_type, max_image_size))
 
     return output
 
 
 class ImageCreator:
 
-    def get_images(self, document: StandardDocumentFormat, element_selection: List[ExtractedEl], max_images: Optional[int], max_image_size: Optional[int]) -> List[any]:
+    def get_images(self, document: StandardDocumentFormat, element_selection: List[ExtractedEl], max_images: Optional[int], max_image_size: Optional[int]) -> List[Base64Image]:
         raise NotImplemented
 
 

@@ -7,7 +7,9 @@ from parsee.templates.job_template import JobTemplate
 from parsee.templates.template_from_json import from_json_dict
 from parsee.extraction.extractor_elements import StandardDocumentFormat
 from parsee.converters.json_to_raw import load_document_from_json
-from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta, source_from_json, AssignedAnswer, ExtractedSource
+from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta, source_from_json, AssignedAnswer
+from parsee.extraction.extractor_dataclasses import Base64Image
+from parsee.converters.image_creation import from_bytes
 
 
 class ParseeCloud:
@@ -95,3 +97,23 @@ class ParseeCloud:
             if r.status_code != 200:
                 failed = True
         return not failed
+
+    def _get_image(self, source_identifier: str, page_index: int) -> bytes:
+
+        url = f"{self.host}/api/document/images?identifier={source_identifier}&page-index={page_index}"
+
+        return requests.get(url, headers=self._headers()).content
+
+    def get_image(self, source_identifier: str, page_index: int, max_image_size: int = 2000) -> Base64Image:
+
+        data = self._get_image(source_identifier, page_index)
+
+        return from_bytes(data, "image/jpeg", max_image_size)
+
+    def get_image_and_save(self, source_identifier: str, page_index: int, output_path: str):
+        """
+        :param output_path: Output image is always a JPEG.
+        """
+
+        with open(output_path, "wb") as f:
+            f.write(self._get_image(source_identifier, page_index))

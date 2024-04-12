@@ -128,6 +128,8 @@ We can also use a different model to run the same extraction:
 
 9) Multimodal Models: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/multimodal_models.py">Python Code.</a>
 
+10) Using Parsee Cloud to Load Images for Multimodal Applications: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/9_loading_images_from_parsee_cloud_for_multimodal_use.py">Python Code.</a>
+
 ## Basic Rules for Extraction Templates
 
 In the following, we will only focus on the "general questions" items of the extraction templates. The logic for table detection/structuring items is quite similar and we will add some more explanations for them in the future.

@@ -7,14 +7,15 @@ from parsee.storage.interfaces import StorageManager
 from parsee.extraction.extractor_elements import StandardDocumentFormat, FinalOutputTableColumn
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeBucket
 from parsee.storage.in_memory_storage import InMemoryStorageManager
+from parsee.converters.image_creation import ImageCreator
 from parsee.extraction.final_structuring import get_structured_tables_from_locations, final_tables_from_columns
 from parsee.extraction.models.model_loader import element_models_from_schema, meta_models_from_items, question_models_from_schema, mapping_models_from_schema, ModelLoader
 
 
-def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
+def run_job_with_single_model(doc: StandardDocumentFormat, job_template: JobTemplate, model: MlModelSpecification, custom_model_loader: Optional[ModelLoader] = None, custom_image_creator: Optional[ImageCreator] = None) -> Tuple[List[ParseeBucket], List[FinalOutputTableColumn], List[ParseeAnswer]]:
     model_loader = custom_model_loader
     if model_loader is None:
-        storage = InMemoryStorageManager([model])
+        storage = InMemoryStorageManager([model], custom_image_creator)
         model_loader = ModelLoader(storage)
     # update the models
     job_template.set_default_model(model)
