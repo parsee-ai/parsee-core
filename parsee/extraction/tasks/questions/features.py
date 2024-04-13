@@ -8,7 +8,7 @@ from parsee.extraction.tasks.questions.utils import MAIN_QUESTION_STR
 from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
 from parsee.utils.enums import DocumentType, SearchStrategy
 from parsee.storage.interfaces import StorageManager
-from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
+from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl, StructuredTable
 
 
 class GeneralQueriesPromptBuilder:
@@ -42,10 +42,10 @@ class GeneralQueriesPromptBuilder:
         else:
             raise NotImplemented
 
-    def get_elements_text(self, elements: List[ExtractedEl]):
-        llm_text = "This is the available data to answer the question (in the following, if tables have empty cells, they are omitted):\n"
+    def get_elements_text(self, elements: List[ExtractedEl], document: StandardDocumentFormat):
+        llm_text = "This is the available data to answer the question (in the following, if tables have empty cells, they are omitted, if a cell spans several columns, values might be repeated for each cell):\n"
         for el in elements:
-            llm_text += f"[{el.source.element_index}]: {el.get_text_llm(True)}\n"
+            llm_text += f"[{el.source.element_index}]: {el.get_text_and_surrounding_elements_text(document.elements) if isinstance(el, StructuredTable) else el.get_text_llm(True)}\n"
         return llm_text
 
     def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat, relevant_elements_custom: Optional[List[ExtractedEl]] = None, multimodal: bool = False, max_images: Optional[int] = None, max_image_size: Optional[int] = None) -> Prompt:
@@ -84,5 +84,5 @@ class GeneralQueriesPromptBuilder:
         prompt = Prompt(general_info, main_question,
                         'Please at the end of each answer also provide the numbers of the text fragments you used to answer in square brackets.' if not multimodal else "",
                         full_example,
-                        self.get_elements_text(elements) if not multimodal else self.storage.image_creator.get_images(document, elements, max_images, max_image_size))
+                        self.get_elements_text(elements, document) if not multimodal else self.storage.image_creator.get_images(document, elements, max_images, max_image_size))
         return prompt

@@ -518,6 +518,21 @@ class StructuredTable(ExtractedEl):
         text = re.sub(r' +', ' ', text)
         return "table: " + text
 
+    def get_text_and_surrounding_elements_text(self, elements: List[ExtractedEl]):
+
+        main_text = self.get_text_llm(True)
+
+        max_elements = 3
+
+        text_pieces = []
+        for a in range(self.source.element_index-1, max(-1, self.source.element_index-max_elements-1), -1):
+            if isinstance(elements[a], StructuredTable):
+                break
+            text_pieces.append(elements[a].get_text_llm(True))
+        text_pieces.reverse()
+        text_before = "\n".join(text_pieces)
+        return f"Table element - Text before table: {text_before}; {main_text}"
+
     def get_data_simplified(self):
         rows = []
 
