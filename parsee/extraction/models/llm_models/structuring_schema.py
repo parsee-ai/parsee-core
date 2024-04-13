@@ -46,14 +46,14 @@ class ListClassificationItem(PromptSchemaItem):
         self.possible_lowercase = [x.lower() for x in possible_values]
 
     def format_list_choice(self, val):
-        return f"$ {val} $"
+        return f"{val}"
 
     def get_example(self, clean_value: bool = False) -> str:
         return self.format_list_choice(self.possible_values[0]) if not clean_value else self.possible_values[0]
 
     def get_possible_values_str(self) -> str:
-        return "possible values (separated by $ symbols): " + ", ".join(
-            self.format_list_choice(x) for x in self.possible_values)
+        return "possible values (select one from json array): [" + ", ".join(
+            "'"+self.format_list_choice(x)+"'" for x in self.possible_values) + "]"
 
     def get_value(self, value: str) -> Tuple[str, bool]:
 
