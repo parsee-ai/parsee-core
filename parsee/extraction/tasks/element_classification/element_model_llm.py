@@ -39,7 +39,7 @@ class ElementModelLLM(ElementModel):
             prompt = self.feature_builder.make_prompt(item, document, self.storage)
 
             answer, amount = self.llm.make_prompt_request(prompt)
-            self.storage.log_expense(self.llm.model_name, amount, item.id)
+            self.storage.log_expense(self.llm.spec.internal_name, amount, item.id)
 
             best_indexes = self.parse_prompt_answer(answer)
 

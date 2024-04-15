@@ -44,5 +44,5 @@ class MappingModelLLM(MappingModel):
 
         prompt = self.feature_builder.make_prompt(table, schema)
         answer, amount = self.llm.make_prompt_request(prompt)
-        self.storage.log_expense(self.llm.model_name, amount, f"mapping:{table.detected_class}")
+        self.storage.log_expense(self.llm.spec.internal_name, amount, f"mapping:{table.detected_class}")
         return self.parse_answer(table, answer, schema, table.li_identifier)

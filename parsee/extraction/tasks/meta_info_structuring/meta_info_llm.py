@@ -43,7 +43,7 @@ class MetaLLMModel(MetaInfoModel):
 
             prompt_answer, amount = self.llm.make_prompt_request(prompt)
 
-            self.storage.log_expense(self.llm.model_name, amount, "meta LLM")
+            self.storage.log_expense(self.llm.spec.internal_name, amount, "meta LLM")
 
             prediction_dict = self.parse_prompt_answer(prompt_answer)
 
