@@ -103,7 +103,7 @@ class EvaluationResult:
         return total_scores
 
 
-def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None, writer_for_model_answers: Optional[DatasetWriter] = None, use_saved_model_answers: bool = False) -> Dict:
+def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None, writer_for_model_answers: Optional[DatasetWriter] = None, use_saved_model_answers: bool = False, new_dataset_name: Optional[str] = None) -> Dict:
 
     storage = InMemoryStorageManager(models) if storage is None else storage
     loader = ModelLoader(storage)
@@ -140,6 +140,6 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
 
     if writer_for_model_answers is not None:
         # write modified rows
-        writer_for_model_answers.write_rows(new_rows, "dataset_with_answers")
+        writer_for_model_answers.write_rows(new_rows, "dataset_with_answers" if new_dataset_name is None else new_dataset_name)
 
     return ev.evaluate()
