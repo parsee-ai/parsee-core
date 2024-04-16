@@ -2,14 +2,14 @@ from typing import *
 
 from parsee.extraction.extractor_elements import StandardDocumentFormat
 from parsee.extraction.tasks.questions.question_model import QuestionModel
-from parsee.extraction.tasks.questions.features import GeneralQueriesPromptBuilder
+from parsee.extraction.tasks.questions.features import GeneralQueriesPromptBuilder, MAIN_QUESTION_STR
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta
 from parsee.storage.interfaces import StorageManager
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel
-from parsee.extraction.tasks.questions.utils import parse_sources, parse_answer_blocks, parse_main_and_meta, MAIN_QUESTION_STR
 from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQueryItemSchema
 from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
 from parsee.extraction.models.llm_models.prompts import Prompt
+from parsee.utils.helper import parse_json_dict
 
 
 class LLMQuestionModel(QuestionModel):
@@ -23,21 +23,33 @@ class LLMQuestionModel(QuestionModel):
 
     def parse_prompt_answer(self, item: GeneralQueryItemSchema, prompt_answer: str, total_elements: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
 
-        multi_block = item.metaInfoIds is not None and len(item.metaInfoIds) > 0
+        json_data = parse_json_dict(prompt_answer)
 
-        answer_blocks = parse_answer_blocks(prompt_answer) if multi_block else [prompt_answer]
+        if json_data is None:
+            return []
+
+        answer_blocks = []
+        if "answers" in json_data and isinstance(json_data["answers"], list):
+            answer_blocks = json_data["answers"]
+        elif MAIN_QUESTION_STR in json_data:
+            answer_blocks = [json_data]
+
+        sources = []
+        if "sources" in json_data and isinstance(json_data["sources"], list):
+            sources = [int(x) for x in json_data["sources"] if str(x).isdigit() and 0 <= int(x) <= total_elements]
+
+        sources_full = [document.elements[el_idx].source for el_idx in sources] if document is not None else []
 
         output = []
-        for answer_block in answer_blocks:
+        for main_and_meta in answer_blocks:
 
-            final_answer, sources = parse_sources(answer_block, total_elements)
-
-            main_and_meta = parse_main_and_meta(final_answer) if multi_block else {MAIN_QUESTION_STR: final_answer}
+            if not isinstance(main_and_meta, dict):
+                continue
 
             main_answer = None
             parse_successful = False
             detected_meta = []
-            sources_full = [document.elements[el_idx].source for el_idx in sources] if document is not None else []
+
             for key, val in main_and_meta.items():
 
                 if key is None:
@@ -47,7 +59,7 @@ class LLMQuestionModel(QuestionModel):
                     prompt_item = get_prompt_schema_item(item)
                     main_answer, parse_successful = prompt_item.get_value(val)
                 else:
-                    meta_items_filtered = [x for x in self.meta if f"({x.id})" in key]
+                    meta_items_filtered = [x for x in self.meta if x.id == key]
                     if len(meta_items_filtered) > 0:
                         meta_item = meta_items_filtered[0]
                         prompt_item = get_prompt_schema_item(meta_item)
@@ -57,7 +69,7 @@ class LLMQuestionModel(QuestionModel):
 
             if main_answer is not None:
 
-                output.append(ParseeAnswer(self.model_name, sources_full, item.id, main_answer, answer_block, parse_successful, detected_meta))
+                output.append(ParseeAnswer(self.model_name, sources_full, item.id, main_answer, prompt_answer, parse_successful, detected_meta))
 
         return output
 

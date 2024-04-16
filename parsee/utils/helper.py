@@ -226,7 +226,12 @@ def parse_int_simple(string_val: str) -> Union[None, int]:
     return None
 
 
+def replace_in_json_string(string_val: str) -> str:
+    return string_val.replace("\\_", "_")
+
+
 def parse_json_dict(string_val: str) -> Union[None, Dict[str, any]]:
+    string_val = replace_in_json_string(string_val)
     match = re.search(r'({[\s\S]+})', string_val)
     if match:
         try:
@@ -239,6 +244,7 @@ def parse_json_dict(string_val: str) -> Union[None, Dict[str, any]]:
 
 
 def parse_json_array(string_val: str) -> Union[None, List[any]]:
+    string_val = replace_in_json_string(string_val)
     result = re.search(r'(\[[^\]]*\])', string_val)
     if result is not None and len(result.groups()) > 0:
         try:
