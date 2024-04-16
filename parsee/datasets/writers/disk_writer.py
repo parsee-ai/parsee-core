@@ -12,12 +12,13 @@ from parsee.datasets.writers.interfaces import DatasetWriter, ModelWriter
 
 class CsvDiskWriter(DatasetWriter):
 
-    def __init__(self, write_location: str):
+    def __init__(self, write_location: str, create_sub_dir: bool = True):
 
         # create folder
         folder_name = "dataset_"+str(uuid.uuid4())
-        final_path = os.path.join(write_location, folder_name)
-        os.mkdir(final_path)
+        final_path = os.path.join(write_location, folder_name) if create_sub_dir else write_location
+        if not os.path.exists(final_path):
+            os.mkdir(final_path)
         self.base_location = write_location
         self.write_location = final_path
         self.file = {}
