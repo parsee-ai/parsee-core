@@ -49,3 +49,4 @@ class ModelType(Enum):
     REPLICATE = "replicate"
     ANTHROPIC = "anthropic"
     OLLAMA = "ollama"
+    TOGETHER = "together"

@@ -13,7 +13,7 @@ pandas = "^1.4.3"
 numpy = "^1.23.1"
 tiktoken = "^0.4.0"
 openai = "^0.27.8"
-pydantic = "^1.6.2"
+pydantic = "^2.7.0"
 faiss-cpu = [{version = "<1.7.1", platform = "darwin"}, {version = "^1.7.1", platform = "linux"}]
 replicate = "^0.23.1"
 beautifulsoup4 = "^4.11.1"
@@ -23,6 +23,7 @@ lxml = "^4.9.1"
 anthropic = "^0.20.0"
 ollama = "^0.1.7"
 opencv-python = "^4.9.0.80"
+together = "^1.1.1"
 
 [tool.poetry.dev-dependencies]
 
