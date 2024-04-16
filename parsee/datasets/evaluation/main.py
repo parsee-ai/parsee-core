@@ -1,7 +1,9 @@
+import os.path
 from typing import *
 
 from parsee.extraction.extractor_dataclasses import ParseeAnswer
 from parsee.datasets.readers.interfaces import DatasetReader
+from parsee.datasets.writers.interfaces import DatasetWriter
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.templates.job_template import JobTemplate
 from parsee.extraction.models.model_loader import ModelLoader, LLMQuestionModel
@@ -101,7 +103,7 @@ class EvaluationResult:
         return total_scores
 
 
-def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None) -> Dict:
+def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None, writer_for_model_answers: Optional[DatasetWriter] = None, use_saved_model_answers: bool = False) -> Dict:
 
     storage = InMemoryStorageManager(models) if storage is None else storage
     loader = ModelLoader(storage)
@@ -111,6 +113,7 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
         if spec.model_type == "custom":
             raise Exception("custom models not allowed here")
 
+    new_rows = []
     for row, _ in reader.row_generator():
 
         for k, model_spec in enumerate(models):
@@ -121,10 +124,22 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
             if len(schema_items) == 0:
                 raise Exception("item not found in schema")
             schema_item = schema_items[0]
-            answers_model = model.predict_for_prompt(row.get_feature("full_prompt"), schema_item, None, None)
+            if use_saved_model_answers and row.get_value(model_spec.internal_name, False) is not None:
+                prompt_answer = row.get_value(model_spec.internal_name, False)
+                answers_model = model.parse_prompt_answer(schema_item, prompt_answer, None, None)
+            else:
+                answers_model = model.predict_for_prompt(row.get_feature("full_prompt"), schema_item, None, None)
+                raw_answer = "\n\n".join([x.raw_value for x in answers_model])
+                row.assign_truth_values({model_spec.internal_name: raw_answer})
             ev.add_answers(row.source_identifier, answers_model, False)
             if k == 0:
-                answers_assigned = model.parse_prompt_answer(schema_item, row.get_value("answer", False), None, None)
+                answers_assigned = model.parse_prompt_answer(schema_item, row.get_value("assigned", False), None, None)
                 ev.add_answers(row.source_identifier, answers_assigned, True)
+        if writer_for_model_answers is not None:
+            new_rows.append(row)
+
+    if writer_for_model_answers is not None:
+        # write modified rows
+        writer_for_model_answers.write_rows(new_rows, "dataset_with_answers")
 
     return ev.evaluate()

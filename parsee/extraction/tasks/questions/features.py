@@ -48,9 +48,7 @@ class GeneralQueriesPromptBuilder:
             llm_text += f"[{el.source.element_index}]: {el.get_text_and_surrounding_elements_text(document.elements) if isinstance(el, StructuredTable) else el.get_text_llm(True)}\n"
         return llm_text
 
-    def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat, relevant_elements_custom: Optional[List[ExtractedEl]] = None, multimodal: bool = False, max_images: Optional[int] = None, max_image_size: Optional[int] = None) -> Prompt:
-
-        elements = self.get_relevant_elements(structuring_item, document) if relevant_elements_custom is None else relevant_elements_custom
+    def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat, relevant_elements: List[ExtractedEl], multimodal: bool = False, max_images: Optional[int] = None, max_image_size: Optional[int] = None) -> Prompt:
 
         if not multimodal:
             general_info = "You are supposed to answer a question based on text fragments that are provided. " \
@@ -84,5 +82,5 @@ class GeneralQueriesPromptBuilder:
         prompt = Prompt(general_info, main_question,
                         'Please at the end of each answer also provide the numbers of the text fragments you used to answer in square brackets.' if not multimodal else "",
                         full_example,
-                        self.get_elements_text(elements, document) if not multimodal else self.storage.image_creator.get_images(document, elements, max_images, max_image_size))
+                        self.get_elements_text(relevant_elements, document) if not multimodal else self.storage.image_creator.get_images(document, relevant_elements, max_images, max_image_size))
         return prompt

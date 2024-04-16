@@ -26,6 +26,9 @@ class TogetherModel(LLMBaseModel):
         response = self.client.chat.completions.create(
             model=self.spec.internal_name,
             messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            max_tokens=self.max_tokens_answer,
+            top_p=1,
         )
         answer = response.choices[0].message.content
         price = Decimal(int(response.usage.total_tokens) * (self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)

@@ -29,13 +29,14 @@ def create_dataset_rows(template: JobTemplate, document: StandardDocumentFormat,
         if len(answers) > 0:
             for item in question_model.items:
                 meta_items_filtered = [x for x in template.meta if x.id in item.metaInfoIds]
-                prompt = question_feature_builder.build_prompt(item, meta_items_filtered, document)
+                relevant_elements = question_feature_builder.get_relevant_elements(item, document)
+                prompt = question_feature_builder.build_prompt(item, meta_items_filtered, document, relevant_elements)
                 real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
                 answers_filtered = [x for x in answers if x.class_id == item.id]
                 if len(answers_filtered) > 0:
                     # join together in case the answer has multiple blocks
                     full_answer = "\n\n".join([question_feature_builder.build_raw_value(answer.class_value, answer.meta, answer.sources, item, meta_items_filtered) for answer in answers_filtered])
                     row = DatasetRow(document.source_identifier, template.id, item.id, {"full_prompt": real_prompt})
-                    row.assign_truth_values({"answer": full_answer})
+                    row.assign_truth_values({"assigned": full_answer})
                     question_rows.append(row)
     return question_rows

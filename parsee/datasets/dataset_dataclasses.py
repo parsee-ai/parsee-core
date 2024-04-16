@@ -5,7 +5,7 @@ from enum import Enum
 from parsee.utils.constants import ID_NOT_CONFIGURED
 
 
-TRUTH_PREFIX = "TRUTH"
+TRUTH_PREFIX = "ANSWER"
 FEATURE_PREFIX = "FEATURE"
 
 

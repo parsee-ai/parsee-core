@@ -70,7 +70,8 @@ class LLMQuestionModel(QuestionModel):
 
         answers: List[ParseeAnswer] = []
         for schema_item in self.items:
-            prompt = self.prompt_builder.build_prompt(schema_item, self.meta, document, None, self.llm.spec.multimodal, self.llm.spec.max_images, self.llm.spec.max_image_pixels)
+            relevant_elements = self.prompt_builder.get_relevant_elements(schema_item, document)
+            prompt = self.prompt_builder.build_prompt(schema_item, self.meta, document, relevant_elements, self.llm.spec.multimodal, self.llm.spec.max_images, self.llm.spec.max_image_pixels)
             answers += self.predict_for_prompt(prompt, schema_item, len(document.elements), document)
 
         return answers
