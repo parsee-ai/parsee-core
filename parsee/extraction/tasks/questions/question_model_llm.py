@@ -36,7 +36,7 @@ class LLMQuestionModel(QuestionModel):
 
         sources = []
         if "sources" in json_data and isinstance(json_data["sources"], list):
-            sources = [int(x) for x in json_data["sources"] if str(x).isdigit() and 0 <= int(x) <= total_elements]
+            sources = [int(x) for x in json_data["sources"] if str(x).isdigit() and (total_elements is None or 0 <= int(x) <= total_elements)]
 
         sources_full = [document.elements[el_idx].source for el_idx in sources] if document is not None else []
 
@@ -54,6 +54,8 @@ class LLMQuestionModel(QuestionModel):
 
                 if key is None:
                     continue
+
+                val = str(val)
 
                 if MAIN_QUESTION_STR in key:
                     prompt_item = get_prompt_schema_item(item)

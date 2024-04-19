@@ -5,7 +5,7 @@ import json
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.models.llm_models.structuring_schema import get_prompt_schema_item
 from parsee.templates.general_structuring_schema import GeneralQueryItemSchema, StructuringItemSchema
-from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource
+from parsee.extraction.extractor_dataclasses import ParseeMeta, ExtractedSource, ParseeAnswer
 from parsee.utils.enums import DocumentType, SearchStrategy
 from parsee.storage.interfaces import StorageManager
 from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl, StructuredTable
@@ -21,19 +21,24 @@ class GeneralQueriesPromptBuilder:
     def __init__(self, storage: StorageManager):
         self.storage = storage
 
-    def build_raw_value(self, main_value: any, meta: List[ParseeMeta], sources: List[ExtractedSource], item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], add_sources: bool = True) -> str:
+    def format_single_item(self, answer: ParseeAnswer, item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema]) -> Dict:
         schema_item = get_prompt_schema_item(item)
+        output = {MAIN_QUESTION_STR: schema_item.parsed_to_raw(answer.class_value)}
+        for meta_item in meta_items:
+            meta_schema_item = get_prompt_schema_item(meta_item)
+            meta_answers = [x for x in answer.meta if x.class_id == meta_item.id]
+            answer_chosen = meta_answers[0].class_value if len(meta_answers) > 0 else "n/a"
+            output[meta_item.id] = meta_schema_item.parsed_to_raw(answer_chosen)
+        return output
+
+    def build_raw_value(self, answers: List[ParseeAnswer], item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], add_sources: bool = True) -> str:
         if len(meta_items) > 0:
-            output = {"answers": [{MAIN_QUESTION_STR: main_value}]}
-            for meta_item in meta_items:
-                meta_schema_item = get_prompt_schema_item(meta_item)
-                meta_answers = [x for x in meta if x.class_id == meta_item.id]
-                answer_chosen = meta_answers[0].class_value if len(meta_answers) > 0 else "n/a"
-                output["answers"][0][meta_item.id] = meta_schema_item.parsed_to_raw(answer_chosen)
+            output = {"answers": [self.format_single_item(x, item, meta_items) for x in answers]}
         else:
-            output = {MAIN_QUESTION_STR: schema_item.parsed_to_raw(main_value)}
+            # if no meta items, there can be only one answer
+            output = self.format_single_item(answers[0], item, meta_items)
         if add_sources:
-            output["sources"] = [x.element_index for x in sources]
+            output["sources"] = [x.element_index for x in answers[0].sources]
         return json.dumps(output)
 
     def get_relevant_elements(self, schema_item: GeneralQueryItemSchema, document: StandardDocumentFormat) -> List[ExtractedEl]:
@@ -70,7 +75,8 @@ class GeneralQueriesPromptBuilder:
         # build full example
         source_examples = [ExtractedSource(DocumentType.PDF, None, None, 241, None), ExtractedSource(DocumentType.PDF, None, None, 423, None)]
         meta_examples = [ParseeMeta("test", 0, source_examples, x.id, get_prompt_schema_item(x).get_example(True), 0.8) for x in relevant_meta_items]
-        example_output = self.build_raw_value(prompt_schema_item.get_example(), meta_examples, source_examples, structuring_item, relevant_meta_items, not multimodal)
+        sample_answer = ParseeAnswer("sample", source_examples, structuring_item.id, prompt_schema_item.get_example(), "", True, meta_examples)
+        example_output = self.build_raw_value([sample_answer], structuring_item, relevant_meta_items, not multimodal)
         sources_format = "Under the key 'sources', you should also provide the numbers of the text fragments you used to answer the question." if not multimodal else ""
 
         full_example = f"Your answer should be formatted as a JSON object, under the key '{MAIN_QUESTION_STR}' you can put as value the answer to the question in the designated format. {sources_format} For example your answer could look like this: {example_output}" \

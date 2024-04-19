@@ -18,28 +18,20 @@ class OllamaModel(LLMBaseModel):
 
     def __init__(self, model: MlModelSpecification):
         super().__init__(model)
-        self.max_retries = 0
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.max_tokens_answer = 1024
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
 
         self.client = Client(host='http://localhost:11434' if model.file_path is None else model.file_path)
 
-    def _call_api(self, prompt: str, retries: int = 0, wait: int = 5) -> str:
-        try:
-            response = self.client.chat(model=self.spec.internal_name, messages=[
-                {
-                    'role': 'user',
-                    'content': prompt,
-                },
-            ])
-            return response["message"]["content"]
-        except Exception as e:
-            if retries < self.max_retries:
-                time.sleep(wait * 2 ** retries)
-                return self._call_api(prompt, retries + 1)
-            else:
-                return ""
+    def _call_api(self, prompt: str) -> str:
+        response = self.client.chat(model=self.spec.internal_name, messages=[
+            {
+                'role': 'user',
+                'content': prompt,
+            },
+        ])
+        return response["message"]["content"]
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, num_tokens_input = truncate_prompt(str(prompt), self.encoding, self.max_tokens_question)

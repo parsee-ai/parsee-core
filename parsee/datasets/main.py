@@ -35,7 +35,7 @@ def create_dataset_rows(template: JobTemplate, document: StandardDocumentFormat,
                 answers_filtered = [x for x in answers if x.class_id == item.id]
                 if len(answers_filtered) > 0:
                     # join together in case the answer has multiple blocks
-                    full_answer = "\n\n".join([question_feature_builder.build_raw_value(answer.class_value, answer.meta, answer.sources, item, meta_items_filtered) for answer in answers_filtered])
+                    full_answer = question_feature_builder.build_raw_value(answers_filtered, item, meta_items_filtered)
                     row = DatasetRow(document.source_identifier, template.id, item.id, {"full_prompt": real_prompt})
                     row.assign_truth_values({"assigned": full_answer})
                     question_rows.append(row)
