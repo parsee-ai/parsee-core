@@ -14,7 +14,7 @@ from parsee.converters.image_creation import from_bytes
 
 class ParseeCloud:
 
-    def __init__(self, api_key: str, custom_host: Optional[str] = None):
+    def __init__(self, api_key: Optional[str], custom_host: Optional[str] = None):
 
         self.api_key = api_key
         self.host = custom_host if custom_host is not None else (os.getenv("BACKEND_HOST") if os.getenv("BACKEND_HOST") is not None else "https://backend.parsee.ai")
@@ -23,7 +23,7 @@ class ParseeCloud:
         return {"Authorization": self.api_key}
 
     def get_template(self, template_id: str) -> JobTemplate:
-        url = f"{self.host}/api/extraction/template/id/{template_id}"
+        url = f"{self.host}/{'public/' if self.api_key is None else ''}api/extraction/template/id/{template_id}"
         template_request = requests.get(url, headers=self._headers())
         if template_request.content == b'':
             raise Exception("template not found or not accessible")
