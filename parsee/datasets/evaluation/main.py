@@ -129,7 +129,7 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
                 answers_model = model.parse_prompt_answer(schema_item, prompt_answer, None, None)
             else:
                 answers_model = model.predict_for_prompt(row.get_feature("full_prompt"), schema_item, None, None)
-                raw_answer = "\n\n".join([x.raw_value for x in answers_model])
+                raw_answer = answers_model[0].raw_value if len(answers_model) > 0 else "n/a"
                 row.assign_truth_values({model_spec.internal_name: raw_answer})
             ev.add_answers(row.source_identifier, answers_model, False)
             if k == 0:
