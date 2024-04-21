@@ -51,7 +51,7 @@ class EvaluationResult:
                     scores_by_source[source][model]["missing_answers"] = max(len(assigned_values.keys()) - len(predicted_values.keys()), 0)
                     for meta_key, correct_value in assigned_values.items():
                         if meta_key in predicted_values:
-                            if meta_key != "":
+                            if meta_key != "" and len(correct_value.meta) > 0:
                                 score_meta += 1
                             predicted_value = predicted_values[meta_key]
                             # check if values match
@@ -95,10 +95,10 @@ class EvaluationResult:
             scores_dict_final["completeness"] = (reference_scores["total_correct"] - scores_dict_final["missing_answers"])/reference_scores["total_correct"]
             # scores INCLUDING missing answers
             scores_dict_final["total_correct_percent"] = scores_dict_final["total_correct"] / reference_scores["total_correct"]
-            scores_dict_final["total_correct_meta_found_percent"] = scores_dict_final["total_correct_meta_found"] / reference_scores["total_correct_meta_found"]
+            scores_dict_final["total_correct_meta_found_percent"] = (scores_dict_final["total_correct_meta_found"] / reference_scores["total_correct_meta_found"]) if reference_scores["total_correct_meta_found"] > 0 else None
             # scores EXCLUDING missing answers
             scores_dict_final["total_correct_percent_ex_missing"] = scores_dict_final["total_correct"] / (reference_scores["total_correct"]-scores_dict_final["missing_answers"])
-            scores_dict_final["total_correct_meta_found_percent_ex_missing"] = scores_dict_final["total_correct_meta_found"] / (reference_scores["total_correct_meta_found"]-scores_dict_final["missing_answers"])
+            scores_dict_final["total_correct_meta_found_percent_ex_missing"] = (scores_dict_final["total_correct_meta_found"] / (reference_scores["total_correct_meta_found"]-scores_dict_final["missing_answers"])) if reference_scores["total_correct_meta_found"] > 0 else None
             total_scores[model] = scores_dict_final
         return total_scores
 
