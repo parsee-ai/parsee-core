@@ -6,22 +6,22 @@ from parsee.extraction.extractor_dataclasses import Base64Image
 
 class Prompt:
 
-    def __init__(self, description: str, main_task: str, additional_info: str, full_example: str, available_data: Union[str, List[Base64Image]]):
+    def __init__(self, description: Optional[str], main_task: str, additional_info: Optional[str], full_example: Optional[str], available_data: Optional[Union[str, List[Base64Image]]]):
 
-        self.description = description
+        self.description = f"{description} \n" if description is not None else ""
         self.main_task = main_task
-        self.additional_info = additional_info
-        self.full_example = full_example
-        self.available_data = available_data
+        self.additional_info = f"{additional_info} \n" if additional_info is not None else ""
+        self.full_example = f"{full_example} \n" if full_example is not None else ""
+        self.available_data = available_data if available_data is not None else ""
 
     def __str__(self) -> str:
-        return f'''{self.description} \n
+        return f'''{self.description}
 
                     {self.main_task} \n
                     
-                    {self.additional_info} \n
+                    {self.additional_info}
 
-                    {self.full_example} \n
+                    {self.full_example}
                     
                     {self.available_data if isinstance(self.available_data, str) else ''}
                     '''

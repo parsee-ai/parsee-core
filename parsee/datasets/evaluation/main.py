@@ -9,6 +9,9 @@ from parsee.templates.job_template import JobTemplate
 from parsee.extraction.models.model_loader import ModelLoader, LLMQuestionModel
 from parsee.storage.interfaces import StorageManager
 from parsee.storage.in_memory_storage import InMemoryStorageManager
+from parsee.extraction.models.llm_models.prompts import Prompt
+from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedSource
+from parsee.utils.enums import DocumentType
 
 
 class EvaluationResult:
@@ -109,6 +112,9 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
     loader = ModelLoader(storage)
     ev = EvaluationResult()
 
+    if len(models) == 0:
+        raise Exception("please provide some model specifications")
+
     for spec in models:
         if spec.model_type == "custom":
             raise Exception("custom models not allowed here")
@@ -128,7 +134,14 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
                 prompt_answer = row.get_value(model_spec.internal_name, False)
                 answers_model = model.parse_prompt_answer(schema_item, prompt_answer, None, None)
             else:
-                answers_model = model.predict_for_prompt(row.get_feature("full_prompt"), schema_item, None, None)
+                # for text based datasets, the data is already in the prompt
+                available_data = None
+                if model_spec.multimodal:
+                    page_indexes = row.get_feature("page_indexes").split("|")
+                    sources = [ExtractedSource(DocumentType.PDF, None, None, 0, {"page_idx": x}) for x in page_indexes]
+                    available_data = storage.image_creator.get_images(StandardDocumentFormat(DocumentType.PDF, row.source_identifier, [], None), sources, len(page_indexes), model_spec.max_image_pixels)
+                prompt = Prompt(None, row.get_feature("full_prompt"), None, None, available_data)
+                answers_model = model.predict_for_prompt(prompt, schema_item, None, None)
                 raw_answer = answers_model[0].raw_value if len(answers_model) > 0 else "n/a"
                 row.assign_truth_values({model_spec.internal_name: raw_answer})
             ev.add_answers(row.source_identifier, answers_model, False)
