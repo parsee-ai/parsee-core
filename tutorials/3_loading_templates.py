@@ -15,7 +15,7 @@ from parsee.extraction.run import run_job_with_single_model
 # For the following, we will use the public template for invoice extraction: https://app.parsee.ai/template/654b562e9edc3c29cdfc8bb5
 # The ID of the template is the text after the last slash in the URL.
 
-parsee_cloud_template_id = "654b562e9edc3c29cdfc8bb5"
+parsee_cloud_template_id = "65f959afe34036446ee859ff"
 
 # set credentials, you can find your API-key here after registering: https://app.parsee.ai/api
 

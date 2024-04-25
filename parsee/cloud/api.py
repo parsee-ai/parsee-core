@@ -2,6 +2,7 @@ import os
 from typing import *
 
 import requests
+from enum import Enum
 
 from parsee.templates.job_template import JobTemplate
 from parsee.templates.template_from_json import from_json_dict
@@ -10,6 +11,11 @@ from parsee.converters.json_to_raw import load_document_from_json
 from parsee.extraction.extractor_dataclasses import ParseeAnswer, ParseeMeta, source_from_json, AssignedAnswer
 from parsee.extraction.extractor_dataclasses import Base64Image
 from parsee.converters.image_creation import from_bytes
+
+
+class RequestType(Enum):
+    POST = "post"
+    GET = "get"
 
 
 class ParseeCloud:
@@ -22,10 +28,22 @@ class ParseeCloud:
     def _headers(self):
         return {"Authorization": self.api_key}
 
+    def _make_request(self, url: str, request_type: RequestType, data: Optional[Dict] = None, max_retries: int=3, retry=0) -> any:
+        try:
+            if request_type == RequestType.POST:
+                return requests.post(url, json=data, headers=self._headers())
+            else:
+                return requests.get(url, headers=self._headers())
+        except Exception as e:
+            if retry < max_retries:
+                return self._make_request(url, request_type, data, max_retries, retry+1)
+            else:
+                return None
+
     def get_template(self, template_id: str) -> JobTemplate:
         url = f"{self.host}/{'public/' if self.api_key is None else ''}api/extraction/template/id/{template_id}"
-        template_request = requests.get(url, headers=self._headers())
-        if template_request.content == b'':
+        template_request = self._make_request(url, RequestType.GET)
+        if template_request is None or template_request.content == b'':
             raise Exception("template not found or not accessible")
         return from_json_dict(template_request.json())
 
@@ -92,9 +110,9 @@ class ParseeCloud:
 
             url = f"{self.host}/api/extraction/output/general-query"
 
-            r = requests.post(url, json=data, headers=self._headers())
+            r = self._make_request(url, RequestType.POST, data)
 
-            if r.status_code != 200:
+            if r is None or r.status_code != 200:
                 failed = True
         return not failed
 
