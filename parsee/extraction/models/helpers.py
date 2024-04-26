@@ -30,3 +30,13 @@ def ollama_config(model_name: str, custom_host: Optional[str] = None, token_limi
 def together_config(together_api_key: str, model_name: str, token_limit: Optional[int] = None) -> MlModelSpecification:
     token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
     return MlModelSpecification(f"Together AI model: {model_name}", model_name, ModelType.TOGETHER, None, None, token_limit, together_api_key, None, None, None, None, None, False, None, None)
+
+
+def cohere_config(cohere_api_key: str, model_name: str, token_limit: Optional[int] = None) -> MlModelSpecification:
+    token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
+    return MlModelSpecification(f"Cohere model: {model_name}", model_name, ModelType.COHERE, None, None, token_limit, cohere_api_key, None, None, None, None, None, False, None, None)
+
+
+def mistral_api_config(mistral_api_key: str, model_name: str, token_limit: Optional[int] = None) -> MlModelSpecification:
+    token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
+    return MlModelSpecification(f"Mistral hosted model: {model_name}", model_name, ModelType.MISTRAL, None, None, token_limit, mistral_api_key, None, None, None, None, None, False, None, None)

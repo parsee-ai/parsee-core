@@ -50,3 +50,5 @@ class ModelType(Enum):
     ANTHROPIC = "anthropic"
     OLLAMA = "ollama"
     TOGETHER = "together"
+    COHERE = "cohere"
+    MISTRAL = "mistral"

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parsee-core"
-version = "0.1.4.16"
+version = "0.1.4.17"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
 homepage = "https://parsee.ai"
@@ -12,7 +12,6 @@ requests = "^2.28.1"
 pandas = "^1.4.3"
 numpy = "^1.23.1"
 tiktoken = "^0.4.0"
-openai = "^0.27.8"
 pydantic = "^2.7.0"
 faiss-cpu = [{version = "<1.7.1", platform = "darwin"}, {version = "^1.7.1", platform = "linux"}]
 replicate = "^0.23.1"
@@ -20,15 +19,18 @@ beautifulsoup4 = "^4.11.1"
 parsee-pdf-reader = "^0.1.5.8"
 sentence-transformers = "^2.2.2"
 lxml = "^4.9.1"
-anthropic = "^0.20.0"
-ollama = "^0.1.7"
 opencv-python = "^4.9.0.80"
-together = "^1.1.1"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.group.extras.dependencies]
 langchain = "^0.1.11"
+anthropic = "^0.20.0"
+ollama = "^0.1.7"
+together = "^1.1.1"
+openai = "^0.27.8"
+cohere = "^5.3.3"
+mistralai = "^0.1.8"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -9,6 +9,8 @@ from parsee.extraction.models.llm_models.replicate_model import ReplicateModel
 from parsee.extraction.models.llm_models.anthropic_model import AnthropicModel
 from parsee.extraction.models.llm_models.ollama_model import OllamaModel
 from parsee.extraction.models.llm_models.together_model import TogetherModel
+from parsee.extraction.models.llm_models.cohere_model import CohereModel
+from parsee.extraction.models.llm_models.mistral_model import MistralModel
 from parsee.extraction.tasks.questions.question_model_llm import LLMQuestionModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMModel
@@ -32,6 +34,10 @@ def get_llm_base_model(spec: MlModelSpecification) -> LLMBaseModel:
         return OllamaModel(spec)
     elif spec.model_type == ModelType.TOGETHER:
         return TogetherModel(spec)
+    elif spec.model_type == ModelType.COHERE:
+        return CohereModel(spec)
+    elif spec.model_type == ModelType.MISTRAL:
+        return MistralModel(spec)
     else:
         raise Exception("llm base model not found")
 
