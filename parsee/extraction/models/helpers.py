@@ -22,9 +22,9 @@ def anthropic_config(anthropic_api_key: str, model_name: str, token_limit: Optio
     return MlModelSpecification(f"Anthropic model: {model_name}", model_name, ModelType.ANTHROPIC, None, None, token_limit, anthropic_api_key, None, None, None, None, None, multimodal, max_images, max_image_size)
 
 
-def ollama_config(model_name: str, custom_host: Optional[str] = None, token_limit: Optional[int] = None) -> MlModelSpecification:
+def ollama_config(model_name: str, custom_host: Optional[str] = None, token_limit: Optional[int] = None, multimodal: bool = False, max_images: int = 5, max_image_size: int = 2000) -> MlModelSpecification:
     token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
-    return MlModelSpecification(f"Ollama model: {model_name}", model_name, ModelType.OLLAMA, custom_host, Decimal(0), token_limit, None, None, None, None, None, None, False, None, None)
+    return MlModelSpecification(f"Ollama model: {model_name}", model_name, ModelType.OLLAMA, custom_host, Decimal(0), token_limit, None, None, None, None, None, None, multimodal, max_images, max_image_size)
 
 
 def together_config(together_api_key: str, model_name: str, token_limit: Optional[int] = None) -> MlModelSpecification:

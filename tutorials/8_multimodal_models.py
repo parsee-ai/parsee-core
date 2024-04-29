@@ -8,7 +8,7 @@ Then use the PDF output instead of the HTML file.
 """
 import os
 from parsee.templates.helpers import StructuringItem, MetaItem, create_template
-from parsee.extraction.models.helpers import gpt_config
+from parsee.extraction.models.helpers import *
 from parsee.converters.main import load_document
 from parsee.utils.enums import *
 from parsee.extraction.run import run_job_with_single_model
@@ -34,3 +34,9 @@ gpt_model = gpt_config(open_ai_api_key, None, openai_model_name="gpt-4-turbo", m
 _, _, answers_gpt = run_job_with_single_model(document, job_template, gpt_model)
 
 print(answers_gpt)
+
+# you can also run multimodal queries locally with ollama
+llava_model = ollama_config("llava:13b", multimodal=True)
+_, _, answers_llava = run_job_with_single_model(document, job_template, llava_model)
+
+print(answers_llava)
