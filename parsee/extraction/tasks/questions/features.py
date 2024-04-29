@@ -53,14 +53,14 @@ class GeneralQueriesPromptBuilder:
     def get_elements_text(self, elements: List[ExtractedEl], document: StandardDocumentFormat):
         llm_text = "This is the available data to answer the question (in the following, if tables have empty cells, they are omitted, if a cell spans several columns, values might be repeated for each cell):\n"
         for el in elements:
-            llm_text += f"[{el.source.element_index}]: {el.get_text_and_surrounding_elements_text(document.elements) if isinstance(el, StructuredTable) else el.get_text_llm(True)}\n"
+            llm_text += f"[{el.source.element_index}]: {el.get_text_and_surrounding_elements_text(document.elements) if isinstance(el, StructuredTable) else el.get_text_llm(True)} [/{el.source.element_index}]\n"
         return llm_text
 
     def build_prompt(self, structuring_item: GeneralQueryItemSchema, meta_items: List[StructuringItemSchema], document: StandardDocumentFormat, relevant_elements: List[ExtractedEl], multimodal: bool = False, max_images: Optional[int] = None, max_image_size: Optional[int] = None) -> Prompt:
 
         if not multimodal:
             general_info = "You are supposed to answer a question based on text fragments that are provided. " \
-                           "The fragments start with a number in square brackets and then the actual text. The lower the number of the fragment, " \
+                           "The fragments start with a number in square brackets and then the actual text. The end of the fragment is shown by the same number in square brackets, only that the number is preceeded by a slash. E.g. [22] Some Text [/22]. The lower the number of the fragment, " \
                            "the earlier the fragment appeared in the document (reading from left to right, top to bottom). "
         else:
             general_info = "You are supposed to answer a question based on one or several images that are provided below."
