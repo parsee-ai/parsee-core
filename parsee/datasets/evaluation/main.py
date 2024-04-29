@@ -16,8 +16,10 @@ from parsee.utils.enums import DocumentType
 
 class EvaluationResult:
 
-    def __init__(self):
+    def __init__(self, custom_compare_func: Optional[Dict[str, Callable]], exclude_meta_keys: Optional[List[str]]):
         self.answers = {}
+        self.custom_compare_func = custom_compare_func
+        self.exclude_meta_keys = exclude_meta_keys
 
     def add_answers(self, source_identifier: str, answers: List[ParseeAnswer], is_assigned: bool):
         if len(answers) == 0:
@@ -32,7 +34,12 @@ class EvaluationResult:
             if answer.class_id not in obj:
                 obj[answer.class_id] = {}
             if answer.unique_id() not in obj[answer.class_id]:
-                obj[answer.class_id][answer.unique_id()] = answer
+                obj[answer.class_id][answer.unique_id(self.exclude_meta_keys)] = answer
+
+    def _values_match(self, val1: ParseeAnswer, val2: ParseeAnswer) -> bool:
+        if val1.class_id in self.custom_compare_func:
+            return self.custom_compare_func[val1.class_id](val1, val2)
+        return val1.class_value == val2.class_value
 
     def evaluate(self) -> Dict:
         scores_by_source = {}
@@ -58,7 +65,7 @@ class EvaluationResult:
                                 score_meta += 1
                             predicted_value = predicted_values[meta_key]
                             # check if values match
-                            if correct_value.class_value == predicted_value.class_value:
+                            if self._values_match(correct_value, predicted_value):
                                 score += 1
                             else:
                                 scores_by_source[source][model]["error_log"].append({"doc": source, "class_id": class_id, "type": "main question", "expected": correct_value.class_value, "actual": predicted_value.class_value})
@@ -106,11 +113,11 @@ class EvaluationResult:
         return total_scores
 
 
-def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None, writer_for_model_answers: Optional[DatasetWriter] = None, use_saved_model_answers: bool = False, new_dataset_name: Optional[str] = None) -> Dict:
+def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None, writer_for_model_answers: Optional[DatasetWriter] = None, use_saved_model_answers: bool = False, new_dataset_name: Optional[str] = None, custom_compare_func: Optional[Dict[str, Callable]] = None, exclude_meta_keys: Optional[List[str]] = None) -> Dict:
 
     storage = InMemoryStorageManager(models) if storage is None else storage
     loader = ModelLoader(storage)
-    ev = EvaluationResult()
+    ev = EvaluationResult(custom_compare_func, exclude_meta_keys)
 
     if len(models) == 0:
         raise Exception("please provide some model specifications")

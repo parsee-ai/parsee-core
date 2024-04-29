@@ -122,14 +122,14 @@ class ParseeAnswer:
         relevant_values = {"class_id": self.class_id, "meta": [x.to_json_dict() for x in self.meta]}
         return sha256(str(relevant_values).encode('utf-8')).hexdigest()
 
-    def meta_key(self) -> str:
+    def meta_key(self, exclude_meta_keys: Optional[List[str]] = None) -> str:
         if len(self.meta) == 0:
             return ""
         meta_sorted = sorted(self.meta, key=lambda x: x.class_id)
-        return "_".join([f"{x.class_id}:{x.class_value}" for x in meta_sorted])
+        return "_".join([f"{x.class_id}:{x.class_value}" for x in meta_sorted if exclude_meta_keys is None or x.class_id not in exclude_meta_keys])
 
-    def unique_id(self) -> str:
-        return f"{self.class_id}:{self.meta_key()}"
+    def unique_id(self, exclude_meta_keys: Optional[List[str]] = None) -> str:
+        return f"{self.class_id}:{self.meta_key(exclude_meta_keys)}"
 
     def to_assigned_answer(self) -> AssignedAnswer:
         return AssignedAnswer(self.class_id, self.class_value, [AssignedMeta(x.class_id, x.class_value) for x in self.meta], self.sources)
