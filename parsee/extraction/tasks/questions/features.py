@@ -60,7 +60,7 @@ class GeneralQueriesPromptBuilder:
 
         if not multimodal:
             general_info = "You are supposed to answer a question based on text fragments that are provided. " \
-                           "The fragments start with a number in square brackets and then the actual text. The end of the fragment is shown by the same number in square brackets, only that the number is preceeded by a slash. E.g. [22] Some Text [/22]. The lower the number of the fragment, " \
+                           "The fragments start with a number in square brackets and then the actual text. The end of the fragment is shown by the same number in square brackets, only that the number is preceded by a slash. E.g. [22] Some Text [/22]. The lower the number of the fragment, " \
                            "the earlier the fragment appeared in the document (reading from left to right, top to bottom). "
         else:
             general_info = "You are supposed to answer a question based on one or several images that are provided below."
