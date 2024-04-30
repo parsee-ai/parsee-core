@@ -52,7 +52,7 @@ def comma_separator_thousands(cell_str) -> bool:
 
 
 def dot_separator_thousands(cell_str) -> bool:
-    if re.search(r'\b[0-9]{1,3}[.][0-9]{3}\b', cell_str):
+    if re.search(r'\b[0-9]{1,3}[.][0-9]{3}[,.][0-9]', cell_str):
         return True
     return False
 
