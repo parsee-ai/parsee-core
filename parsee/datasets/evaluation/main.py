@@ -126,7 +126,6 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
         if spec.model_type == "custom":
             raise Exception("custom models not allowed here")
 
-    new_rows = []
     for row, _ in reader.row_generator():
 
         for k, model_spec in enumerate(models):
@@ -156,10 +155,6 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
                 answers_assigned = model.parse_prompt_answer(schema_item, row.get_value("assigned", False), None, None)
                 ev.add_answers(row.source_identifier, answers_assigned, True)
         if writer_for_model_answers is not None:
-            new_rows.append(row)
-
-    if writer_for_model_answers is not None:
-        # write modified rows
-        writer_for_model_answers.write_rows(new_rows, "dataset_with_answers" if new_dataset_name is None else new_dataset_name)
+            writer_for_model_answers.write_rows([row], "dataset_with_answers" if new_dataset_name is None else new_dataset_name)
 
     return ev.evaluate()
