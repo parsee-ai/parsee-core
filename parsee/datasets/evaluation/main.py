@@ -137,7 +137,7 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
             if len(schema_items) == 0:
                 raise Exception("item not found in schema")
             schema_item = schema_items[0]
-            if use_saved_model_answers and row.get_value(model_spec.internal_name, False) is not None:
+            if use_saved_model_answers and row.get_value(model_spec.internal_name, False) is not None and str(row.get_value(model_spec.internal_name, False)).strip() != "":
                 prompt_answer = row.get_value(model_spec.internal_name, False)
                 answers_model = model.parse_prompt_answer(schema_item, prompt_answer, None, None)
             else:
