@@ -29,7 +29,8 @@ class MistralModel(LLMBaseModel):
 
         chat_response = self.client.chat(
             model=self.spec.internal_name,
-            messages=[ChatMessage(role="user", content=prompt)]
+            messages=[ChatMessage(role="user", content=prompt)],
+            temperature=0
         )
 
         answer = chat_response.choices[0].message.content
