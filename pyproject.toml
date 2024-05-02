@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parsee-core"
-version = "0.1.4.26"
+version = "0.1.4.27"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
 homepage = "https://parsee.ai"
@@ -26,6 +26,7 @@ together = "^1.1.1"
 openai = "^0.27.8"
 cohere = "^5.3.3"
 mistralai = "^0.1.8"
+torch = "<2.3"
 
 [tool.poetry.dev-dependencies]
 
