@@ -113,7 +113,7 @@ class EvaluationResult:
         return total_scores
 
 
-def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None, writer_for_model_answers: Optional[DatasetWriter] = None, use_saved_model_answers: bool = False, new_dataset_name: Optional[str] = None, custom_compare_func: Optional[Dict[str, Callable]] = None, exclude_meta_keys: Optional[List[str]] = None) -> Dict:
+def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, models: List[MlModelSpecification], storage: Optional[StorageManager] = None, writer_for_model_answers: Optional[DatasetWriter] = None, use_saved_model_answers: bool = False, new_dataset_name: Optional[str] = None, custom_compare_func: Optional[Dict[str, Callable]] = None, exclude_meta_keys: Optional[List[str]] = None, retry_on_na: bool = False) -> Dict:
 
     storage = InMemoryStorageManager(models) if storage is None else storage
     loader = ModelLoader(storage)
@@ -136,7 +136,7 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
             if len(schema_items) == 0:
                 raise Exception("item not found in schema")
             schema_item = schema_items[0]
-            if use_saved_model_answers and row.get_value(model_spec.internal_name, False) is not None and str(row.get_value(model_spec.internal_name, False)).strip() != "":
+            if use_saved_model_answers and row.get_value(model_spec.internal_name, False) is not None and str(row.get_value(model_spec.internal_name, False)).strip() != "" and not (retry_on_na and str(row.get_value(model_spec.internal_name, False)) == "n/a"):
                 prompt_answer = row.get_value(model_spec.internal_name, False)
                 answers_model = model.parse_prompt_answer(schema_item, prompt_answer, None, None)
             else:
