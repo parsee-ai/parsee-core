@@ -23,7 +23,7 @@ class MistralModel(LLMBaseModel):
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.max_tokens_answer = 1024
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
-        self.client = MistralClient(api_key=model.api_key)
+        self.client = MistralClient(api_key=model.api_key) if model.api_key is not None else None
 
     def _call_api(self, prompt: str, images: List[Base64Image], retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
 
