@@ -11,4 +11,4 @@ class RawToJsonConverter:
         self.doc_type = doc_type
 
     def convert(self, file_path_or_content: str) -> Tuple[List[ExtractedEl], Decimal]:
-        raise NotImplemented
+        raise NotImplementedError

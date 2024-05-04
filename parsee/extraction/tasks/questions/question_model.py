@@ -14,7 +14,7 @@ class QuestionModel:
         self.meta = meta_items
 
     def predict_answers(self, document: StandardDocumentFormat) -> List[ParseeAnswer]:
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class AssignedQuestionModel(QuestionModel):

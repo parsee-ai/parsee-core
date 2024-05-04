@@ -22,10 +22,10 @@ class PromptSchemaItem:
         return val is not None and val.strip() != ""
 
     def get_example(self, clean_value: bool = False) -> str:
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_possible_values_str(self) -> str:
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_default_value(self) -> str:
         return self.default_value if self.default_value is not None else NOT_AVAILABLE

@@ -6,7 +6,7 @@ from parsee.extraction.extractor_dataclasses import Base64Image
 
 class Prompt:
 
-    def __init__(self, description: Optional[str], main_task: str, additional_info: Optional[str], full_example: Optional[str], available_data: Optional[Union[str, List[Base64Image]]]):
+    def __init__(self, description: Optional[str], main_task: str, additional_info: Optional[str] = None, full_example: Optional[str] = None, available_data: Optional[Union[str, List[Base64Image]]] = None):
 
         self.description = f"{description} \n" if description is not None else ""
         self.main_task = main_task

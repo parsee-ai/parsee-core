@@ -48,7 +48,7 @@ class GeneralQueriesPromptBuilder:
         elif schema_item.searchStrategy == SearchStrategy.START:
             return document.elements
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
     def get_elements_text(self, elements: List[ExtractedEl], document: StandardDocumentFormat):
         llm_text = "This is the available data to answer the question (in the following, if tables have empty cells, they are omitted, if a cell spans several columns, values might be repeated for each cell):\n"

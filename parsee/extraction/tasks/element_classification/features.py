@@ -162,7 +162,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
         elif item.searchStrategy == SearchStrategy.START:
             closest_elements = [el for el in document.elements if el.el_type == ElementType.TABLE]
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
         additional_info_str = f" Additional info: {item.additionalInfo}" if item.additionalInfo.strip() != "" else ""
         all_element_indices = [x.source.element_index for x in closest_elements]

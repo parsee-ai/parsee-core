@@ -16,4 +16,4 @@ class MetaInfoModel:
 
     def predict_meta(self, columns: List[FinalOutputTableColumn], elements: List[ExtractedEl]) -> List[List[ParseeMeta]]:
         # returns meta information
-        raise NotImplemented
+        raise NotImplementedError

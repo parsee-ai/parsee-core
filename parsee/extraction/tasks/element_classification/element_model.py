@@ -16,7 +16,7 @@ class ElementModel:
         self.items = items
 
     def classify_elements(self, document: StandardDocumentFormat) -> List[ParseeLocation]:
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class AssignedElementModel(ElementModel):

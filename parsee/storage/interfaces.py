@@ -22,10 +22,10 @@ class StorageManager:
         self.image_creator = image_creator
 
     def db_values_template(self, job_template: JobTemplate, strict: bool) -> JobTemplate:
-        raise NotImplemented
+        raise NotImplementedError
 
     def log_expense(self, service: str, amount: Decimal, class_id: str):
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_available_models(self) -> List[MlModelSpecification]:
-        raise NotImplemented
+        raise NotImplementedError

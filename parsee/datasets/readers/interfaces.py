@@ -18,28 +18,28 @@ class DatasetReader:
         self.total_rows = len(self.indices)
 
     def row_generator(self) -> Generator[Tuple[DatasetRow, int], None, None]:
-        raise NotImplemented
+        raise NotImplementedError
 
     def infinite_final_data_generator(self, column_data: List[ColumnData], batch_size: int) -> Generator[any, None, None]:
-        raise NotImplemented
+        raise NotImplementedError
 
     def apply_skip_condition_fun(self, fun: Callable, args: Dict):
-        raise NotImplemented
+        raise NotImplementedError
 
     def set_preprocessing_fun(self, fun: Callable):
         self.preprocessing_fun = fun
 
     def get_columns(self) -> List[DatasetColumn]:
-        raise NotImplemented
+        raise NotImplementedError
 
     def stream_column(self, col_name: str) -> Generator[any, None, None]:
-        raise NotImplemented
+        raise NotImplementedError
 
     def undersample(self, fun: Callable):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class ModelReader:
 
     def load_model(self, model_specification: MlModelSpecification) -> Tuple[any, Dict[str, ColumnSettings]]:
-        raise NotImplemented
+        raise NotImplementedError

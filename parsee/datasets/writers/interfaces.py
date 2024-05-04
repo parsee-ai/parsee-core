@@ -9,7 +9,7 @@ class DatasetWriter:
         self._write_rows(dataset_rows, dataset)
 
     def _write_rows(self, dataset_rows: List[BaseDatasetRow], dataset: str):
-        raise NotImplemented
+        raise NotImplementedError
 
     def check_consistency(self, rows: List[BaseDatasetRow]):
         all_keys = set()
@@ -30,7 +30,7 @@ class ModelWriter:
     local_write_dir: str
 
     def set_sub_directory(self, sub_directory_name: str):
-        raise NotImplemented
+        raise NotImplementedError
 
     def save_model_settings(self, columns: Dict[str, ColumnSettings]):
-        raise NotImplemented
+        raise NotImplementedError

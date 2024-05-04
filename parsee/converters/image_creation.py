@@ -26,15 +26,19 @@ def resize(image_cv2: ndarray, max_image_size: Optional[int]) -> ndarray:
     return img_resized
 
 
-def from_bytes(file_content: bytes, media_type: str, max_image_size: int) -> Base64Image:
+def from_bytes(file_content: bytes, max_image_size: int) -> Base64Image:
     # open and resize image if necessary
     jpg_as_np = frombuffer(file_content, dtype=np.uint8)
     img = cv2.imdecode(jpg_as_np, cv2.IMREAD_COLOR)
     # resize
     img = resize(img, max_image_size)
-    retval, buffer = cv2.imencode('.jpg', img)
+    return from_numpy(img)
+
+
+def from_numpy(numpy_img: ndarray) -> Base64Image:
+    retval, buffer = cv2.imencode('.jpg', numpy_img)
     encoded_string = base64.b64encode(buffer).decode("utf-8")
-    return Base64Image(media_type, encoded_string)
+    return Base64Image("image/jpeg", encoded_string)
 
 
 def get_media_type_simple(file_path: str) -> str:
@@ -49,9 +53,8 @@ def get_media_type_simple(file_path: str) -> str:
 def from_file_paths(file_paths: List[str], max_image_size: int) -> List[Base64Image]:
     output = []
     for fp in file_paths:
-        media_type = get_media_type_simple(fp)
         with open(fp, "rb") as f:
-            output.append(from_bytes(f.read(), media_type, max_image_size))
+            output.append(from_bytes(f.read(), max_image_size))
 
     return output
 
@@ -59,7 +62,7 @@ def from_file_paths(file_paths: List[str], max_image_size: int) -> List[Base64Im
 class ImageCreator:
 
     def get_images(self, document: StandardDocumentFormat, element_selection: List[Union[ExtractedEl, ExtractedSource]], max_images: Optional[int], max_image_size: Optional[int]) -> List[Base64Image]:
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class DiskImageCreator(ImageCreator):

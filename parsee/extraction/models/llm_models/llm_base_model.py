@@ -28,4 +28,4 @@ class LLMBaseModel:
         self.spec = spec
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
-        raise NotImplemented
+        raise NotImplementedError

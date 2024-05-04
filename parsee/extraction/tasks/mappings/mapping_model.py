@@ -19,7 +19,7 @@ class MappingModel:
         self.memory: Dict[str, List[ParseeBucket]] = {}
 
     def classify_with_schema(self, table: FinalOutputTable, schema: MappingSchema) -> List[ParseeBucket]:
-        raise NotImplemented
+        raise NotImplementedError
 
     def classify_elements(self, table: FinalOutputTable) -> Tuple[List[ParseeBucket], Union[None, MappingSchema]]:
         for item in self.items:

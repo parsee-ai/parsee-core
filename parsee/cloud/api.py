@@ -126,7 +126,7 @@ class ParseeCloud:
 
         data = self._get_image(source_identifier, page_index)
 
-        return from_bytes(data, "image/jpeg", max_image_size)
+        return from_bytes(data, max_image_size)
 
     def get_image_and_save(self, source_identifier: str, page_index: int, output_path: str):
         """
