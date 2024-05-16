@@ -62,7 +62,7 @@ class AnthropicModel(LLMBaseModel):
             answer = message.content[0].text if len(message.content) > 0 else ""
             cost_input = (message.usage.input_tokens * Decimal(self.spec.price_per_1k_tokens/1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
             cost_output = (message.usage.output_tokens * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
-            cost_images = (len(images) * self.spec.price_per_image) if self.spec.price_per_image is not None else Decimal(0)
+            cost_images = (len(images) * Decimal(self.spec.price_per_image)) if self.spec.price_per_image is not None else Decimal(0)
             final_cost = cost_input + cost_output + cost_images
             return answer, final_cost
         except Exception as e:
