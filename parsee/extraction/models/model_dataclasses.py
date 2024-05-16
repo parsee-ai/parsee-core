@@ -9,6 +9,7 @@ from parsee.utils.enums import ModelType
 @dataclass
 class MlModelSpecification:
     name: str
+    model_id: str
     internal_name: str
     model_type: ModelType
     file_path: Optional[str]

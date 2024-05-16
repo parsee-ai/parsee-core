@@ -12,7 +12,7 @@ class ElementModelLLM(ElementModel):
 
     def __init__(self, items: List[ElementSchema], storage: StorageManager, llm: LLMBaseModel, **kwargs):
         super().__init__(items)
-        self.model_name = llm.spec.internal_name
+        self.model_name = llm.spec.model_id
         self.llm = llm
         self.max_search_items = 10
         self.storage = storage
@@ -39,7 +39,7 @@ class ElementModelLLM(ElementModel):
             prompt = self.feature_builder.make_prompt(item, document, self.storage)
 
             answer, amount = self.llm.make_prompt_request(prompt)
-            self.storage.log_expense(self.llm.spec.internal_name, amount, item.id)
+            self.storage.log_expense(self.llm.spec.model_id, amount, item.id)
 
             best_indexes = self.parse_prompt_answer(answer)
 

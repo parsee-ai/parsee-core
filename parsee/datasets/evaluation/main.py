@@ -129,15 +129,15 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
     for row, _ in reader.row_generator():
 
         for k, model_spec in enumerate(models):
-            model: LLMQuestionModel = loader.get_question_model(model_spec.internal_name, template.questions.items, template.meta, {})
+            model: LLMQuestionModel = loader.get_question_model(model_spec.model_id, template.questions.items, template.meta, {})
             if model is None:
                 raise Exception("model not found")
             schema_items = [x for x in template.questions.items if x.id == row.element_identifier]
             if len(schema_items) == 0:
                 raise Exception("item not found in schema")
             schema_item = schema_items[0]
-            if use_saved_model_answers and row.get_value(model_spec.internal_name, False) is not None and str(row.get_value(model_spec.internal_name, False)).strip() != "" and not (retry_on_na and str(row.get_value(model_spec.internal_name, False)) == "n/a"):
-                prompt_answer = row.get_value(model_spec.internal_name, False)
+            if use_saved_model_answers and row.get_value(model_spec.model_id, False) is not None and str(row.get_value(model_spec.model_id, False)).strip() != "" and not (retry_on_na and str(row.get_value(model_spec.model_id, False)) == "n/a"):
+                prompt_answer = row.get_value(model_spec.model_id, False)
                 answers_model = model.parse_prompt_answer(schema_item, prompt_answer, None, None)
             else:
                 # for text based datasets, the data is already in the prompt
@@ -149,7 +149,7 @@ def evaluate_llm_performance(template: JobTemplate, reader: DatasetReader, model
                 prompt = Prompt(None, row.get_feature("full_prompt"), None, None, available_data)
                 answers_model = model.predict_for_prompt(prompt, schema_item, None, None)
                 raw_answer = answers_model[0].raw_value if len(answers_model) > 0 else "n/a"
-                row.assign_truth_values({model_spec.internal_name: raw_answer})
+                row.assign_truth_values({model_spec.model_id: raw_answer})
             ev.add_answers(row.source_identifier, answers_model, False)
             if k == 0:
                 answers_assigned = model.parse_prompt_answer(schema_item, row.get_value("assigned", False), None, None)

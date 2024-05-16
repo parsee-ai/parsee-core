@@ -18,7 +18,7 @@ class LLMQuestionModel(QuestionModel):
         super().__init__(items, meta_items)
         self.storage = storage
         self.llm = llm
-        self.model_name = llm.spec.internal_name
+        self.model_name = llm.spec.model_id
         self.prompt_builder = GeneralQueriesPromptBuilder(storage)
 
     def parse_prompt_answer(self, item: GeneralQueryItemSchema, prompt_answer: str, total_elements: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
@@ -77,7 +77,7 @@ class LLMQuestionModel(QuestionModel):
 
     def predict_for_prompt(self, prompt: Prompt, schema_item: GeneralQueryItemSchema, max_element_index: Optional[int], document: Optional[StandardDocumentFormat]) -> List[ParseeAnswer]:
         prompt_answer, amount = self.llm.make_prompt_request(prompt)
-        self.storage.log_expense(self.llm.spec.internal_name, amount, schema_item.id)
+        self.storage.log_expense(self.llm.spec.model_id, amount, schema_item.id)
         return self.parse_prompt_answer(schema_item, prompt_answer, max_element_index, document)
 
     def predict_answers(self, document: StandardDocumentFormat) -> List[ParseeAnswer]:

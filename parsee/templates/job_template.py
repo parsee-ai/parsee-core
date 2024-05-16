@@ -19,13 +19,13 @@ class JobTemplate:
     # sets all models to one default model
     def set_default_model(self, model: MlModelSpecification):
         for item in self.questions.items:
-            item.model = model.internal_name
+            item.model = model.model_id
         for item in self.detection.items:
-            item.model = model.internal_name
+            item.model = model.model_id
             if item.mapRows is not None:
-                item.mappingModel = model.internal_name
+                item.mappingModel = model.model_id
         for item in self.meta:
-            item.model = model.internal_name
+            item.model = model.model_id
 
     def to_json_dict(self) -> Dict:
         return {"id": self.id, "title": self.title, "description": self.description, "questions": self.questions.to_json_dict(), "detection": self.detection.to_json_dict(), "meta": [x.to_json_dict() for x in self.meta]}

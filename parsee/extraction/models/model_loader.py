@@ -47,56 +47,56 @@ class ModelLoader:
     def __init__(self, storage: StorageManager):
         self.storage = storage
 
-    def get_model_spec(self, model_name: Optional[str]) -> Union[MlModelSpecification, None]:
-        filtered = [x for x in self.storage.get_available_models() if x.internal_name == model_name]
+    def get_model_spec(self, model_id: Optional[str]) -> Union[MlModelSpecification, None]:
+        filtered = [x for x in self.storage.get_available_models() if x.model_id == model_id]
         if len(filtered) == 0:
             return None
         return filtered[0]
 
-    def get_question_model(self, model_name: Optional[str], items: List[GeneralQueryItemSchema], all_meta_items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[QuestionModel, None]:
-        if model_name is None:
+    def get_question_model(self, model_id: Optional[str], items: List[GeneralQueryItemSchema], all_meta_items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[QuestionModel, None]:
+        if model_id is None:
             return None
-        elif model_name == "assigned":
+        elif model_id == "assigned":
             return AssignedQuestionModel(items, all_meta_items, **params)
         else:
-            spec = self.get_model_spec(model_name)
+            spec = self.get_model_spec(model_id)
             if spec is None or spec.model_type == ModelType.CUSTOM:
                 # custom models have to be handled with a custom ModelLoader class
                 return None
-            return LLMQuestionModel(items, all_meta_items, self.storage, get_llm_base_model(self.get_model_spec(model_name)), **params)
+            return LLMQuestionModel(items, all_meta_items, self.storage, get_llm_base_model(self.get_model_spec(model_id)), **params)
     
-    def get_element_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementModel, None]:
-        if model_name is None:
+    def get_element_model(self, model_id: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[ElementModel, None]:
+        if model_id is None:
             return None
-        elif model_name == "assigned":
+        elif model_id == "assigned":
             return AssignedElementModel(items, **params)
         else:
-            spec = self.get_model_spec(model_name)
+            spec = self.get_model_spec(model_id)
             if spec is None or spec.model_type == ModelType.CUSTOM:
                 # custom models have to be handled with a custom ModelLoader class
                 return None
             return ElementModelLLM(items, self.storage, get_llm_base_model(spec), **params)
     
-    def get_meta_model(self, model_name: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoModel, None]:
-        if model_name is None:
+    def get_meta_model(self, model_id: Optional[str], items: List[StructuringItemSchema], params: Dict[str, Any]) -> Union[MetaInfoModel, None]:
+        if model_id is None:
             return None
-        elif model_name == "assigned":
+        elif model_id == "assigned":
             # for assigned, no model is needed
             return None
         else:
-            spec = self.get_model_spec(model_name)
+            spec = self.get_model_spec(model_id)
             if spec is None or spec.model_type == ModelType.CUSTOM:
                 # custom models have to be handled with a custom ModelLoader class
                 return None
             return MetaLLMModel(items, get_llm_base_model(spec), self.storage, **params)
     
-    def get_mapping_model(self, model_name: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingModel, None]:
-        if model_name is None:
+    def get_mapping_model(self, model_id: Optional[str], items: List[ElementSchema], params: Dict[str, Any]) -> Union[MappingModel, None]:
+        if model_id is None:
             return None
-        elif model_name == "assigned":
+        elif model_id == "assigned":
             return None # TODO
         else:
-            spec = self.get_model_spec(model_name)
+            spec = self.get_model_spec(model_id)
             if spec is None or spec.model_type == ModelType.CUSTOM:
                 # custom models have to be handled with a custom ModelLoader class
                 return None
