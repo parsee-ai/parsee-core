@@ -14,6 +14,8 @@ class MlModelSpecification:
     model_type: ModelType
     file_path: Optional[str]
     price_per_1k_tokens: Optional[Decimal]
+    price_per_1k_output_tokens: Optional[Decimal]
+    price_per_image: Optional[Decimal]
     max_tokens: Optional[int]
     api_key: Optional[str]
     only_questions: Optional[List[str]]

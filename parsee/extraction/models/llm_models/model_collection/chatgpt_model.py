@@ -5,16 +5,16 @@ from dataclasses import dataclass
 from decimal import Decimal
 import math
 
-import anthropic
+import openai
 import tiktoken
 
-from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.extractor_dataclasses import Base64Image
 
 
-class AnthropicModel(LLMBaseModel):
+class ChatGPTModel(LLMBaseModel):
 
     def __init__(self, model: MlModelSpecification):
         super().__init__(model)
@@ -22,7 +22,7 @@ class AnthropicModel(LLMBaseModel):
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.max_tokens_answer = 1024
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
-        self.client = anthropic.Anthropic(api_key=model.api_key if model.api_key is not None else os.getenv("ANTHROPIC_API_KEY"))
+        openai.api_key = model.api_key if model.api_key is not None else os.getenv("OPENAI_KEY")
 
     def _call_api(self, prompt: str, images: List[Base64Image], retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
         user_message_content = [
@@ -40,27 +40,31 @@ class AnthropicModel(LLMBaseModel):
             ]
             user_message_content += [
                 {
-                    "type": "image",
-                    "source": {
-                        "type": "base64",
-                        "media_type": x.media_type,
-                        "data": x.data,
-                    },
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:{x.media_type};base64,{x.data}"
+                    }
                 }
                 for x in images
             ]
         try:
-            message = self.client.messages.create(
+            response = openai.ChatCompletion.create(
                 model=self.spec.internal_name,
-                max_tokens=self.max_tokens_answer,
-                temperature=0,
                 messages=[
                     {"role": "user", "content": user_message_content}
-                ]
+                ],
+                temperature=0,
+                max_tokens=self.max_tokens_answer,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0
             )
 
-            answer = message.content[0].text if len(message.content) > 0 else ""
-            final_cost = (Decimal(message.usage.input_tokens+message.usage.output_tokens) * Decimal(self.spec.price_per_1k_tokens/1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+            answer = response['choices'][0]["message"]["content"]
+            cost_input = (int(response["usage"]['prompt_tokens']) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+            cost_output = (int(response["usage"]['completion_tokens']) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
+            cost_images = (len(images) * self.spec.price_per_image) if self.spec.price_per_image is not None else Decimal(0)
+            final_cost = cost_input + cost_output + cost_images
             return answer, final_cost
         except Exception as e:
             if retries < self.max_retries:

@@ -4,13 +4,13 @@ from parsee.templates.element_schema import ElementDetectionSchema, ElementSchem
 from parsee.templates.general_structuring_schema import StructuringItemSchema, GeneralQuerySchema, GeneralQueryItemSchema
 from parsee.extraction.tasks.element_classification.element_model import ElementModel, AssignedElementModel
 from parsee.extraction.tasks.questions.question_model import QuestionModel, AssignedQuestionModel
-from parsee.extraction.models.llm_models.chatgpt_model import ChatGPTModel
-from parsee.extraction.models.llm_models.replicate_model import ReplicateModel
-from parsee.extraction.models.llm_models.anthropic_model import AnthropicModel
-from parsee.extraction.models.llm_models.ollama_model import OllamaModel
-from parsee.extraction.models.llm_models.together_model import TogetherModel
-from parsee.extraction.models.llm_models.cohere_model import CohereModel
-from parsee.extraction.models.llm_models.mistral_model import MistralModel
+from parsee.extraction.models.llm_models.model_collection.chatgpt_model import ChatGPTModel
+from parsee.extraction.models.llm_models.model_collection.replicate_model import ReplicateModel
+from parsee.extraction.models.llm_models.model_collection.anthropic_model import AnthropicModel
+from parsee.extraction.models.llm_models.model_collection.ollama_model import OllamaModel
+from parsee.extraction.models.llm_models.model_collection.together_model import TogetherModel
+from parsee.extraction.models.llm_models.model_collection.cohere_model import CohereModel
+from parsee.extraction.models.llm_models.model_collection.mistral_model import MistralModel
 from parsee.extraction.tasks.questions.question_model_llm import LLMQuestionModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMModel

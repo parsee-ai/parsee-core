@@ -34,8 +34,10 @@ class MistralModel(LLMBaseModel):
         )
 
         answer = chat_response.choices[0].message.content
-
-        final_cost = (Decimal(chat_response.usage.prompt_tokens + chat_response.usage.completion_tokens) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_input = (int(chat_response.usage.prompt_tokens) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_output = (int(chat_response.usage.completion_tokens) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
+        cost_images = (len(images) * self.spec.price_per_image) if self.spec.price_per_image is not None else Decimal(0)
+        final_cost = cost_input + cost_output + cost_images
         return answer, final_cost
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:

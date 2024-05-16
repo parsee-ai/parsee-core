@@ -46,5 +46,7 @@ class ReplicateModel(LLMBaseModel):
         final_prompt, num_tokens_input = truncate_prompt(str(prompt), self.encoding, self.max_tokens_question)
         response = self._call_api(final_prompt)
         tokens_response = len(get_tokens_encoded(response, self.encoding))
-        final_cost = Decimal((tokens_response + num_tokens_input) * (self.spec.price_per_1k_tokens/1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_input = (int(num_tokens_input) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_output = (int(tokens_response) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
+        final_cost = cost_input + cost_output
         return response, final_cost

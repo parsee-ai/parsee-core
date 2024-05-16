@@ -35,7 +35,10 @@ class CohereModel(LLMBaseModel):
         )
 
         answer = response.text
-        final_cost = (Decimal(response.meta.billed_units.input_tokens + response.meta.billed_units.output_tokens) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_input = (int(response.meta.billed_units.input_tokens) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_output = (int(response.meta.billed_units.output_tokens) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
+        cost_images = (len(images) * self.spec.price_per_image) if self.spec.price_per_image is not None else Decimal(0)
+        final_cost = cost_input + cost_output + cost_images
         return answer, final_cost
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:

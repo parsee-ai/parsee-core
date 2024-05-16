@@ -31,8 +31,10 @@ class TogetherModel(LLMBaseModel):
             top_p=1,
         )
         answer = response.choices[0].message.content
-        price = Decimal(int(response.usage.total_tokens) * (self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
-        return answer, price
+        cost_input = (int(response.usage.prompt_tokens) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_output = (int(response.usage.completion_tokens) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
+        final_cost = cost_input + cost_output
+        return answer, final_cost
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, _ = truncate_prompt(str(prompt), self.encoding, self.max_tokens_question)
