@@ -38,7 +38,7 @@ class MetaItem(StructuringItemSchema):
 
 class StructuringItem(GeneralQueryItemSchema):
 
-    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, meta_info: Optional[List[MetaItem]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None, additional_info: Optional[str] = None):
+    def __init__(self, question: str, output_type: OutputType, list_values: Optional[List[str]] = None, meta_info: Optional[List[MetaItem]] = None, assigned_id: Optional[str] = None, example: Optional[str] = None, additional_info: Optional[str] = None, keywords: Optional[str] = None):
 
         self.model = None
         self.type = output_type
@@ -51,8 +51,7 @@ class StructuringItem(GeneralQueryItemSchema):
         self.metaInfoIds = [] if meta_info is None else [x.id for x in meta_info]
         self.meta_info = meta_info
         self.example = example
-        self.keywords = None
-        self.valuesList = None
+        self.keywords = keywords
         self.defaultValue = None
         self.customArgsJson = None
 

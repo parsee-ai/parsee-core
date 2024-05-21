@@ -7,6 +7,8 @@ from decimal import Decimal
 from dataclasses import dataclass
 from hashlib import sha256
 
+from pandas import DataFrame
+
 from parsee.extraction.extractor_dataclasses import ExtractedSource, ParseeLocation, ParseeMeta, ParseeAnswer, ParseeBucket
 from parsee.utils.enums import ElementType, DocumentType
 from parsee.extraction.tasks.mappings.utils import calc_buckets
@@ -109,6 +111,7 @@ class FinalOutputTableColumn:
                 self.key_value_pairs[k] = (li, col.key_value_pairs[k][1])
         self.set_identifiers()
 
+
 class FinalOutputTable:
     detected_class: str
     columns: List[FinalOutputTableColumn]
@@ -127,6 +130,21 @@ class FinalOutputTable:
             values = [clean_number_for_matching(col.key_value_pairs[k][1]) for col in self.columns]
             output.append((li, set(values)))
         return output
+
+    def to_pandas(self) -> DataFrame:
+        if len(self.columns) == 0:
+            raise Exception("no columns found")
+        header = ["line_item"]
+        for col_idx, col in enumerate(self.columns):
+            col_name = ("_".join([f"{x.class_id}:{x.class_value}" for x in col.meta])) if len(col.meta) > 0 else f"col{col_idx}"
+            header.append(col_name)
+        data = []
+        for li_idx, li in enumerate(self.line_items):
+            row = {header[0]: li}
+            for k, col in enumerate(self.columns):
+                row[header[k+1]] = col.key_value_pairs[li_idx][1]
+            data.append(row)
+        return DataFrame(data)
 
 
 class ElementGroup:
