@@ -1,15 +1,14 @@
 from decimal import Decimal
 from typing import *
 
-from parsee.extraction.extractor_elements import StandardDocumentFormat, FinalOutputTableColumn, ParseeAnswer
-from parsee.utils.enums import DocumentType
 from parsee.templates.job_template import JobTemplate
-from parsee.extraction.extractor_dataclasses import ParseeBucket
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
-from parsee.datasets.readers.interfaces import ModelReader
 from parsee.storage.vector_stores.interfaces import VectorStore
-from parsee.extraction.extractor_elements import ExtractedEl
+from parsee.extraction.extractor_elements import FileReference, ExtractedEl
 from parsee.converters.image_creation import ImageCreator
+from parsee.extraction.extractor_dataclasses import Base64Image
+from parsee.utils.enums import SearchStrategy
+from parsee.chat.custom_dataclasses import ChatSettings
 
 
 class StorageManager:
@@ -28,4 +27,19 @@ class StorageManager:
         raise NotImplementedError
 
     def get_available_models(self) -> List[MlModelSpecification]:
+        raise NotImplementedError
+
+
+class DocumentManager:
+
+    storage: StorageManager
+
+    def __init__(self, storage: StorageManager, settings: ChatSettings):
+        self.storage = storage
+        self.settings = settings
+
+    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str]) -> Union[str, List[Base64Image]]:
+        raise NotImplementedError
+
+    def load_fragments(self, references: List[FileReference]) -> List[ExtractedEl]:
         raise NotImplementedError

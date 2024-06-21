@@ -24,6 +24,7 @@ class ParseeCloud:
 
         self.api_key = api_key
         self.host = custom_host if custom_host is not None else (os.getenv("BACKEND_HOST") if os.getenv("BACKEND_HOST") is not None else "https://backend.parsee.ai")
+        self.default_image_size = 2000
 
     def _headers(self):
         return {"Authorization": self.api_key}
@@ -122,11 +123,11 @@ class ParseeCloud:
 
         return requests.get(url, headers=self._headers()).content
 
-    def get_image(self, source_identifier: str, page_index: int, max_image_size: int = 2000) -> Base64Image:
+    def get_image(self, source_identifier: str, page_index: int, max_image_size: Optional[int]) -> Base64Image:
 
         data = self._get_image(source_identifier, page_index)
 
-        return from_bytes(data, max_image_size)
+        return from_bytes(data, max_image_size if max_image_size is not None else self.default_image_size)
 
     def get_image_and_save(self, source_identifier: str, page_index: int, output_path: str):
         """
