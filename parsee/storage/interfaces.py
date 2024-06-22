@@ -38,8 +38,5 @@ class DocumentManager:
         self.storage = storage
         self.settings = settings
 
-    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str]) -> Union[str, List[Base64Image]]:
-        raise NotImplementedError
-
-    def load_fragments(self, references: List[FileReference]) -> List[ExtractedEl]:
+    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int]) -> Union[str, List[Base64Image]]:
         raise NotImplementedError

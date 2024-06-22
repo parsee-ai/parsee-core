@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from enum import Enum
 from decimal import Decimal
 
+import tiktoken
+from tiktoken.core import Encoding
 
 from parsee.utils.enums import SearchStrategy, DocumentType
 from parsee.extraction.extractor_elements import FileReference
@@ -44,4 +46,6 @@ class Message:
 class ChatSettings:
     search_strategy: SearchStrategy = SearchStrategy.VECTOR
     max_el_in_memory: int = 10000
-    max_images: int = 20
+    max_images_to_load_per_doc: int = 30
+    min_tokens_for_instructions_and_history = 500
+    encoding: Encoding = tiktoken.get_encoding("cl100k_base")

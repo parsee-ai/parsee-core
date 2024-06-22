@@ -43,7 +43,7 @@ class ReplicateModel(LLMBaseModel):
                 return ""
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
-        final_prompt, num_tokens_input = truncate_prompt(str(prompt), self.encoding, self.max_tokens_question)
+        final_prompt, num_tokens_input = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
         response = self._call_api(final_prompt)
         tokens_response = len(get_tokens_encoded(response, self.encoding))
         cost_input = (int(num_tokens_input) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)

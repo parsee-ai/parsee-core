@@ -14,7 +14,7 @@ def run_chat(message: Message, message_history: List[Message], document_manager:
     models = [get_llm_base_model(spec) for spec in receivers]
 
     for model in models:
-        prompt = Prompt(main_task=f"{message}", description="", available_data=document_manager.load_documents(message.references, model.spec.multimodal, str(message)), history=[str(m) for m in message_history])
+        prompt = Prompt(None, f"{message}", available_data=document_manager.load_documents(message.references, model.spec.multimodal, str(message), model.spec.max_images, model.spec.max_tokens-document_manager.settings.min_tokens_for_instructions_and_history), history=[str(m) for m in message_history])
         answer, cost = model.make_prompt_request(prompt)
         output.append(Message(answer, [], Author(model.spec.model_id, Role.AGENT), cost))
 

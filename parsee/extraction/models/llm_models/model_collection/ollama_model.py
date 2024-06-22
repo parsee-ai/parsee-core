@@ -36,5 +36,5 @@ class OllamaModel(LLMBaseModel):
         return response["message"]["content"]
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
-        final_prompt, num_tokens_input = truncate_prompt(str(prompt), self.encoding, self.max_tokens_question)
+        final_prompt, num_tokens_input = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
         return self._call_api(final_prompt, prompt.available_data if self.spec.multimodal else []), Decimal(0)

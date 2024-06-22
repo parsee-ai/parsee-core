@@ -1,3 +1,6 @@
+from functools import reduce
+import math
+
 from parsee.storage.interfaces import *
 from parsee.extraction.extractor_dataclasses import Base64Image
 from parsee.cloud.api import ParseeCloud
@@ -10,7 +13,7 @@ class CloudFileManager(DocumentManager):
         super().__init__(storage, settings)
         self.cloud = cloud
 
-    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str]) -> Union[str, List[Base64Image]]:
+    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int]) -> Union[str, List[Base64Image]]:
         unique_identifiers = set([x.source_identifier for x in references])
 
         if self.settings.search_strategy == SearchStrategy.VECTOR and search_term is None:
@@ -34,15 +37,44 @@ class CloudFileManager(DocumentManager):
             raise Exception("unknown search strategy")
 
         if multimodal:
-            output = []
+            output_by_doc = {}
+            total_images = 0
             for doc in docs:
-                images = self.storage.image_creator.get_images(doc, doc.elements, self.settings.max_images, None)
-                output += images
-            return output
+                output_by_doc[doc.source_identifier] = self.storage.image_creator.get_images(doc, doc.elements, self.settings.max_images_to_load_per_doc, None)
+                total_images += len(output_by_doc[doc.source_identifier])
+            if max_images is not None and total_images > max_images:
+                max_images_per_file = math.floor(max_images/len(output_by_doc.keys()))
+                output = []
+                for k, values in output_by_doc.items():
+                    if len(values) > max_images_per_file:
+                        if k == list(output_by_doc.keys())[-1]:
+                            images_left = max_images - len(output)
+                            output += values[0:images_left]
+                        else:
+                            output += values[0:max_images_per_file]
+                    else:
+                        output += values
+                return output
+            else:
+                return reduce(lambda acc, x: acc + x, output_by_doc.values(), [])
         else:
-            output = ""
+            output_by_doc = {}
+            total_tokens = 0
             for k, doc in enumerate(docs):
-                output += f"[START OF DOCUMENT #{k+1}]\n"
-                output += str(doc)
-                output += f"[END OF DOCUMENT #{k+1}]\n"
-            return output
+                output_by_doc[doc.source_identifier] = self.settings.encoding.encode(str(doc))
+                total_tokens += len(output_by_doc[doc.source_identifier])
+            if total_tokens > max_tokens:
+                max_tokens_per_document = math.floor(max_tokens / len(output_by_doc.keys()))
+                output = ""
+                for k, tokens in enumerate(output_by_doc.values()):
+                    output += f"[START OF DOCUMENT #{k + 1}]\n"
+                    output += self.settings.encoding.decode(tokens[0:max_tokens_per_document])
+                    output += f"[END OF DOCUMENT #{k + 1}]\n"
+                return output
+            else:
+                output = ""
+                for k, doc in enumerate(docs):
+                    output += f"[START OF DOCUMENT #{k + 1}]\n"
+                    output += str(doc)
+                    output += f"[END OF DOCUMENT #{k + 1}]\n"
+                return output

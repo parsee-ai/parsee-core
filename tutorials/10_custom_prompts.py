@@ -40,7 +40,7 @@ image = cv2.imread("PATH_TO_IMAGE")
 base64_image = from_numpy(image)
 
 # define your prompt
-prompt = Prompt(main_task="What can you see in this image?", available_data=[base64_image], description=None)
+prompt = Prompt(main_task="What can you see in this image?", available_data=[base64_image], intro=None)
 
 # send prompt to the LLM
 answer, _ = llm.make_prompt_request(prompt)
