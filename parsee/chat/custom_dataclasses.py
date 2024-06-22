@@ -17,7 +17,7 @@ class Role(Enum):
 class Author:
     id: str
     role: Role
-    type: Optional[str]
+    type: Optional[str] = None
 
     def __str__(self):
         return f"[{self.role.value}] {self.id}"

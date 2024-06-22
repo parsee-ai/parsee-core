@@ -13,10 +13,13 @@ class Prompt:
         self.additional_info = f"{additional_info} \n" if additional_info is not None else ""
         self.full_example = f"{full_example} \n" if full_example is not None else ""
         self.available_data = available_data if available_data is not None else ""
-        self.history = history # TODO add history
+        self.history = ""
+        if self.history is not None and len(self.history) > 0:
+            self.history = "[PREVIOUS MESSAGES]\n"
+            self.history += "\n".join(self.history) + "\n [END PREVIOUS MESSAGES]\n"
 
     def __str__(self) -> str:
-        return f'''{self.description}
+        return f'''{self.history}{self.description}
 
                     {self.main_task} \n
                     
