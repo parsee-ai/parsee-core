@@ -89,7 +89,7 @@ class GeneralQueriesPromptBuilder:
                 meta_prompt_item = get_prompt_schema_item(meta_item)
                 main_question += f"\n({meta_item.id}): {meta_item.title} {meta_item.additionalInfo} {meta_prompt_item.get_possible_values_str()}"
 
-        prompt = Prompt(general_info, main_question, "",
+        prompt = Prompt(general_info, main_question, None,
                         full_example,
                         self.get_elements_text(relevant_elements, document) if not multimodal else self.storage.image_creator.get_images(document, relevant_elements, max_images, max_image_size))
         return prompt
