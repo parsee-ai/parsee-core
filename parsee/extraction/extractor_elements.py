@@ -756,3 +756,6 @@ class FileReference:
 
     def __repr__(self):
         return str(self)
+
+    def take_all_elements(self) -> bool:
+        return self.fragments is None or len(self.fragments) == 0

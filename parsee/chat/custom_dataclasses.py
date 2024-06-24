@@ -44,7 +44,6 @@ class Message:
 
 @dataclass
 class ChatSettings:
-    search_strategy: SearchStrategy = SearchStrategy.VECTOR
     max_el_in_memory: int = 10000
     max_images_to_load_per_doc: int = 30
     min_tokens_for_instructions_and_history = 500

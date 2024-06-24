@@ -8,5 +8,5 @@ class VectorStore:
     def find_closest_elements(self, document: StandardDocumentFormat, search_element_title: str, keywords: str, tables_only: bool = True) -> List[ExtractedEl]:
         raise NotImplementedError
 
-    def find_closest_elements_from_references(self, references: List[FileReference], search_element_title: str, keywords: str, tables_only: bool = True, max_results: Optional[int] = None) -> List[StandardDocumentFormat]:
+    def sort_identifiers_by_relevance(self, source_identifiers: Set[str], search_query: str) -> Set[str]:
         raise NotImplementedError
