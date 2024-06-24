@@ -1,6 +1,6 @@
 # Parsee AI
 
-Parsee AI is an opinionated, high-level, open source data extraction and structuring framework created by <a href="https://github.com/SimFin">SimFin</a>. Our goal is to make the structuring of data from the most common sources of unstructured data (mainly PDFs, HTML files and images) as easy as possible.
+Parsee AI is a high-level open source data extraction and structuring framework created by <a href="https://github.com/SimFin">SimFin</a>. Our goal is to make the structuring of data from the most common sources of unstructured data (mainly PDFs, HTML files and images) as easy as possible.
 
 Parsee can be used entirely from your local Python environment. We also provide a hosted version of Parsee, where you can edit and share your <a>extraction templates</a> and also run jobs in the cloud: <a href="https://app.parsee.ai">app.parsee.ai</a>.
 
@@ -133,6 +133,8 @@ We can also use a different model to run the same extraction:
 9) Using Parsee Cloud to Load Images for Multimodal Applications: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/9_loading_images_from_parsee_cloud_for_multimodal_use.py">Python Code.</a>
 
 10) Custom Prompts: <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/10_custom_prompts.py">Python Code.</a>
+
+10) Document Chat (asking questions about the content of more than one file): <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/11_document_chat.py">Python Code.</a>
 
 ## Basic Rules for Extraction Templates
 
