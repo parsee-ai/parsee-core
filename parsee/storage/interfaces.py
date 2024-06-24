@@ -6,10 +6,9 @@ from functools import reduce
 from parsee.templates.job_template import JobTemplate
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.storage.vector_stores.interfaces import VectorStore
-from parsee.extraction.extractor_elements import FileReference, ExtractedEl, StandardDocumentFormat
+from parsee.extraction.extractor_elements import FileReference
 from parsee.converters.image_creation import ImageCreator
 from parsee.extraction.extractor_dataclasses import Base64Image
-from parsee.utils.enums import SearchStrategy
 from parsee.chat.custom_dataclasses import ChatSettings
 
 
