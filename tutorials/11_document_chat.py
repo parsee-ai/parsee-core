@@ -2,14 +2,11 @@ import os
 
 from parsee import OutputType, StructuringItem, create_template, MetaItem, run_job_with_single_model, from_text
 from parsee.chat.custom_dataclasses import *
-from parsee.cloud.api import ParseeCloud
-from parsee.cloud.cloud_image_fetcher import CloudImageFetcher
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 from parsee.storage.local_file_manager import LocalFileManager
 from parsee.converters.image_creation import DiskImageCreator, DiskImageReader
 from parsee.extraction.models.helpers import ollama_config, gpt_config
 from parsee.utils.helper import get_source_identifier
-from parsee.cloud.cloud_file_manager import CloudFileManager
 from parsee.chat.main import run_chat
 
 
