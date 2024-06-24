@@ -24,7 +24,7 @@ class ChatGPTModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         openai.api_key = model.api_key if model.api_key is not None else os.getenv("OPENAI_KEY")
 
-    def _call_api(self, prompt: str, images: List[Base64Image], retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
+    def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
         user_message_content = [
             {
                 "type": "text",
@@ -47,31 +47,25 @@ class ChatGPTModel(LLMBaseModel):
                 }
                 for x in images
             ]
-        try:
-            response = openai.ChatCompletion.create(
-                model=self.spec.internal_name,
-                messages=[
-                    {"role": "user", "content": user_message_content}
-                ],
-                temperature=0,
-                max_tokens=self.max_tokens_answer,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
-            )
 
-            answer = response['choices'][0]["message"]["content"]
-            cost_input = (int(response["usage"]['prompt_tokens']) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
-            cost_output = (int(response["usage"]['completion_tokens']) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
-            cost_images = (len(images) * Decimal(self.spec.price_per_image)) if self.spec.price_per_image is not None else Decimal(0)
-            final_cost = cost_input + cost_output + cost_images
-            return answer, final_cost
-        except Exception as e:
-            if retries < self.max_retries:
-                time.sleep(wait * 2 ** retries)
-                return self._call_api(prompt, images, retries + 1)
-            else:
-                return "", Decimal(0)
+        response = openai.ChatCompletion.create(
+            model=self.spec.internal_name,
+            messages=[
+                {"role": "user", "content": user_message_content}
+            ],
+            temperature=0,
+            max_tokens=self.max_tokens_answer,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        answer = response['choices'][0]["message"]["content"]
+        cost_input = (int(response["usage"]['prompt_tokens']) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
+        cost_output = (int(response["usage"]['completion_tokens']) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
+        cost_images = (len(images) * Decimal(self.spec.price_per_image)) if self.spec.price_per_image is not None else Decimal(0)
+        final_cost = cost_input + cost_output + cost_images
+        return answer, final_cost
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, _ = truncate_prompt(prompt, self.encoding, self.max_tokens_question)

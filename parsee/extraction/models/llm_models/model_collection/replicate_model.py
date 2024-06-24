@@ -22,25 +22,19 @@ class ReplicateModel(LLMBaseModel):
         self.max_tokens_answer = 1024
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
 
-    def _call_api(self, prompt: str, retries: int = 0, wait: int = 5) -> str:
-        try:
-            response = replicate.run(self.spec.internal_name, input={
-                "prompt": prompt,
-                "top_k": 50,
-                "top_p": 0.9,
-                "temperature": 0,
-                "max_new_tokens": 1024,
-                "presence_penalty": 0,
-                "frequency_penalty": 0
-            })
-            answer = "".join(response)
-            return answer
-        except Exception as e:
-            if retries < self.max_retries:
-                time.sleep(wait * 2 ** retries)
-                return self._call_api(prompt, retries + 1)
-            else:
-                return ""
+    def _call_api(self, prompt: str) -> str:
+
+        response = replicate.run(self.spec.internal_name, input={
+            "prompt": prompt,
+            "top_k": 50,
+            "top_p": 0.9,
+            "temperature": 0,
+            "max_new_tokens": 1024,
+            "presence_penalty": 0,
+            "frequency_penalty": 0
+        })
+        answer = "".join(response)
+        return answer
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, num_tokens_input = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
