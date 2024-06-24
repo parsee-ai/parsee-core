@@ -20,7 +20,7 @@ class OllamaModel(LLMBaseModel):
     def __init__(self, model: MlModelSpecification):
         super().__init__(model)
         self.encoding = tiktoken.get_encoding("cl100k_base")
-        self.max_tokens_answer = 1024
+        self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
 
         self.client = Client(host='http://localhost:11434' if model.file_path is None else model.file_path)

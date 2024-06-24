@@ -20,7 +20,7 @@ class ChatGPTModel(LLMBaseModel):
         super().__init__(model)
         self.max_retries = 5
         self.encoding = tiktoken.get_encoding("cl100k_base")
-        self.max_tokens_answer = 1024
+        self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         openai.api_key = model.api_key if model.api_key is not None else os.getenv("OPENAI_KEY")
 
