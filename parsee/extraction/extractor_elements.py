@@ -749,7 +749,7 @@ class StandardDocumentFormat:
 class FileReference:
     source_identifier: str
     source_type: DocumentType
-    fragments: Optional[List[ExtractedSource]]
+    element_index: Optional[int] = None
 
     def __str__(self):
         return f"[FILE] id: {self.source_identifier}"
@@ -757,5 +757,5 @@ class FileReference:
     def __repr__(self):
         return str(self)
 
-    def take_all_elements(self) -> bool:
-        return self.fragments is None or len(self.fragments) == 0
+    def reference_id(self) -> str:
+        return f"{self.source_identifier}_{self.source_type}_{self.element_index}"

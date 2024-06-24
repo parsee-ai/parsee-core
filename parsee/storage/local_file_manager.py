@@ -1,5 +1,6 @@
 from parsee.utils.helper import get_source_identifier
 from parsee.storage.interfaces import *
+from parsee.extraction.extractor_elements import StandardDocumentFormat
 from parsee.converters.main import load_document
 
 

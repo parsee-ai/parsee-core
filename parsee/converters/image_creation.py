@@ -69,6 +69,8 @@ class DiskImageCreator(ImageCreator):
 
     def get_images(self, document: StandardDocumentFormat, element_selection: List[Union[ExtractedEl, ExtractedSource]], max_images: Optional[int], max_image_size: Optional[int]) -> List[Base64Image]:
 
+        max_image_size = 2000 if max_image_size is None else max_image_size
+
         if document.file_path is None:
             return []
 
