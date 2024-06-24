@@ -80,3 +80,7 @@ class SimpleFaissStore(VectorStore):
                 all_element_indices += element_indices[idx]
 
         return [document.elements[el_idx] for el_idx in all_element_indices]
+
+    def sort_identifiers_by_relevance(self, source_identifiers: Set[str], search_query: str) -> Set[str]:
+        # the simple faiss store is storing information on a single document basis only, so for usage in the 'chat' functionality this is not really suited
+        return source_identifiers

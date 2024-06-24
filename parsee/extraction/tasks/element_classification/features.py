@@ -169,7 +169,7 @@ class LLMLocationFeatureBuilder(LocationFeatureBuilder):
 
         features = self.make_features(None, None, all_element_indices, document.elements, False)
 
-        prompt = Prompt("", f'we want to find an item labeled "{item.title}".{additional_info_str}', f"""We are providing data in the following with the element_index and the text, such as [ELEMENT_INDEX] "TEXT" [end of item].
+        prompt = Prompt(None, f'we want to find an item labeled "{item.title}".{additional_info_str}', f"""We are providing data in the following with the element_index and the text, such as [ELEMENT_INDEX] "TEXT" [end of item].
                 Using the provided text, identify "{item.title}" and return the tables which you think are most likely representing "{item.title}" (it can be one item alone or several together that form the searched item).
                 Return the ELEMENT_INDEX of all items in a JSON array.""", "Your response could be for example: [10] or [241, 1204] ", self.get_elements_text(features))
 

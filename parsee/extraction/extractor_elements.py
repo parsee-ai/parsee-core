@@ -734,3 +734,28 @@ class StandardDocumentFormat:
 
     def to_json_dict(self):
         return {"source_type": self.source_type.value, "source_identifier": self.source_identifier, "elements": [x.to_json_dict() for x in self.elements]}
+
+    def __str__(self):
+        output = ""
+        for el in self.elements:
+            output += el.get_text_llm(True) + "\n"
+        return output
+
+    def __repr__(self):
+        return str(self)
+
+
+@dataclass
+class FileReference:
+    source_identifier: str
+    source_type: DocumentType
+    element_index: Optional[int] = None
+
+    def __str__(self):
+        return f"[FILE] id: {self.source_identifier}"
+
+    def __repr__(self):
+        return str(self)
+
+    def reference_id(self) -> str:
+        return f"{self.source_identifier}_{self.source_type}_{self.element_index}"

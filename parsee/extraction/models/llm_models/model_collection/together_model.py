@@ -18,7 +18,7 @@ class TogetherModel(LLMBaseModel):
     def __init__(self, model: MlModelSpecification):
         super().__init__(model)
         self.encoding = tiktoken.get_encoding("cl100k_base")
-        self.max_tokens_answer = 1024
+        self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = Together(api_key=model.api_key if model.api_key is not None else os.getenv("TOGETHER_API_KEY"), max_retries=5)
 
@@ -37,5 +37,5 @@ class TogetherModel(LLMBaseModel):
         return answer, final_cost
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
-        final_prompt, _ = truncate_prompt(str(prompt), self.encoding, self.max_tokens_question)
+        final_prompt, _ = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
         return self._call_api(final_prompt)

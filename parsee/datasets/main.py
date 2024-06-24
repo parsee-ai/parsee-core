@@ -31,7 +31,7 @@ def create_dataset_rows(template: JobTemplate, document: StandardDocumentFormat,
                 meta_items_filtered = [x for x in template.meta if x.id in item.metaInfoIds]
                 relevant_elements = question_feature_builder.get_relevant_elements(item, document)
                 prompt = question_feature_builder.build_prompt(item, meta_items_filtered, document, relevant_elements)
-                real_prompt, _ = truncate_prompt(str(prompt), encoding, max_tokens_prompt)
+                real_prompt, _ = truncate_prompt(prompt, encoding, max_tokens_prompt)
                 answers_filtered = [x for x in answers if x.class_id == item.id]
                 if len(answers_filtered) > 0:
                     # join together in case the answer has multiple blocks
