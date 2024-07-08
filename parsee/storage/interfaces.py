@@ -90,16 +90,16 @@ class DocumentManager:
                 max_tokens_per_document = math.floor(max_tokens / len(output_by_doc.keys()))
                 output = ""
                 for k, tokens in enumerate(output_by_doc.values()):
-                    output += f"[START OF DOCUMENT #{k + 1}]\n"
+                    output += f"[START OF DOCUMENT with index {k}]\n"
                     output += self.settings.encoding.decode(tokens[0:max_tokens_per_document])
-                    output += f"[END OF DOCUMENT #{k + 1}]\n"
+                    output += f"[END OF DOCUMENT with index {k}]\n\n"
                 return output
             else:
                 output = ""
                 for k, doc in enumerate(docs):
-                    output += f"[START OF DOCUMENT #{k + 1}]\n"
+                    output += f"[START OF DOCUMENT with index {k}]\n"
                     output += str(doc)
-                    output += f"[END OF DOCUMENT #{k + 1}]\n"
+                    output += f"[END OF DOCUMENT with index {k}]\n\n"
                 return output
 
     def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int]) -> Union[str, List[Base64Image]]:
