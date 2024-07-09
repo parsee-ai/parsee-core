@@ -49,7 +49,7 @@ class DocumentManager:
             # check if all elements should be taken or not
             take_all = len([x for x in references if x.source_identifier == doc.source_identifier and x.element_index is None]) > 0
             if not take_all:
-                allowed_element_indexes = [x for x in references if x.source_identifier == doc.source_identifier and x.element_index is not None]
+                allowed_element_indexes = [x.element_index for x in references if x.source_identifier == doc.source_identifier and x.element_index is not None]
                 doc.elements = [x for x in doc.elements if x.source.element_index in allowed_element_indexes]
             if total_added + len(doc.elements) > self.settings.max_el_in_memory:
                 to_add = self.settings.max_el_in_memory - total_added
