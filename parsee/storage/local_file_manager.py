@@ -21,5 +21,5 @@ class LocalFileManager(DocumentManager):
             raise Exception("file not found")
         return load_document(self.source_identifier_to_paths[source_identifier])
 
-    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int]) -> Union[str, List[Base64Image]]:
-        return self._load_documents(references, multimodal, search_term, max_images, max_tokens, self.load_with_source_identifier)
+    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int], show_chunk_index: bool = False) -> Union[str, List[Base64Image]]:
+        return self._load_documents(references, multimodal, search_term, max_images, max_tokens, self.load_with_source_identifier, show_chunk_index)

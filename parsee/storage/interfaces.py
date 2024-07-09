@@ -39,7 +39,7 @@ class DocumentManager:
         self.storage = storage
         self.settings = settings
 
-    def _load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int], load_function: Callable) -> Union[str, List[Base64Image]]:
+    def _load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int], load_function: Callable, show_chunk_index: bool) -> Union[str, List[Base64Image]]:
         # find and load the most relevant documents
         docs = []
         unique_identifiers = set([x.source_identifier for x in references])
@@ -60,6 +60,8 @@ class DocumentManager:
             docs.append(doc)
 
         if multimodal:
+            if show_chunk_index:
+                raise Exception("chunks can't be displayed with multimodal option")
             output_by_doc = {}
             total_images = 0
             for doc in docs:
@@ -84,7 +86,7 @@ class DocumentManager:
             output_by_doc = {}
             total_tokens = 0
             for k, doc in enumerate(docs):
-                output_by_doc[doc.source_identifier] = self.settings.encoding.encode(str(doc))
+                output_by_doc[doc.source_identifier] = self.settings.encoding.encode(doc.to_string(show_chunk_index))
                 total_tokens += len(output_by_doc[doc.source_identifier])
             if total_tokens > max_tokens:
                 max_tokens_per_document = math.floor(max_tokens / len(output_by_doc.keys()))
@@ -98,9 +100,9 @@ class DocumentManager:
                 output = ""
                 for k, doc in enumerate(docs):
                     output += f"[START OF DOCUMENT with index {k}]\n"
-                    output += str(doc)
+                    output += doc.to_string(show_chunk_index)
                     output += f"[END OF DOCUMENT with index {k}]\n\n"
                 return output
 
-    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int]) -> Union[str, List[Base64Image]]:
+    def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int], show_chunk_index: bool = False) -> Union[str, List[Base64Image]]:
         raise NotImplementedError

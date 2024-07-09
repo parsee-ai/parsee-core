@@ -736,13 +736,16 @@ class StandardDocumentFormat:
         return {"source_type": self.source_type.value, "source_identifier": self.source_identifier, "elements": [x.to_json_dict() for x in self.elements]}
 
     def __str__(self):
-        output = ""
-        for el in self.elements:
-            output += el.get_text_llm(True) + "\n"
-        return output
+        return self.to_string(False)
 
     def __repr__(self):
         return str(self)
+
+    def to_string(self, show_chunk_index: bool):
+        output = ""
+        for el in self.elements:
+            output += (f"[chunk {el.source.element_index}] " if show_chunk_index else "") + el.get_text_llm(True) + "\n"
+        return output
 
 
 @dataclass
