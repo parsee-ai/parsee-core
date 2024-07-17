@@ -13,6 +13,7 @@ from parsee.extraction.extractor_elements import FileReference
 class Role(Enum):
     USER = "USER"
     AGENT = "AGENT"
+    SYSTEM = "SYSTEM"
 
 
 @dataclass
