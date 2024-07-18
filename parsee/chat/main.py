@@ -1,5 +1,5 @@
 from typing import *
-from parsee.chat.custom_dataclasses import Message, ChatSettings, Author, Role
+from parsee.chat.custom_dataclasses import Message, ChatSettings
 from parsee.storage.interfaces import DocumentManager
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.model_loader import get_llm_base_model
@@ -27,6 +27,6 @@ def run_chat(message: Message, message_history: List[Message], document_manager:
     for model in models:
         prompt = Prompt(None, f"{message}", available_data=document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, model.spec.max_tokens-document_manager.settings.min_tokens_for_instructions_and_history, show_chunk_index), history=[str(m) for m in message_history])
         answer, cost = model.make_prompt_request(prompt)
-        output.append(Message(answer, [], Author(model.spec.model_id, Role.AGENT), cost=cost))
+        output.append(Message(answer, [], model.spec.model_id, cost=cost))
 
     return output

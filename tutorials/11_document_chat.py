@@ -36,7 +36,7 @@ Fragments will be set to None for this example, which means that the entire file
 message = Message("What is the difference between these two files?", [
     FileReference(get_source_identifier("../tests/fixtures/fiver-march-FI15636047324.pdf"), DocumentType.PDF, None),
     FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
-], Author("me", Role.USER, None))
+])
 
 chat_messages = run_chat(message, [], file_manager, [model], False)
 
@@ -45,14 +45,14 @@ print(chat_messages)
 # you can also pass a message history. You can decide if the references of the message history should be loaded or not with the 'most_recent_references_only' parameter of the 'run_chat' method.
 message1 = Message("Who is the issuer of the invoice?", [
     FileReference(get_source_identifier("../tests/fixtures/fiver-march-FI15636047324.pdf"), DocumentType.PDF, None)
-], Author("me", Role.USER, None))
-message1_answer = Message("The invoice issuer is Fiverr Inc.", [], Author("model", Role.AGENT))
+])
+message1_answer = Message("The invoice issuer is Fiverr Inc.", [])
 message2 = Message("Who is the issuer of the invoice?", [
     FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
-], Author("me", Role.USER, None))
-message2_answer = Message("The invoice issuer is Midjourney Inc.", [], Author("model", Role.AGENT))
+])
+message2_answer = Message("The invoice issuer is Midjourney Inc.", [])
 # we don't have to pass the references again as the history contains them
-message3 = Message("Which invoice total is higher?", [], Author("me", Role.USER, None), None)
+message3 = Message("Which invoice total is higher?", [])
 
 chat_messages = run_chat(message3, [message1, message1_answer, message2, message2_answer], file_manager, [model], False)
 
@@ -62,7 +62,7 @@ print(chat_messages)
 message = Message("Which invoice total is higher?", [
     FileReference(get_source_identifier("../tests/fixtures/fiver-march-FI15636047324.pdf"), DocumentType.PDF, None),
     FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
-], Author("me", Role.USER, None))
+])
 
 # we are using ChatGPT-4o vision now
 model = gpt_config(os.getenv("OPENAI_KEY"), 10000, "gpt-4o", multimodal=True)

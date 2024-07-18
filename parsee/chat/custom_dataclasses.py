@@ -10,33 +10,16 @@ from parsee.utils.enums import SearchStrategy, DocumentType
 from parsee.extraction.extractor_elements import FileReference
 
 
-class Role(Enum):
-    USER = "USER"
-    AGENT = "AGENT"
-    SYSTEM = "SYSTEM"
-
-
-@dataclass
-class Author:
-    id: str
-    role: Role
-    type: Optional[str] = None
-
-    def __str__(self):
-        return f"[{self.role.value}] {self.id}"
-
-    def __repr__(self):
-        return str(self)
-
-
 @dataclass
 class Message:
     text: str
     references: List[FileReference]
-    author: Author
+    author: Optional[str] = None
     cost: Optional[Decimal] = None
 
     def __str__(self):
+        if self.author is None:
+            return self.text
         return f"{self.author}: {self.text}"
 
     def __repr__(self):
