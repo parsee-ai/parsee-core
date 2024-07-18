@@ -26,6 +26,7 @@ class ReplicateModel(LLMBaseModel):
 
         response = replicate.run(self.spec.internal_name, input={
             "prompt": prompt,
+            "system_prompt": self.spec.system_message if self.spec.system_message is not None else "",
             "top_k": 50,
             "top_p": 0.9,
             "temperature": 0,

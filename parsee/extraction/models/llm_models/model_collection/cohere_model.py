@@ -27,6 +27,7 @@ class CohereModel(LLMBaseModel):
     def _call_api(self, prompt: str, images: List[Base64Image], retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
         response = self.client.chat(
             model=self.spec.internal_name,
+            preamble=self.spec.system_message,
             message=prompt,
             temperature=0,
             chat_history=[],

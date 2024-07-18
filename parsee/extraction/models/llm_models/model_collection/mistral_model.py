@@ -25,11 +25,15 @@ class MistralModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = MistralClient(api_key=model.api_key) if model.api_key is not None else None
 
-    def _call_api(self, prompt: str, images: List[Base64Image], retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
+    def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
+
+        messages = [ChatMessage(role="user", content=prompt)]
+        if self.spec.system_message is not None:
+            messages.insert(0, ChatMessage(role="system", content=self.spec.system_message))
 
         chat_response = self.client.chat(
             model=self.spec.internal_name,
-            messages=[ChatMessage(role="user", content=prompt)],
+            messages=messages,
             temperature=0
         )
 

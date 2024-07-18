@@ -23,9 +23,12 @@ class TogetherModel(LLMBaseModel):
         self.client = Together(api_key=model.api_key if model.api_key is not None else os.getenv("TOGETHER_API_KEY"), max_retries=5)
 
     def _call_api(self, prompt: str) -> Tuple[str, Decimal]:
+        messages = [{"role": "user", "content": prompt}]
+        if self.spec.system_message is not None:
+            messages.insert(0, {"role": "system", "content": self.spec.system_message})
         response = self.client.chat.completions.create(
             model=self.spec.internal_name,
-            messages=[{"role": "user", "content": prompt}],
+            messages=messages,
             temperature=0,
             max_tokens=self.max_tokens_answer,
             top_p=1,

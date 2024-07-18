@@ -32,7 +32,13 @@ class OllamaModel(LLMBaseModel):
         }
         if self.spec.multimodal:
             message_content['images'] = [x.data.encode() for x in images]
-        response = self.client.chat(model=self.spec.internal_name, messages=[message_content])
+        messages = [message_content]
+        if self.spec.system_message is not None:
+            messages.insert(0, {
+            'role': 'system',
+            'content': self.spec.system_message
+        })
+        response = self.client.chat(model=self.spec.internal_name, messages=messages)
         return response["message"]["content"]
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:

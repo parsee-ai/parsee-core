@@ -48,11 +48,16 @@ class ChatGPTModel(LLMBaseModel):
                 for x in images
             ]
 
+        messages = [
+                {"role": "user", "content": user_message_content}
+            ]
+
+        if self.spec.system_message is not None:
+            messages.insert(0, {"role": "system", "content": self.spec.system_message})
+
         response = openai.ChatCompletion.create(
             model=self.spec.internal_name,
-            messages=[
-                {"role": "user", "content": user_message_content}
-            ],
+            messages=messages,
             temperature=0,
             max_tokens=self.max_tokens_answer,
             top_p=1,
