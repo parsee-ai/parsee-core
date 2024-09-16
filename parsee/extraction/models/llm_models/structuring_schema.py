@@ -189,9 +189,47 @@ class DateItem(PromptSchemaItem):
         return str(val), True
 
 
+class MultiChoiceClassificationItem(PromptSchemaItem):
+
+    def __init__(self, possible_values: List[str], example: Optional[str] = None,
+                 default_value: Optional[str] = None):
+        super().__init__(possible_values, example, default_value)
+
+        self.possible_lowercase = [x.lower() for x in possible_values]
+        self.SEPARATOR = "|"
+        self.SEPARATOR_SPACED = f" {self.SEPARATOR} "
+
+    def format_multiple(self, values: List[str]):
+        return f"[{self.SEPARATOR_SPACED.join(values)}]"
+
+    def get_example(self, clean_value: bool = False) -> str:
+        return self.format_multiple([self.possible_values[0]] + ([self.possible_values[1]] if len(self.possible_values) > 1 else []))
+
+    def get_possible_values_str(self) -> str:
+        return f"possible values (select one or more from the following values, options are separated by '{self.SEPARATOR}'. Separate your choices (if multiple) by '{self.SEPARATOR}'): {self.format_multiple(self.possible_values)}"
+
+    def get_value(self, value: str) -> Tuple[str, bool]:
+
+        value = value.lower()
+        search = re.search(r'\[(.+)\]', value)
+        parsed = []
+        if search is not None and len(search.groups()) == 1:
+            value = search.groups()[0].strip()
+        values_split = value.split(self.SEPARATOR)
+        for val in values_split:
+            if val.strip() in self.possible_lowercase:
+                parsed.append(val.strip())
+        return self.SEPARATOR_SPACED.join(parsed), True
+
+    def parsed_to_raw(self, value: str) -> str:
+        return f"[{value}]"
+
+
 def get_prompt_schema_item(item: StructuringItemSchema) -> PromptSchemaItem:
     if item.type == OutputType.LIST:
         return ListClassificationItem(item.valuesList, item.example, item.defaultValue)
+    elif item.type == OutputType.MULTI:
+        return MultiChoiceClassificationItem(item.valuesList, item.example, item.defaultValue)
     elif item.type == OutputType.INTEGER:
         return PositiveIntegerItem(item.example, item.defaultValue)
     elif item.type == OutputType.NUMERIC:

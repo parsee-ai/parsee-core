@@ -16,6 +16,7 @@ class ElementType(Enum):
 class OutputType(Enum):
     INTEGER = "int"
     LIST = "list"
+    MULTI = "multi"
     TEXT = "text"
     NUMERIC = "numeric"
     ENTITY = "entity"
