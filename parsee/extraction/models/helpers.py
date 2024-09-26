@@ -37,6 +37,6 @@ def cohere_config(cohere_api_key: str, model_name: str, token_limit: Optional[in
     return MlModelSpecification(f"Cohere model: {model_name}", model_name, model_name, ModelType.COHERE, None, None, None, None, token_limit, cohere_api_key, None, None, None, None, None, False, None, None, output_token_limit, system_message)
 
 
-def mistral_api_config(mistral_api_key: str, model_name: str, token_limit: Optional[int] = None, output_token_limit: Optional[int] = None, system_message: Optional[str] = None) -> MlModelSpecification:
+def mistral_api_config(mistral_api_key: str, model_name: str, token_limit: Optional[int] = None, output_token_limit: Optional[int] = None, system_message: Optional[str] = None, multimodal: bool = False, max_images: int = 5, max_image_size: int = 2000) -> MlModelSpecification:
     token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
-    return MlModelSpecification(f"Mistral hosted model: {model_name}", model_name, model_name, ModelType.MISTRAL, None, None, None, None, token_limit, mistral_api_key, None, None, None, None, None, False, None, None, output_token_limit, system_message)
+    return MlModelSpecification(f"Mistral hosted model: {model_name}", model_name, model_name, ModelType.MISTRAL, None, None, None, None, token_limit, mistral_api_key, None, None, None, None, None, multimodal, max_images, max_image_size, output_token_limit, system_message)

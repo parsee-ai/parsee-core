@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 import math
 
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage
+from mistralai import Mistral
 import tiktoken
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
@@ -23,15 +22,36 @@ class MistralModel(LLMBaseModel):
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
-        self.client = MistralClient(api_key=model.api_key) if model.api_key is not None else None
+        self.client = Mistral(api_key=model.api_key) if model.api_key is not None else None
 
     def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
 
-        messages = [ChatMessage(role="user", content=prompt)]
-        if self.spec.system_message is not None:
-            messages.insert(0, ChatMessage(role="system", content=self.spec.system_message))
+        user_message_content = [
+            {
+                "type": "text",
+                "text": prompt
+            }
+        ]
+        if len(images) > 0:
+            user_message_content += [
+                {
+                    "type": "text",
+                    "text": "These are the images:"
+                }
+            ]
+            user_message_content += [
+                {
+                    "type": "image_url",
+                    "image_url": f"data:{x.media_type};base64,{x.data}",
+                }
+                for x in images
+            ]
 
-        chat_response = self.client.chat(
+        messages = [{"role": "user", "content": user_message_content}]
+        if self.spec.system_message is not None:
+            messages.insert(0, {"role": "system", "content": [{"type": "text", "text": self.spec.system_message}]})
+
+        chat_response = self.client.chat.complete(
             model=self.spec.internal_name,
             messages=messages,
             temperature=0
