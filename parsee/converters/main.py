@@ -60,6 +60,7 @@ def save_doc_in_standard_format(source_identifier: str, source_type: DocumentTyp
     json_string = json.dumps(doc.to_json_dict())
     tmp = tempfile.NamedTemporaryFile(delete=True)
     tmp.write(str.encode(json_string, 'utf-8'))
+    tmp.flush()
     return tmp, doc, amount
 
 
