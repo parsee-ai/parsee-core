@@ -13,11 +13,9 @@ pandas = "^1.4.3"
 numpy = "^1.23.1"
 tiktoken = "^0.4.0"
 pydantic = "^2.7.0"
-faiss-cpu = [{version = "<1.7.1", platform = "darwin"}, {version = "^1.7.1", platform = "linux"}]
 replicate = "^0.23.1"
 beautifulsoup4 = "^4.11.1"
 parsee-pdf-reader = "^0.1.6.0"
-sentence-transformers = "^2.2.2"
 lxml = "^4.9.1"
 opencv-python = "^4.9.0.80"
 anthropic = "^0.20.0"
@@ -33,6 +31,10 @@ urllib3 = "<2"
 
 [tool.poetry.group.extras.dependencies]
 langchain = "^0.1.11"
+
+[tool.poetry.group.faiss.dependencies]
+faiss-cpu = [{version = "<1.7.1", platform = "darwin"}, {version = "^1.7.1", platform = "linux"}]
+sentence-transformers = "^2.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
