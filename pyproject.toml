@@ -22,17 +22,17 @@ urllib3 = "<2"
 
 # Extras
 langchain = "^0.1.11"
-faiss-cpu = [{version = "<1.7.1", platform = "darwin"}, {version = "^1.7.1", platform = "linux"}]
-sentence-transformers = "^2.2.2"
+faiss-cpu = [{version = "<1.7.1", platform = "darwin", optional = true}, {version = "^1.7.1", platform = "linux", optional = true}]
+sentence-transformers = { version="^2.2.2", optional=true }
 
 # Model provider specific
-anthropic = "^0.20.0"
-ollama = "^0.1.7"
-together = "^1.1.1"
-openai = "^0.27.8"
-cohere = "^5.3.3"
-mistralai = "^1.1.0"
-replicate = "^0.23.1"
+anthropic = { version="^0.20.0", optional=true }
+ollama = { version="^0.1.7", optional=true }
+together = { version="^1.1.1", optional=true }
+openai = { version="^0.27.8", optional=true }
+cohere = { version="^5.3.3", optional=true }
+mistralai = { version="^1.1.0", optional=true }
+replicate = { version="^0.23.1", optional=true }
 
 [tool.poetry.extras]
 langchain = ["langchain"]
