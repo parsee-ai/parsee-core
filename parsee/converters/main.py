@@ -19,8 +19,10 @@ def determine_document_type(file_path: str) -> DocumentType:
         return DocumentType.PDF
     elif file_path.endswith(".html") or file_path.endswith(".xml"):
         return DocumentType.HTML
+    elif file_path.endswith(".xlsx") or file_path.endswith(".xls") or file_path.endswith(".csv"):
+        return DocumentType.TABULAR
     else:
-        raise Exception("document format not recognized")
+        return DocumentType.OTHER
 
 
 def choose_converter(source_type: DocumentType) -> RawToJsonConverter:

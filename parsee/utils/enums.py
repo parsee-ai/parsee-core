@@ -5,6 +5,8 @@ class DocumentType(Enum):
     HTML = "html"
     PDF = "pdf"
     TEXT = "text"
+    TABULAR = "tabular"
+    OTHER = "other"
 
 
 class ElementType(Enum):
