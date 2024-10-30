@@ -1,7 +1,7 @@
 import os
 
 from parsee.cloud.api import ParseeCloud
-from parsee.extraction.models.helpers import replicate_config
+from parsee.extraction.models.helpers import ollama_config
 from parsee.converters.main import load_document
 from parsee.extraction.run import run_job_with_single_model
 # Extraction templates define all the aspects of an extraction job in a JSON file
@@ -33,10 +33,8 @@ file_path = "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"
 document = load_document(file_path)
 
 # let's see if some other model can also predict the right answer
-# requires an API key from replicate: https://replicate.com/
-replicate_api_key = os.getenv("REPLICATE_KEY")
-replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
+model = ollama_config("llama3")
 
-_, _, answers_open_source_model = run_job_with_single_model(document, template, replicate_model)
+_, _, answers_open_source_model = run_job_with_single_model(document, template, model)
 
 print(answers_open_source_model)

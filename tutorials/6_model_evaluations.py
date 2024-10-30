@@ -8,7 +8,7 @@ correct and see the output in a graphical user interface, and then create datase
 from parsee.datasets.evaluation.main import evaluate_llm_performance
 from parsee.datasets.readers.disk_reader import SimpleCsvDiskReader
 from parsee.templates.helpers import StructuringItem, MetaItem, create_template
-from parsee.extraction.models.helpers import gpt_config, replicate_config
+from parsee.extraction.models.helpers import gpt_config, ollama_config
 from parsee.utils.enums import *
 
 # Let's first use the dataset we created in the previous example and run it for two different models
@@ -26,12 +26,9 @@ reader = SimpleCsvDiskReader(dataset_path)
 # let's define the models we want to evaluate
 open_ai_api_key = os.getenv("OPENAI_KEY") # enter your key manually here instead of loading from an .env file
 gpt_model = gpt_config(open_ai_api_key)
-replicate_api_key = os.getenv("REPLICATE_KEY")
-replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
-replicate_model2 = replicate_config(replicate_api_key, "mistralai/mistral-7b-v0.1")
-replicate_model3 = replicate_config(replicate_api_key, "mistralai/mistral-7b-instruct-v0.2")
+ollama_model = ollama_config("llama3")
 
 # let's run predictions with several models
-performance = evaluate_llm_performance(job_template, reader, [replicate_model, replicate_model2, replicate_model3])
+performance = evaluate_llm_performance(job_template, reader, [ollama_model, gpt_model])
 
 print(performance)
