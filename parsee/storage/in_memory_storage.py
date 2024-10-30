@@ -3,7 +3,7 @@ from decimal import Decimal
 from copy import deepcopy
 
 from parsee.storage.interfaces import StorageManager
-from parsee.storage.vector_stores.simple_faiss import SimpleFaissStore
+from parsee.storage.vector_stores.simple_numpy import SimpleNumpyStore
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.templates.job_template import JobTemplate
 from parsee.extraction.extractor_dataclasses import AssignedMeta, AssignedLocation, AssignedAnswer, AssignedBucket
@@ -18,7 +18,7 @@ class InMemoryStorageManager(StorageManager):
     truth_mappings: List[AssignedBucket]
 
     def __init__(self, available_models: Optional[List[MlModelSpecification]], custom_image_creator: Optional[ImageCreator] = None):
-        super().__init__(SimpleFaissStore(), DiskImageCreator() if custom_image_creator is None else custom_image_creator)
+        super().__init__(SimpleNumpyStore(), DiskImageCreator() if custom_image_creator is None else custom_image_creator)
         self.models = available_models if available_models is not None else []
         self.truth_questions = []
         self.truth_locations = []

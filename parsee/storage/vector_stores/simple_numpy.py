@@ -5,15 +5,15 @@ import pickle
 import io
 
 import numpy as np
-import faiss
 from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from parsee.storage.vector_stores.interfaces import VectorStore
 from parsee.extraction.extractor_elements import StandardDocumentFormat, ExtractedEl
 from parsee.utils.enums import ElementType
 
 
-class SimpleFaissStore(VectorStore):
+class SimpleNumpyStore(VectorStore):
 
     def __init__(self):
         self.encoder = SentenceTransformer('all-MiniLM-L6-v2')
@@ -49,12 +49,7 @@ class SimpleFaissStore(VectorStore):
             )
 
         sentence_embeddings = self.encoder.encode([x["text"] for x in data])
-
-        d = sentence_embeddings.shape[1]
-        index = faiss.IndexFlatL2(d)
-        index.add(sentence_embeddings)
-
-        return [x["element_indices"] for x in data], index
+        return [x["element_indices"] for x in data], sentence_embeddings
 
     def get_index(self, document: StandardDocumentFormat, tables_only: bool) -> Tuple[List[List[int]], any]:
         key = (document.source_identifier, tables_only)
@@ -64,23 +59,23 @@ class SimpleFaissStore(VectorStore):
 
     def find_closest_elements(self, document: StandardDocumentFormat, search_element_title: str, keywords: Optional[str], tables_only: bool = True) -> List[ExtractedEl]:
 
-        element_indices, index = self.get_index(document, tables_only)
+        element_indices, embeddings = self.get_index(document, tables_only)
 
         query = f"{search_element_title}" + (f"; {keywords}" if keywords is not None else "")
 
         xq = self.encoder.encode([query])
 
-        _, results = index.search(xq, self.k)  # search
+        similarities = cosine_similarity(embeddings, xq)
 
-        indices = results.tolist()[0]
+        best_indices = np.argsort(similarities, axis=0)[::-1].flatten()[0:self.k]
 
         all_element_indices = []
-        for idx in indices:
+        for idx in best_indices:
             if idx >= 0:
                 all_element_indices += element_indices[idx]
 
         return [document.elements[el_idx] for el_idx in all_element_indices]
 
     def sort_identifiers_by_relevance(self, source_identifiers: Set[str], search_query: str) -> Set[str]:
-        # the simple faiss store is storing information on a single document basis only, so for usage in the 'chat' functionality this is not really suited
+        # the simple numpy store is storing information on a single document basis only, so for usage in the 'chat' functionality this is not really suited
         return source_identifiers
