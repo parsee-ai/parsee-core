@@ -60,10 +60,9 @@ As an alternative to using extraction templates, you can also run your own custo
     
 ### Step 2: define a model
 
-In the following we will use the Mixtral model from Replicate, requires an API key: https://replicate.com/
+In the following we will use the Llama 3 model from Meta via Ollama
     
-    replicate_api_key = os.getenv("REPLICATE_KEY")
-    replicate_model = replicate_config(replicate_api_key, "mistralai/mixtral-8x7b-instruct-v0.1")
+    ollama_model = ollama_config("llama3")
 
 If you intend to use a model that has multimodal capabilities such as GPT 4 or Claude 3, you can enable the multimodal queries by setting the multimodal setting to True (you can also specify how many images should be passed to the modal at most and the maximum size for each image):
 
@@ -72,10 +71,6 @@ If you intend to use a model that has multimodal capabilities such as GPT 4 or C
 or for Anthropic models:
     
     anthropic_model = anthropic_config(os.getenv("ANTHROPIC_KEY"), "claude-3-opus-20240229", None, multimodal=True, max_images=1, max_image_size=800)
-
-of course you can also load a locally hosted model with Ollama:
-
-    ollama_model = ollama_config("mistral")
     
 ### Step 3: load a document
 Parsee converts all data (strings, file contents etc.) to a standardized format, the class for this is called StandardDocumentFormat.
@@ -92,7 +87,7 @@ Parsee converts all data (strings, file contents etc.) to a standardized format,
     
 ### Step 4: run the extraction
 
-    _, _, answers_open_source_model = run_job_with_single_model(document, job_template, replicate_model)
+    _, _, answers_open_source_model = run_job_with_single_model(document, job_template, ollama_model)
 
 If we look at the answers of the model we get the following:
 
