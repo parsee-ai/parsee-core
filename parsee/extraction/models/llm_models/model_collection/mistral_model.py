@@ -35,12 +35,6 @@ class MistralModel(LLMBaseModel):
         if len(images) > 0:
             user_message_content += [
                 {
-                    "type": "text",
-                    "text": "These are the images:"
-                }
-            ]
-            user_message_content += [
-                {
                     "type": "image_url",
                     "image_url": f"data:{x.media_type};base64,{x.data}",
                 }

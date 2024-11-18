@@ -34,12 +34,6 @@ class AnthropicModel(LLMBaseModel):
         if len(images) > 0:
             user_message_content += [
                 {
-                    "type": "text",
-                    "text": "These are the images:"
-                }
-            ]
-            user_message_content += [
-                {
                     "type": "image",
                     "source": {
                         "type": "base64",
