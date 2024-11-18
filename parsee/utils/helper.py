@@ -254,3 +254,30 @@ def parse_json_array(string_val: str) -> Union[None, List[any]]:
         except Exception as e:
             return None
     return None
+
+
+def merge_answer_pieces(answers: List[str]) -> str:
+
+    if len(answers) == 0:
+        return ""
+    is_array = parse_json_array(answers[0]) is not None
+    is_dict = parse_json_dict(answers[0]) is not None
+
+    if is_array:
+        # try to merge the JSON array
+        output = []
+        for piece in answers:
+            arr = parse_json_array(piece)
+            if arr is not None:
+                output += arr
+        return json.dumps(output)
+    elif is_dict:
+        # try to merge the dicts
+        output = {}
+        for piece in answers:
+            d = parse_json_dict(piece)
+            if d is not None:
+                output = {**output, **d}
+        return json.dumps(output)
+    else:
+        return "".join(answers)
