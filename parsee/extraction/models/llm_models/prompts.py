@@ -26,3 +26,15 @@ class Prompt:
 
     def available_data_string(self) -> str:
         return self.available_data if isinstance(self.available_data, str) else ''
+
+    def __key(self):
+        return self.intro, self.main_task, self.additional_info, self.full_example, self.available_data, self.history
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, Prompt):
+            result = self.__key() == other.__key()
+            return result
+        return NotImplemented

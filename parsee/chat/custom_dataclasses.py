@@ -32,3 +32,6 @@ class ChatSettings:
     max_images_to_load_per_doc: int = 30
     min_tokens_for_instructions_and_history = 500
     encoding: Encoding = tiktoken.get_encoding("cl100k_base")
+    max_cache_size: int = 128
+
+chat_settings = ChatSettings()

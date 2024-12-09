@@ -1,5 +1,6 @@
 import os
 import time
+from functools import lru_cache
 from typing import List, Tuple
 from dataclasses import dataclass
 from decimal import Decimal
@@ -11,6 +12,7 @@ import replicate
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
+from parsee.chat.custom_dataclasses import chat_settings
 
 
 class ReplicateModel(LLMBaseModel):
@@ -37,6 +39,7 @@ class ReplicateModel(LLMBaseModel):
         answer = "".join(response)
         return answer
 
+    @lru_cache(maxsize=chat_settings.max_cache_size)
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, num_tokens_input = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
         response = self._call_api(final_prompt)

@@ -1,5 +1,5 @@
 from typing import *
-from parsee.chat.custom_dataclasses import Message, ChatSettings
+from parsee.chat.custom_dataclasses import Message
 from decimal import Decimal
 from parsee.storage.interfaces import DocumentManager
 from parsee.extraction.models.model_dataclasses import MlModelSpecification

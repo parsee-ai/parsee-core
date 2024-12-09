@@ -39,3 +39,17 @@ class MlModelSpecification:
             return None
         model_dir = os.path.dirname(self.file_path)
         return os.path.join(model_dir, "settings.pkl")
+
+    def __key(self):
+        return (self.name, self.model_id, self.internal_name, self.model_type, self.file_path, self.price_per_1k_tokens,
+                self.price_per_1k_output_tokens, self.price_per_image, self.max_tokens, self.api_key,
+                self.only_questions, self.only_elements, self.only_meta, self.only_mappings, self.stats,
+                self.multimodal, self.max_images, self.max_image_pixels, self.max_output_tokens, self.system_message)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, MlModelSpecification):
+            return self.__key() == other.__key()
+        return NotImplemented

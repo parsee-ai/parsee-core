@@ -1,5 +1,6 @@
 import os
 import time
+from functools import lru_cache
 from typing import List, Tuple
 from dataclasses import dataclass
 from decimal import Decimal
@@ -13,6 +14,7 @@ from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.extractor_dataclasses import Base64Image
+from parsee.chat.custom_dataclasses import chat_settings
 
 
 class OllamaModel(LLMBaseModel):
@@ -41,6 +43,7 @@ class OllamaModel(LLMBaseModel):
         response = self.client.chat(model=self.spec.internal_name, messages=messages)
         return response["message"]["content"]
 
+    @lru_cache(maxsize=chat_settings.max_cache_size)
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, num_tokens_input = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
         return self._call_api(final_prompt, prompt.available_data if self.spec.multimodal else []), Decimal(0)
