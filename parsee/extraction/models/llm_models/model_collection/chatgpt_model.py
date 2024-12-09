@@ -13,7 +13,7 @@ from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.extractor_dataclasses import Base64Image
-from parsee.chat.custom_dataclasses import chat_settings
+from parsee.settings import chat_settings
 
 
 class ChatGPTModel(LLMBaseModel):

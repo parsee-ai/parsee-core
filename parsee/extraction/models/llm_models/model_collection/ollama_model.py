@@ -2,19 +2,16 @@ import os
 import time
 from functools import lru_cache
 from typing import List, Tuple
-from dataclasses import dataclass
 from decimal import Decimal
-import math
 
 import tiktoken
-import ollama
 from ollama import Client
 
-from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.extractor_dataclasses import Base64Image
-from parsee.chat.custom_dataclasses import chat_settings
+from parsee.settings import chat_settings
 
 
 class OllamaModel(LLMBaseModel):

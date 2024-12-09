@@ -12,7 +12,7 @@ import replicate
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
-from parsee.chat.custom_dataclasses import chat_settings
+from parsee.settings import chat_settings
 
 
 class ReplicateModel(LLMBaseModel):

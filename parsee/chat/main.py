@@ -6,6 +6,7 @@ from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.model_loader import get_llm_base_model
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.utils.helper import merge_answer_pieces
+from parsee.settings import chat_settings
 
 
 def run_chat(message: Message, message_history: List[Message], document_manager: DocumentManager, receivers: List[MlModelSpecification], most_recent_references_only: bool, show_chunk_index: bool = False, single_page_processing_max_images_trigger: Optional[int] = None) -> List[Message]:
@@ -26,7 +27,7 @@ def run_chat(message: Message, message_history: List[Message], document_manager:
                 added_references.add(ref.reference_id())
 
     for model in models:
-        data = document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, model.spec.max_tokens-document_manager.settings.min_tokens_for_instructions_and_history, show_chunk_index)
+        data = document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, chat_settings.min_tokens_for_instructions_and_history, show_chunk_index)
         # for multimodal queries, check if pages have to be processed individually
         process_pages_individually = False
         if type(data) is list:

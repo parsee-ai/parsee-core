@@ -1,16 +1,7 @@
-from typing import Optional, Union, List
-
 from parsee import ollama_config
 from parsee.chat.custom_dataclasses import Message
-from parsee.chat.custom_dataclasses import ChatSettings
-from parsee.chat.main import run_chat
-from parsee.extraction.extractor_dataclasses import Base64Image
-from parsee.extraction.extractor_elements import FileReference
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.models.model_loader import get_llm_base_model
-from parsee.storage.in_memory_storage import InMemoryStorageManager
-from parsee.storage.interfaces import DocumentManager
-from parsee.chat.custom_dataclasses import chat_settings
 
 
 def test_make_prompt_request__with_cache():

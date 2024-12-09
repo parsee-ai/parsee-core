@@ -28,11 +28,22 @@ openai = "^0.27.8"
 cohere = "^5.3.3"
 mistralai ="^1.1.0"
 replicate ="^0.23.1"
+pydantic-settings = "^2.6.1"
 
 
 [tool.poetry.group.extras.dependencies]
 langchain = "^0.1.11"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-env = "^1.1.5"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+env = [
+    "max_cache_size=1",
+]
