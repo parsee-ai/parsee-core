@@ -6,8 +6,8 @@ from parsee.converters.main import load_document
 
 class LocalFileManager(DocumentManager):
 
-    def __init__(self, storage: StorageManager, settings: ChatSettings, document_paths: List[str]):
-        super().__init__(storage, settings)
+    def __init__(self, storage: StorageManager, document_paths: List[str]):
+        super().__init__(storage)
         self.source_identifier_to_paths = {}
         for path in document_paths:
             self.source_identifier_to_paths[get_source_identifier(path)] = path
