@@ -4,6 +4,8 @@ from decimal import Decimal
 
 import cohere
 import tiktoken
+from cohere import TooManyRequestsError
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_exponential
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -22,7 +24,13 @@ class CohereModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = cohere.Client(model.api_key)
 
-    def _call_api(self, prompt: str, images: List[Base64Image], retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
+    @retry(reraise=True,
+           stop=stop_after_attempt(chat_settings.retry_attempts),
+           retry=retry_if_exception_type(TooManyRequestsError),
+           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+                                 min=chat_settings.retry_wait_min,
+                                 max=chat_settings.retry_wait_max), )
+    def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
         response = self.client.chat(
             model=self.spec.internal_name,
             preamble=self.spec.system_message,

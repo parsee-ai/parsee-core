@@ -1,13 +1,10 @@
-import os
-import time
 from functools import lru_cache
 from typing import List, Tuple
-from dataclasses import dataclass
 from decimal import Decimal
-import math
 
-from mistralai import Mistral
+from mistralai import Mistral, SDKError
 import tiktoken
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -26,6 +23,12 @@ class MistralModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = Mistral(api_key=model.api_key) if model.api_key is not None else None
 
+    @retry(reraise=True,
+           stop=stop_after_attempt(chat_settings.retry_attempts),
+           retry=retry_if_exception(lambda x: isinstance(x, SDKError) and x.status_code == 429),
+           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+                                 min=chat_settings.retry_wait_min,
+                                 max=chat_settings.retry_wait_max), )
     def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
 
         user_message_content = [

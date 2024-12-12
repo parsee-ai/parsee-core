@@ -28,6 +28,7 @@ openai = "^0.27.8"
 cohere = "^5.3.3"
 mistralai ="^1.1.0"
 replicate ="^0.23.1"
+tenacity = "^8.1.0"
 pydantic-settings = "^2.6.1"
 
 
@@ -46,4 +47,5 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 env = [
     "max_cache_size=1",
+    "retry_attempts=2",
 ]

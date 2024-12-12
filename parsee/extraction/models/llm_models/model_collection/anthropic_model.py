@@ -1,13 +1,12 @@
 import os
-import time
 from functools import lru_cache
 from typing import List, Tuple
-from dataclasses import dataclass
 from decimal import Decimal
-import math
 
 import anthropic
 import tiktoken
+from anthropic import RateLimitError
+from tenacity import retry, wait_exponential, retry_if_exception_type, stop_after_attempt
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -20,12 +19,17 @@ class AnthropicModel(LLMBaseModel):
 
     def __init__(self, model: MlModelSpecification):
         super().__init__(model)
-        self.max_retries = 5
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = anthropic.Anthropic(api_key=model.api_key if model.api_key is not None else os.getenv("ANTHROPIC_API_KEY"))
 
+    @retry(reraise=True,
+           stop=stop_after_attempt(chat_settings.retry_attempts),
+           retry=retry_if_exception_type(RateLimitError),
+           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+                                 min=chat_settings.retry_wait_min,
+                                 max=chat_settings.retry_wait_max), )
     def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
         user_message_content = [
             {

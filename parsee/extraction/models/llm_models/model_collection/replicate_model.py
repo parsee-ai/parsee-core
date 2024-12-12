@@ -1,13 +1,11 @@
-import os
-import time
 from functools import lru_cache
 from typing import List, Tuple
-from dataclasses import dataclass
 from decimal import Decimal
-import math
 
 import tiktoken
 import replicate
+from replicate.exceptions import ReplicateError
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -24,6 +22,13 @@ class ReplicateModel(LLMBaseModel):
         self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
 
+    @retry(reraise=True,
+           stop=stop_after_attempt(chat_settings.retry_attempts),
+           retry=retry_if_exception(lambda x: isinstance(x, ReplicateError) and len(x.args) > 0 and
+                                              "Request was throttled." in x.args[0]),
+           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+                                 min=chat_settings.retry_wait_min,
+                                 max=chat_settings.retry_wait_max), )
     def _call_api(self, prompt: str) -> str:
 
         response = replicate.run(self.spec.internal_name, input={

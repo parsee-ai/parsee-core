@@ -1,13 +1,12 @@
 import os
-import time
 from functools import lru_cache
 from typing import List, Tuple
-from dataclasses import dataclass
 from decimal import Decimal
-import math
 
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_exponential
 from together import Together
 import tiktoken
+from together.error import RateLimitError
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -24,6 +23,12 @@ class TogetherModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = Together(api_key=model.api_key if model.api_key is not None else os.getenv("TOGETHER_API_KEY"), max_retries=5)
 
+    @retry(reraise=True,
+           stop=stop_after_attempt(chat_settings.retry_attempts),
+           retry=retry_if_exception_type(RateLimitError),
+           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+                                 min=chat_settings.retry_wait_min,
+                                 max=chat_settings.retry_wait_max), )
     def _call_api(self, prompt: str) -> Tuple[str, Decimal]:
         messages = [{"role": "user", "content": prompt}]
         if self.spec.system_message is not None:
