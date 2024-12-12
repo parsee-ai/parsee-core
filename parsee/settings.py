@@ -12,7 +12,7 @@ class ChatSettings(BaseSettings):
     max_cache_size: int = 128
     retry_attempts: int = 5
     retry_wait_multiplier: int = 1
-    retry_wait_min: int = 4
+    retry_wait_min: int = 2
     retry_wait_max: int = 20
 
 chat_settings = ChatSettings()

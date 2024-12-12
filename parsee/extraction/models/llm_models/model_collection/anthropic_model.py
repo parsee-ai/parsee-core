@@ -6,13 +6,16 @@ from decimal import Decimal
 import anthropic
 import tiktoken
 from anthropic import RateLimitError
-from tenacity import retry, wait_exponential, retry_if_exception_type, stop_after_attempt
+from tenacity import retry, wait_exponential, retry_if_exception_type, stop_after_attempt, after_log
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.extractor_dataclasses import Base64Image
 from parsee.settings import chat_settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AnthropicModel(LLMBaseModel):
@@ -29,7 +32,8 @@ class AnthropicModel(LLMBaseModel):
            retry=retry_if_exception_type(RateLimitError),
            wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,
-                                 max=chat_settings.retry_wait_max), )
+                                 max=chat_settings.retry_wait_max),
+           after=after_log(logger, logging.DEBUG))
     def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
         user_message_content = [
             {

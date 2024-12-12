@@ -1,17 +1,20 @@
 import os
 from functools import lru_cache
-from typing import List, Tuple
+from typing import Tuple
 from decimal import Decimal
 
-from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_exponential
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_exponential, after_log
 from together import Together
 import tiktoken
 from together.error import RateLimitError
 
-from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, get_tokens_encoded, truncate_prompt
+from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.settings import chat_settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class TogetherModel(LLMBaseModel):
@@ -28,7 +31,8 @@ class TogetherModel(LLMBaseModel):
            retry=retry_if_exception_type(RateLimitError),
            wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,
-                                 max=chat_settings.retry_wait_max), )
+                                 max=chat_settings.retry_wait_max),
+           after=after_log(logger, logging.DEBUG))
     def _call_api(self, prompt: str) -> Tuple[str, Decimal]:
         messages = [{"role": "user", "content": prompt}]
         if self.spec.system_message is not None:

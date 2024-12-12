@@ -1,3 +1,6 @@
+import logging
+import sys
+
 from replicate.exceptions import ReplicateError
 
 from parsee import replicate_config
@@ -10,11 +13,10 @@ def mock_run(self, input):
     raise ReplicateError("Request was throttled. Expected available in 1 second.",)
 
 
-
-
-def test__call_api_retry(monkeypatch):
+def test__call_api_retry(monkeypatch, caplog):
     """The call to the API should be retried a specified in the settings number of times
     and at the end throw the original SDKError."""
+    caplog.set_level(logging.DEBUG)
     monkeypatch.setattr("parsee.extraction.models.llm_models.model_collection.replicate_model.replicate.run",
                         mock_run)
     spec = replicate_config(replicate_api_key="123", model_name="123")
