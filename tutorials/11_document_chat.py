@@ -40,43 +40,43 @@ chat_messages = run_chat(message, [], file_manager, [model], False)
 
 print(chat_messages)
 
-# # you can also pass a message history. You can decide if the references of the message history should be loaded or not with the 'most_recent_references_only' parameter of the 'run_chat' method.
-# message1 = Message("Who is the issuer of the invoice?", [
-#     FileReference(get_source_identifier("../tests/fixtures/fiver-march-FI15636047324.pdf"), DocumentType.PDF, None)
-# ])
-# message1_answer = Message("The invoice issuer is Fiverr Inc.", [])
-# message2 = Message("Who is the issuer of the invoice?", [
-#     FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
-# ])
-# message2_answer = Message("The invoice issuer is Midjourney Inc.", [])
-# # we don't have to pass the references again as the history contains them
-# message3 = Message("Which invoice total is higher?", [])
-#
-# chat_messages = run_chat(message3, [message1, message1_answer, message2, message2_answer], file_manager, [model], False)
-#
-# print(chat_messages)
-#
-# # we can also use multimodal models for the local files:
-# message = Message("Which invoice total is higher?", [
-#     FileReference(get_source_identifier("../tests/fixtures/fiver-march-FI15636047324.pdf"), DocumentType.PDF, None),
-#     FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
-# ])
+# you can also pass a message history. You can decide if the references of the message history should be loaded or not with the 'most_recent_references_only' parameter of the 'run_chat' method.
+message1 = Message("Who is the issuer of the invoice?", [
+    FileReference(get_source_identifier("../tests/fixtures/fiver-march-FI15636047324.pdf"), DocumentType.PDF, None)
+])
+message1_answer = Message("The invoice issuer is Fiverr Inc.", [])
+message2 = Message("Who is the issuer of the invoice?", [
+    FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
+])
+message2_answer = Message("The invoice issuer is Midjourney Inc.", [])
+# we don't have to pass the references again as the history contains them
+message3 = Message("Which invoice total is higher?", [])
+
+chat_messages = run_chat(message3, [message1, message1_answer, message2, message2_answer], file_manager, [model], False)
+
+print(chat_messages)
+
+# we can also use multimodal models for the local files:
+message = Message("Which invoice total is higher?", [
+    FileReference(get_source_identifier("../tests/fixtures/fiver-march-FI15636047324.pdf"), DocumentType.PDF, None),
+    FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
+])
 
 # we are using ChatGPT-4o vision now
-# model = gpt_config(os.getenv("OPENAI_KEY"), 10000, "gpt-4o", multimodal=True)
-#
-# chat_messages = run_chat(message, [], file_manager, [model], False)
-#
-# print(chat_messages)
-#
-# # Finally, we can also use the Parsee Extraction templates with the output from the chat, to structure the data:
-# structuring_item = StructuringItem("Which invoice total is higher?", OutputType.LIST, ["Fiverr invoice", "Midjourney Invoice"])
-#
-# job_template = create_template([structuring_item])
-#
-# doc = from_text(str(chat_messages))
-# model = gpt_config(os.getenv("OPENAI_KEY"), 10000, "gpt-4o", multimodal=False)
-# _, _, answers = run_job_with_single_model(doc, job_template, model)
-#
-# print(answers)
+model = gpt_config(os.getenv("OPENAI_KEY"), 10000, "gpt-4o", multimodal=True)
+
+chat_messages = run_chat(message, [], file_manager, [model], False)
+
+print(chat_messages)
+
+# Finally, we can also use the Parsee Extraction templates with the output from the chat, to structure the data:
+structuring_item = StructuringItem("Which invoice total is higher?", OutputType.LIST, ["Fiverr invoice", "Midjourney Invoice"])
+
+job_template = create_template([structuring_item])
+
+doc = from_text(str(chat_messages))
+model = gpt_config(os.getenv("OPENAI_KEY"), 10000, "gpt-4o", multimodal=False)
+_, _, answers = run_job_with_single_model(doc, job_template, model)
+
+print(answers)
 
