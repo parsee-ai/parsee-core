@@ -14,5 +14,11 @@ class ChatSettings(BaseSettings):
     retry_wait_multiplier: int = 1
     retry_wait_min: int = 2
     retry_wait_max: int = 20
+    openai_key: str
+    replicate_key: str
+    together_api_key: str
+    anthropic_api_key: str
+
 
 chat_settings = ChatSettings()
+
