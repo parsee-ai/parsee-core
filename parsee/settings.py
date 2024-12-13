@@ -1,3 +1,5 @@
+from typing import Optional
+
 import tiktoken
 from tiktoken import Encoding
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -14,10 +16,10 @@ class ChatSettings(BaseSettings):
     retry_wait_multiplier: int = 1
     retry_wait_min: int = 2
     retry_wait_max: int = 20
-    openai_key: str
-    replicate_key: str
-    together_api_key: str
-    anthropic_api_key: str
+    openai_key: Optional[str] = None
+    replicate_key: Optional[str] = None
+    together_api_key: Optional[str] = None
+    anthropic_api_key: Optional[str] = None
 
 
 chat_settings = ChatSettings()
