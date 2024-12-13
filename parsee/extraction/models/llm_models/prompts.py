@@ -6,7 +6,8 @@ from parsee.extraction.extractor_dataclasses import Base64Image
 
 class Prompt:
 
-    def __init__(self, intro: Optional[str], main_task: str, additional_info: Optional[str] = None, full_example: Optional[str] = None, available_data: Optional[Union[str, List[Base64Image]]] = None,
+    def __init__(self, intro: Optional[str], main_task: str, additional_info: Optional[str] = None,
+                 full_example: Optional[str] = None, available_data: Optional[Union[str, List[Base64Image]]] = None,
                  history: Optional[List[str]] = None):
         self.intro = f"{intro} \n" if intro is not None else ""
         self.main_task = main_task
@@ -26,3 +27,16 @@ class Prompt:
 
     def available_data_string(self) -> str:
         return self.available_data if isinstance(self.available_data, str) else ''
+
+    def __key(self):
+        available_data_key = self.available_data if (isinstance(self.available_data, str) or self.available_data is None) else hash(tuple(self.available_data))
+        return self.intro, self.main_task, self.additional_info, self.full_example, available_data_key, self.history
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, Prompt):
+            result = self.__key() == other.__key()
+            return result
+        return NotImplemented

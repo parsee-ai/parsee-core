@@ -9,7 +9,7 @@ from parsee.storage.vector_stores.interfaces import VectorStore
 from parsee.extraction.extractor_elements import FileReference
 from parsee.converters.image_creation import ImageCreator
 from parsee.extraction.extractor_dataclasses import Base64Image
-from parsee.chat.custom_dataclasses import ChatSettings
+from parsee.settings import chat_settings
 
 
 class StorageManager:
@@ -35,9 +35,8 @@ class DocumentManager:
 
     storage: StorageManager
 
-    def __init__(self, storage: StorageManager, settings: ChatSettings):
+    def __init__(self, storage: StorageManager):
         self.storage = storage
-        self.settings = settings
 
     def _load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int], load_function: Callable, show_chunk_index: bool) -> Union[str, List[Base64Image]]:
         # find and load the most relevant documents
@@ -51,8 +50,8 @@ class DocumentManager:
             if not take_all:
                 allowed_element_indexes = [x.element_index for x in references if x.source_identifier == doc.source_identifier and x.element_index is not None]
                 doc.elements = [x for x in doc.elements if x.source.element_index in allowed_element_indexes]
-            if total_added + len(doc.elements) > self.settings.max_el_in_memory:
-                to_add = self.settings.max_el_in_memory - total_added
+            if total_added + len(doc.elements) > chat_settings.max_el_in_memory:
+                to_add = chat_settings.max_el_in_memory - total_added
                 if to_add > 0:
                     doc.elements = doc.elements[0:to_add]
                 else:
@@ -65,7 +64,7 @@ class DocumentManager:
             output_by_doc = {}
             total_images = 0
             for doc in docs:
-                output_by_doc[doc.source_identifier] = self.storage.image_creator.get_images(doc, doc.elements, self.settings.max_images_to_load_per_doc, None)
+                output_by_doc[doc.source_identifier] = self.storage.image_creator.get_images(doc, doc.elements, chat_settings.max_images_to_load_per_doc, None)
                 total_images += len(output_by_doc[doc.source_identifier])
             if max_images is not None and total_images > max_images:
                 max_images_per_file = math.floor(max_images / len(output_by_doc.keys()))
@@ -86,14 +85,14 @@ class DocumentManager:
             output_by_doc = {}
             total_tokens = 0
             for k, doc in enumerate(docs):
-                output_by_doc[doc.source_identifier] = self.settings.encoding.encode(doc.to_string(show_chunk_index))
+                output_by_doc[doc.source_identifier] = chat_settings.encoding.encode(doc.to_string(show_chunk_index))
                 total_tokens += len(output_by_doc[doc.source_identifier])
             if total_tokens > max_tokens:
                 max_tokens_per_document = math.floor(max_tokens / len(output_by_doc.keys()))
                 output = ""
                 for k, tokens in enumerate(output_by_doc.values()):
                     output += f"[START OF DOCUMENT with index {k}]\n"
-                    output += self.settings.encoding.decode(tokens[0:max_tokens_per_document])
+                    output += chat_settings.encoding.decode(tokens[0:max_tokens_per_document])
                     output += f"[END OF DOCUMENT with index {k}]\n\n"
                 return output
             else:

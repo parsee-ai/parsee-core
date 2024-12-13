@@ -1,10 +1,6 @@
-from functools import reduce
-import math
-
 from parsee.storage.interfaces import *
 from parsee.extraction.extractor_dataclasses import Base64Image
 from parsee.cloud.api import ParseeCloud
-from parsee.cloud.cloud_image_fetcher import CloudImageFetcher
 
 
 class CloudFileManager(DocumentManager):

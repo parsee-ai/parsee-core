@@ -41,3 +41,11 @@ class LLMBaseModel:
 
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         raise NotImplementedError
+
+    def __hash__(self):
+        return hash(self.spec)
+
+    def __eq__(self, other):
+        if isinstance(other, LLMBaseModel):
+            return self.spec == other.spec
+        return NotImplemented

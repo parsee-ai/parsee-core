@@ -147,3 +147,15 @@ class AssignedAnswer:
 class Base64Image:
     media_type: str
     data: str
+
+    def __key(self):
+        return self.media_type, self.data
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, Base64Image):
+            result = self.__key() == other.__key()
+            return result
+        return NotImplemented

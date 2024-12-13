@@ -1,16 +1,14 @@
 import os
 
-from parsee import OutputType, StructuringItem, create_template, MetaItem, run_job_with_single_model, from_text
+from parsee import OutputType, StructuringItem, create_template, run_job_with_single_model, from_text
 from parsee.chat.custom_dataclasses import *
+from parsee.utils.enums import DocumentType
 from parsee.storage.in_memory_storage import InMemoryStorageManager
 from parsee.storage.local_file_manager import LocalFileManager
-from parsee.converters.image_creation import DiskImageCreator, DiskImageReader
+from parsee.converters.image_creation import DiskImageCreator
 from parsee.extraction.models.helpers import ollama_config, gpt_config
 from parsee.utils.helper import get_source_identifier
 from parsee.chat.main import run_chat
-
-
-settings = ChatSettings()
 
 """
 The previous examples revolve around extracting data from a single file. If you want to ask a question about more than one document ("document chat"), you can use the chat functionality.
@@ -22,7 +20,7 @@ or we can read images from a directory if you already created them and use the D
 storage = InMemoryStorageManager(None, DiskImageCreator())
 
 # we can specify the paths to one or more files on the disk here
-file_manager = LocalFileManager(storage, settings, ["../tests/fixtures/fiver-march-FI15636047324.pdf", "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"])
+file_manager = LocalFileManager(storage, ["../tests/fixtures/fiver-march-FI15636047324.pdf", "../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"])
 
 # specify a model
 model = ollama_config("llama3")

@@ -1,17 +1,19 @@
-import os
-import time
+from functools import lru_cache
 from typing import List, Tuple
-from dataclasses import dataclass
 from decimal import Decimal
-import math
 
-from mistralai import Mistral
+from mistralai import Mistral, SDKError
 import tiktoken
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception, after_log
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.extractor_dataclasses import Base64Image
+from parsee.settings import chat_settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MistralModel(LLMBaseModel):
@@ -24,6 +26,13 @@ class MistralModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = Mistral(api_key=model.api_key) if model.api_key is not None else None
 
+    @retry(reraise=True,
+           stop=stop_after_attempt(chat_settings.retry_attempts),
+           retry=retry_if_exception(lambda x: isinstance(x, SDKError) and x.status_code == 429),
+           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+                                 min=chat_settings.retry_wait_min,
+                                 max=chat_settings.retry_wait_max),
+           after=after_log(logger, logging.DEBUG) )
     def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
 
         user_message_content = [
@@ -58,6 +67,7 @@ class MistralModel(LLMBaseModel):
         final_cost = cost_input + cost_output + cost_images
         return answer, final_cost
 
+    @lru_cache(maxsize=chat_settings.max_cache_size)
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, _ = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
         return self._call_api(final_prompt, prompt.available_data if self.spec.multimodal else [])

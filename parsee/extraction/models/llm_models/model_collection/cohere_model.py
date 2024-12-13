@@ -1,17 +1,20 @@
-import os
-import time
+from functools import lru_cache
 from typing import List, Tuple
-from dataclasses import dataclass
 from decimal import Decimal
-import math
 
 import cohere
 import tiktoken
+from cohere import TooManyRequestsError
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_exponential, after_log
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.extractor_dataclasses import Base64Image
+from parsee.settings import chat_settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CohereModel(LLMBaseModel):
@@ -24,7 +27,14 @@ class CohereModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = cohere.Client(model.api_key)
 
-    def _call_api(self, prompt: str, images: List[Base64Image], retries: int = 0, wait: int = 5) -> Tuple[str, Decimal]:
+    @retry(reraise=True,
+           stop=stop_after_attempt(chat_settings.retry_attempts),
+           retry=retry_if_exception_type(TooManyRequestsError),
+           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+                                 min=chat_settings.retry_wait_min,
+                                 max=chat_settings.retry_wait_max),
+           after=after_log(logger, logging.DEBUG))
+    def _call_api(self, prompt: str, images: List[Base64Image]) -> Tuple[str, Decimal]:
         response = self.client.chat(
             model=self.spec.internal_name,
             preamble=self.spec.system_message,
@@ -42,6 +52,7 @@ class CohereModel(LLMBaseModel):
         final_cost = cost_input + cost_output + cost_images
         return answer, final_cost
 
+    @lru_cache(maxsize=chat_settings.max_cache_size)
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
         final_prompt, _ = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
         return self._call_api(final_prompt, prompt.available_data if self.spec.multimodal else [])
