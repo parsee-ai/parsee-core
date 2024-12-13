@@ -29,7 +29,7 @@ class Prompt:
         return self.available_data if isinstance(self.available_data, str) else ''
 
     def __key(self):
-        available_data_key = self.available_data if isinstance(self.available_data, str | None) else hash(tuple(self.available_data))
+        available_data_key = self.available_data if (isinstance(self.available_data, str) or self.available_data is None) else hash(tuple(self.available_data))
         return self.intro, self.main_task, self.additional_info, self.full_example, available_data_key, self.history
 
     def __hash__(self):
