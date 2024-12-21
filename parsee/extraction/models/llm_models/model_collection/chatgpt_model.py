@@ -5,7 +5,7 @@ from decimal import Decimal
 import openai
 import tiktoken
 from openai.error import RateLimitError
-from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_exponential, after_log
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_random_exponential, after_log
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -29,7 +29,7 @@ class ChatGPTModel(LLMBaseModel):
     @retry(reraise=True,
            stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception_type(RateLimitError),
-           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+           wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,
                                  max=chat_settings.retry_wait_max),
            after=after_log(logger, logging.DEBUG))
