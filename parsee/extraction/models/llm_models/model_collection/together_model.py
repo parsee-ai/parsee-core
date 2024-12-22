@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Tuple
 from decimal import Decimal
 
-from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_exponential, after_log
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_random_exponential, after_log
 from together import Together
 import tiktoken
 from together.error import RateLimitError
@@ -29,7 +29,7 @@ class TogetherModel(LLMBaseModel):
     @retry(reraise=True,
            stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception_type(RateLimitError),
-           wait=wait_exponential(multiplier=chat_settings.retry_wait_multiplier,
+           wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,
                                  max=chat_settings.retry_wait_max),
            after=after_log(logger, logging.DEBUG))
