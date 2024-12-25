@@ -5,8 +5,8 @@ from parsee.cloud.api import ParseeCloud
 
 class CloudFileManager(DocumentManager):
 
-    def __init__(self, storage: StorageManager, settings: ChatSettings, cloud: ParseeCloud):
-        super().__init__(storage, settings)
+    def __init__(self, storage: StorageManager, cloud: ParseeCloud):
+        super().__init__(storage)
         self.cloud = cloud
 
     def load_documents(self, references: List[FileReference], multimodal: bool, search_term: Optional[str], max_images: Optional[int], max_tokens: Optional[int], show_chunk_index: bool = False) -> Union[str, List[Base64Image]]:

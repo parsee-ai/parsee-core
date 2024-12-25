@@ -365,11 +365,15 @@ class StructuredTableCell:
     def __repr__(self):
         return self.__str__()
 
-    def __init__(self, val: Union[str, Decimal, int], colspan: int = 1):
+    def __init__(self, val: Union[str, Decimal, int], colspan: int = 1, disable_clean: bool = False):
 
         self.val = val
         self.colspan = colspan
-        self.clean_cell()
+        if not disable_clean:
+            self.clean_cell()
+        else:
+            self.text_value_cleaned = val
+            self.cell_type = "text"
 
     def to_json_dict(self):
         return {"val": self.val, "colspan": self.colspan}
