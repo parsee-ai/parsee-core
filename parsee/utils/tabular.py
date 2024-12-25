@@ -42,5 +42,6 @@ def parse_csv(file_path: str, max_rows: Optional[int] = None) -> StructuredTable
         for col_idx in range(0, max_cols):
             val = row[col_idx] if col_idx <= len(row) - 1 else ""
             r.values.append(StructuredTableCell(str(val), 1, True))
+    f.close()
 
     return table
