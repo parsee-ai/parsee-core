@@ -1,10 +1,14 @@
 from decimal import Decimal
 from typing import *
+import logging
 
 from tiktoken.core import Encoding
 
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_tokens_encoded(prompt: str, encoding: Encoding) -> List[int]:
@@ -16,7 +20,8 @@ def truncate_prompt(prompt: Prompt, encoding: Encoding, max_tokens: int) -> Tupl
     tokens_instructions = get_tokens_encoded(prompt.instructions(), encoding)
     tokens_data = get_tokens_encoded(prompt.available_data_string(), encoding)
     if len(tokens_instructions) > max_tokens:
-        raise Exception("instructions exceed token limit")
+        logger.warning("Instructions bigger than max amount of tokens, truncating instructions and ignoring history & data")
+        return encoding.decode(tokens_instructions[0:max_tokens]), max_tokens
     num_tokens = len(tokens_history) + len(tokens_instructions) + len(tokens_data)
     if num_tokens > max_tokens:
         # check if instructions + data are fitting
