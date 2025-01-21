@@ -28,6 +28,7 @@ class MlModelSpecification:
     max_image_pixels: Optional[int]
     max_output_tokens: Optional[int]
     system_message: Optional[str]
+    api_version: Optional[str]
 
     def model_path(self) -> Union[None, str]:
         if self.file_path is None:
