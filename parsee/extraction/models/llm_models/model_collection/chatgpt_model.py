@@ -33,8 +33,7 @@ class ChatGPTModel(LLMBaseModel):
         else:
             self.client = OpenAI(api_key=api_key)
 
-    @retry(reraise=True,
-           stop=stop_after_attempt(chat_settings.retry_attempts),
+    @retry(stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception_type(RateLimitError),
            wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,

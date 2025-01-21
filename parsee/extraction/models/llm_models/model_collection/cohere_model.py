@@ -27,8 +27,7 @@ class CohereModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = cohere.Client(model.api_key)
 
-    @retry(reraise=True,
-           stop=stop_after_attempt(chat_settings.retry_attempts),
+    @retry(stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception_type(TooManyRequestsError),
            wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,

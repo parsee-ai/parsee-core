@@ -1,5 +1,6 @@
 import httpx
 from anthropic import RateLimitError
+from tenacity import RetryError
 
 from parsee import anthropic_config
 from parsee.chat.custom_dataclasses import Message
@@ -32,6 +33,6 @@ def test__call_api_retry(monkeypatch):
     prompt = Prompt(None, f"{message}", available_data="123", history=[])
     try:
         model.make_prompt_request(prompt)
-    except RateLimitError:
+    except RetryError:
         pass
     assert model._call_api.statistics["attempt_number"] == 2

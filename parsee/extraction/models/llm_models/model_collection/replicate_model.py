@@ -25,8 +25,7 @@ class ReplicateModel(LLMBaseModel):
         self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
 
-    @retry(reraise=True,
-           stop=stop_after_attempt(chat_settings.retry_attempts),
+    @retry(stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception(lambda x: isinstance(x, ReplicateError) and len(x.args) > 0 and
                                               "Request was throttled." in x.args[0]),
            wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,

@@ -1,5 +1,6 @@
 import httpx
 from mistralai import SDKError
+from tenacity import RetryError
 
 from parsee import mistral_api_config
 from parsee.chat.custom_dataclasses import Message
@@ -33,6 +34,6 @@ def test__call_api_retry(monkeypatch):
     prompt = Prompt(None, f"{message}", available_data="123", history=[])
     try:
         model.make_prompt_request(prompt)
-    except SDKError:
+    except RetryError:
         pass
     assert model._call_api.statistics["attempt_number"] == 2
