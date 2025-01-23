@@ -36,7 +36,7 @@ message = Message("What is the difference between these two files?", [
     FileReference(get_source_identifier("../tests/fixtures/Midjourney_Invoice-DBD682ED-0005.pdf"), DocumentType.PDF, None)
 ])
 
-chat_messages = run_chat(message, [], file_manager, [model], False)
+chat_messages = run_chat(message, [], file_manager, model, False)
 
 print(chat_messages)
 
@@ -52,7 +52,7 @@ message2_answer = Message("The invoice issuer is Midjourney Inc.", [])
 # we don't have to pass the references again as the history contains them
 message3 = Message("Which invoice total is higher?", [])
 
-chat_messages = run_chat(message3, [message1, message1_answer, message2, message2_answer], file_manager, [model], False)
+chat_messages = run_chat(message3, [message1, message1_answer, message2, message2_answer], file_manager, model, False)
 
 print(chat_messages)
 
@@ -65,7 +65,7 @@ message = Message("Which invoice total is higher?", [
 # we are using ChatGPT-4o vision now
 model = gpt_config(os.getenv("OPENAI_KEY"), 10000, "gpt-4o", multimodal=True)
 
-chat_messages = run_chat(message, [], file_manager, [model], False)
+chat_messages = run_chat(message, [], file_manager, model, False)
 
 print(chat_messages)
 
