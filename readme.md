@@ -57,6 +57,7 @@ let's also define an item for the issuer of the invoice
     job_template = create_template([invoice_total, invoice_issuer])
 
 As an alternative to using extraction templates, you can also run your own custom prompts, more in <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/10_custom_prompts.py">tutorial 10</a>.
+You can also use Parsee for a "document chat", where you can ask questions about one or more files/documents, this is explained in <a href="https://github.com/parsee-ai/parsee-core/blob/master/tutorials/11_document_chat.py">tutorial 11</a>. 
     
 ### Step 2: define a model
 
