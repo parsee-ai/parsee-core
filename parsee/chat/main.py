@@ -54,30 +54,31 @@ def run_chat(message: Message, message_history: List[Message],
                 references.append(ref)
                 added_references.add(ref.reference_id())
 
-        data = document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, chat_settings.min_tokens_for_instructions_and_history, show_chunk_index)
-        # for multimodal queries, check if pages have to be processed individually
-        process_pages_individually = False
-        if type(data) is list:
-            # check if pages can be processed one by one
-            if single_page_processing_max_images_trigger is not None and len(data) >= single_page_processing_max_images_trigger:
-                process_pages_individually = True
-        if process_pages_individually:
-            answers = []
-            cost = Decimal(0)
-            for k, img in enumerate(data):
-                if k > 0:
-                    additional_info = f"We are showing you the images contained in the document one by one. The current image is number {k + 1} out of a total of {len(data)}.\n Your last answer ended with the following (make sure that your new answer is valid JSON or similar, as requested; last 500 characters are shown):\n" \
-                                      f"{answers[-1][-500:]}"
-                else:
-                    additional_info = f"We are showing you the images contained in the document one by one. The current image is number {k + 1} out of a total of {len(data)}."
-                prompt = Prompt(None, f"{message}", additional_info=additional_info, available_data=[img], history=[str(m) for m in message_history])
-                current_answer, current_cost = model.make_prompt_request(prompt)
-                answers.append(current_answer)
-                cost += current_cost
-            answer = merge_answer_pieces(answers)
-        else:
-            prompt = Prompt(None, f"{message}", available_data=data, history=[str(m) for m in message_history])
-            answer, cost = model.make_prompt_request(prompt)
+    data = document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, chat_settings.min_tokens_for_instructions_and_history, show_chunk_index)
+    # for multimodal queries, check if pages have to be processed individually
+    process_pages_individually = False
+    if type(data) is list:
+        # check if pages can be processed one by one
+        if single_page_processing_max_images_trigger is not None and len(data) >= single_page_processing_max_images_trigger:
+            process_pages_individually = True
+    if process_pages_individually:
+        answers = []
+        cost = Decimal(0)
+        for k, img in enumerate(data):
+            if k > 0:
+                additional_info = f"We are showing you the images contained in the document one by one. The current image is number {k + 1} out of a total of {len(data)}.\n Your last answer ended with the following (make sure that your new answer is valid JSON or similar, as requested; last 500 characters are shown):\n" \
+                                  f"{answers[-1][-500:]}"
+            else:
+                additional_info = f"We are showing you the images contained in the document one by one. The current image is number {k + 1} out of a total of {len(data)}."
+            prompt = Prompt(None, f"{message}", additional_info=additional_info, available_data=[img], history=[str(m) for m in message_history])
+            current_answer, current_cost = model.make_prompt_request(prompt)
+            answers.append(current_answer)
+            cost += current_cost
+        answer = merge_answer_pieces(answers)
+    else:
+        prompt = Prompt(None, f"{message}", available_data=data, history=[str(m) for m in message_history])
+        answer, cost = model.make_prompt_request(prompt)
+
         output.append(Message(answer, [], model.spec.model_id, cost=cost))
     cache_info = model.make_prompt_request.cache_info()
     logger.info(f"Chat with {spec.model_id} done. Cache info: {cache_info}")
