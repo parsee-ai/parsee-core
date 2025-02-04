@@ -2,9 +2,10 @@ from functools import lru_cache
 from typing import List, Tuple
 from decimal import Decimal
 
-import openai
+from openai import OpenAI, AzureOpenAI
+
 import tiktoken
-from openai.error import RateLimitError
+from openai import RateLimitError
 from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_random_exponential, after_log
 
 from parsee.extraction.models.llm_models.llm_base_model import LLMBaseModel, truncate_prompt
@@ -24,10 +25,15 @@ class ChatGPTModel(LLMBaseModel):
         self.encoding = tiktoken.get_encoding("cl100k_base")
         self.max_tokens_answer = 1024 if model.max_output_tokens is None else model.max_output_tokens
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
-        openai.api_key = model.api_key if model.api_key is not None else chat_settings.openai_key
+        api_key = model.api_key if model.api_key is not None else chat_settings.openai_key
+        if model.file_path is not None:
+            self.client = AzureOpenAI(api_key=api_key,
+                                      api_version=model.api_version,
+                                      azure_endpoint=model.file_path)
+        else:
+            self.client = OpenAI(api_key=api_key)
 
-    @retry(reraise=True,
-           stop=stop_after_attempt(chat_settings.retry_attempts),
+    @retry(stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception_type(RateLimitError),
            wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,
@@ -58,7 +64,7 @@ class ChatGPTModel(LLMBaseModel):
         if self.spec.system_message is not None:
             messages.insert(0, {"role": "system", "content": self.spec.system_message})
 
-        response = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model=self.spec.internal_name,
             messages=messages,
             temperature=0,
@@ -68,7 +74,7 @@ class ChatGPTModel(LLMBaseModel):
             presence_penalty=0
         )
 
-        answer = response['choices'][0]["message"]["content"]
+        answer = response.choices[0].message.content
         cost_input = (int(response["usage"]['prompt_tokens']) * Decimal(self.spec.price_per_1k_tokens / 1000)) if self.spec.price_per_1k_tokens is not None else Decimal(0)
         cost_output = (int(response["usage"]['completion_tokens']) * Decimal(self.spec.price_per_1k_output_tokens / 1000)) if self.spec.price_per_1k_output_tokens is not None else Decimal(0)
         cost_images = (len(images) * Decimal(self.spec.price_per_image)) if self.spec.price_per_image is not None else Decimal(0)

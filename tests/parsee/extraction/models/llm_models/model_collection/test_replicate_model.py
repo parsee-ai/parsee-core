@@ -1,7 +1,7 @@
 import logging
-import sys
 
 from replicate.exceptions import ReplicateError
+from tenacity import RetryError
 
 from parsee import replicate_config
 from parsee.chat.custom_dataclasses import Message
@@ -25,6 +25,6 @@ def test__call_api_retry(monkeypatch, caplog):
     prompt = Prompt(None, f"{message}", available_data="123", history=[])
     try:
         model.make_prompt_request(prompt)
-    except ReplicateError:
+    except RetryError:
         pass
     assert model._call_api.statistics["attempt_number"] == 2
