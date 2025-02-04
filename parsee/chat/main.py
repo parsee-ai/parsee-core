@@ -54,7 +54,6 @@ def run_chat(message: Message, message_history: List[Message],
                 references.append(ref)
                 added_references.add(ref.reference_id())
 
-
         data = document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, chat_settings.min_tokens_for_instructions_and_history, show_chunk_index)
         # for multimodal queries, check if pages have to be processed individually
         process_pages_individually = False
