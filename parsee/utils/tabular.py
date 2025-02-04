@@ -25,11 +25,15 @@ def parse_csv(file_path: str, max_rows: Optional[int] = None) -> StructuredTable
         f = open(file_path, "r", encoding='windows-1254')
         data = f.read()
     f.seek(0)
-    dialect = sniffer.sniff(data, delimiters=[",", ";", "|"])
     delimiter_alt, share_alt, total_alt = csv_delimiter_simple(data)
-    if total_alt > 100 and share_alt > 0.6:
-        dialect.delimiter = delimiter_alt
-    reader = csv.reader(f, dialect)
+    args = {}
+    try:
+        args["dialect"] = sniffer.sniff(data, delimiters=[",", ";", "|"])
+    except Exception as e:
+        args["delimiter"] = delimiter_alt
+    if total_alt > 100 and share_alt > 0.6 and "dialect" in args:
+        args["dialect"].delimiter = delimiter_alt
+    reader = csv.reader(f, **args)
     for k, row in enumerate(reader):
         if max_rows is not None and k+1 > max_rows:
             continue
