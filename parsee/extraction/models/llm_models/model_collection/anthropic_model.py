@@ -27,8 +27,7 @@ class AnthropicModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = anthropic.Anthropic(api_key=model.api_key if model.api_key is not None else os.getenv("ANTHROPIC_API_KEY"))
 
-    @retry(reraise=True,
-           stop=stop_after_attempt(chat_settings.retry_attempts),
+    @retry(stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception_type(RateLimitError),
            wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,

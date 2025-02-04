@@ -26,8 +26,7 @@ class TogetherModel(LLMBaseModel):
         self.max_tokens_question = self.spec.max_tokens - self.max_tokens_answer
         self.client = Together(api_key=model.api_key if model.api_key is not None else os.getenv("TOGETHER_API_KEY"), max_retries=5)
 
-    @retry(reraise=True,
-           stop=stop_after_attempt(chat_settings.retry_attempts),
+    @retry(stop=stop_after_attempt(chat_settings.retry_attempts),
            retry=retry_if_exception_type(RateLimitError),
            wait=wait_random_exponential(multiplier=chat_settings.retry_wait_multiplier,
                                  min=chat_settings.retry_wait_min,

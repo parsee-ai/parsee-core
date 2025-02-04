@@ -20,6 +20,10 @@ Alternatively:
 
     pip install parsee-core
 
+In order to use the PDF to image functionality (for multimodal models) you need to install poppler, e.g. on MacOSX:
+
+    brew install poppler
+
 ## Quick Example
 
 *Goal:*
