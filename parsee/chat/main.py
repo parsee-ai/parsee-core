@@ -79,7 +79,7 @@ def run_chat(message: Message, message_history: List[Message],
         prompt = Prompt(None, f"{message}", available_data=data, history=[str(m) for m in message_history])
         answer, cost = model.make_prompt_request(prompt)
 
-        output.append(Message(answer, [], model.spec.model_id, cost=cost))
+    output.append(Message(answer, [], model.spec.model_id, cost=cost))
     cache_info = model.make_prompt_request.cache_info()
     logger.info(f"Chat with {spec.model_id} done. Cache info: {cache_info}")
     return output
