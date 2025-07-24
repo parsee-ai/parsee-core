@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parsee-core"
-version = "0.1.7.5"
+version = "0.1.7.6"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
 homepage = "https://parsee.ai"
@@ -23,7 +23,7 @@ sentence-transformers = "^2.7"
 transformers = "^4.47.1,<4.50"
 scikit-learn = "^1.5.2"
 anthropic = "^0.20.0"
-ollama = "^0.1.7"
+ollama = ">0.1.7"
 together = "^1.1.1"
 openai = "^1.59.9"
 cohere = "^5.3.3"
@@ -31,6 +31,7 @@ mistralai ="^1.1.0"
 replicate ="^0.23.1"
 tenacity = "^8.1.0"
 pydantic-settings = "^2.6.1"
+google-genai = "^1.26.0"
 
 
 [tool.poetry.group.extras.dependencies]

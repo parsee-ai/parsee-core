@@ -37,3 +37,8 @@ def cohere_config(cohere_api_key: str, model_name: str, token_limit: Optional[in
 def mistral_api_config(mistral_api_key: str, model_name: str, token_limit: Optional[int] = None, output_token_limit: Optional[int] = None, system_message: Optional[str] = None, multimodal: bool = False, max_images: int = 5, max_image_size: int = 2000) -> MlModelSpecification:
     token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
     return MlModelSpecification(f"Mistral hosted model: {model_name}", model_name, model_name, ModelType.MISTRAL, None, None, None, None, token_limit, mistral_api_key, None, None, None, None, None, multimodal, max_images, max_image_size, output_token_limit, system_message, None)
+
+
+def google_config(model_name: str, project_name: str, location_name: str, token_limit: Optional[int] = None, multimodal: bool = False, max_images: int = 5, max_image_size: int = 2000, output_token_limit: Optional[int] = None, system_message: Optional[str] = None):
+    token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
+    return MlModelSpecification(f"Google model: {model_name}", model_name, model_name, ModelType.GOOGLE, f"{project_name}__{location_name}", None, None, None, token_limit, None, None, None, None, None, None, multimodal, max_images, max_image_size, output_token_limit, system_message, None)

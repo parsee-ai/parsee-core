@@ -20,6 +20,7 @@ class ChatSettings(BaseSettings):
     replicate_key: Optional[str] = None
     together_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
+    google_application_credentials: Optional[str] = None
 
 
 chat_settings = ChatSettings()
