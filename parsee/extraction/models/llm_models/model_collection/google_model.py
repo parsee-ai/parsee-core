@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from google import genai
 from google.genai import types, errors
+import httpx
 import base64
 
 import tiktoken
@@ -41,7 +42,7 @@ class GoogleModel(LLMBaseModel):
 
     @retry(
         stop=stop_after_attempt(chat_settings.retry_attempts),
-        retry=retry_if_exception_type(RateLimitError),
+        retry=retry_if_exception_type((RateLimitError, httpx.RemoteProtocolError)),
         wait=wait_random_exponential(
             multiplier=chat_settings.retry_wait_multiplier,
             min=chat_settings.retry_wait_min,
