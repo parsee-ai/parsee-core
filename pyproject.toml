@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parsee-core"
-version = "0.1.8.0"
+version = "0.1.8.1"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
 homepage = "https://parsee.ai"
@@ -14,7 +14,7 @@ numpy = "^1.23.1"
 tiktoken = "^0.4.0"
 pydantic = "^2.7.0"
 beautifulsoup4 = "^4.11.1"
-parsee-pdf-reader = "^0.1.7.0"
+parsee-pdf-reader = "^0.1.8.1"
 lxml = "^4.9.1"
 opencv-python = "^4.9.0.80"
 torch = "<2.3"
@@ -23,7 +23,7 @@ sentence-transformers = "^2.7"
 transformers = "^4.47.1,<4.50"
 scikit-learn = "^1.5.2"
 anthropic = "^0.20.0"
-ollama = "^0.1.7"
+ollama = ">0.1.7"
 together = "^1.1.1"
 openai = "^1.59.9"
 cohere = "^5.3.3"
@@ -31,6 +31,7 @@ mistralai ="^1.1.0"
 replicate ="^0.23.1"
 tenacity = "^8.1.0"
 pydantic-settings = "^2.6.1"
+google-genai = "^1.26.0"
 
 
 [tool.poetry.group.extras.dependencies]

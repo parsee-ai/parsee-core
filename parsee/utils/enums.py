@@ -55,3 +55,4 @@ class ModelType(Enum):
     TOGETHER = "together"
     COHERE = "cohere"
     MISTRAL = "mistral"
+    GOOGLE = "google"

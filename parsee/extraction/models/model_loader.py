@@ -11,6 +11,7 @@ from parsee.extraction.models.llm_models.model_collection.ollama_model import Ol
 from parsee.extraction.models.llm_models.model_collection.together_model import TogetherModel
 from parsee.extraction.models.llm_models.model_collection.cohere_model import CohereModel
 from parsee.extraction.models.llm_models.model_collection.mistral_model import MistralModel
+from parsee.extraction.models.llm_models.model_collection.google_model import GoogleModel
 from parsee.extraction.tasks.questions.question_model_llm import LLMQuestionModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info import MetaInfoModel
 from parsee.extraction.tasks.meta_info_structuring.meta_info_llm import MetaLLMModel
@@ -38,6 +39,8 @@ def get_llm_base_model(spec: MlModelSpecification) -> LLMBaseModel:
         return CohereModel(spec)
     elif spec.model_type == ModelType.MISTRAL:
         return MistralModel(spec)
+    elif spec.model_type == ModelType.GOOGLE:
+        return GoogleModel(spec)
     else:
         raise Exception("llm base model not found")
 
