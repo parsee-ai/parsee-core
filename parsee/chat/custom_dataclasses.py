@@ -19,3 +19,9 @@ class Message:
 
     def __repr__(self):
         return str(self)
+
+
+@dataclass
+class SinglePageProcessingSettings:
+    max_images_trigger: int = 3
+    merge_strategy: Optional[Callable[[List[str]], str]] = None

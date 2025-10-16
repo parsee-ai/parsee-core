@@ -1,5 +1,5 @@
 from typing import *
-from parsee.chat.custom_dataclasses import Message
+from parsee.chat.custom_dataclasses import Message, SinglePageProcessingSettings
 from decimal import Decimal
 from parsee.storage.interfaces import DocumentManager
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
@@ -14,16 +14,16 @@ logger = logging.getLogger(__name__)
 
 
 def run_chat_with_fallback(message: Message, message_history: List[Message],
-             document_manager: DocumentManager, receivers: List[MlModelSpecification],
-             most_recent_references_only: bool, show_chunk_index: bool = False,
-             single_page_processing_max_images_trigger: Optional[int] = None) -> List[Message]:
+                           document_manager: DocumentManager, receivers: List[MlModelSpecification],
+                           most_recent_references_only: bool, show_chunk_index: bool = False,
+                           single_page_processing_settings: Optional[SinglePageProcessingSettings] = None) -> List[Message]:
     """Runs a chat with a fallback to other models if the first one fails to process the message."""
     logger.info(f"Running chat with fallback")
     logger.debug(f"Message: {message}")
     for spec in receivers:
         try:
             output = run_chat(message, message_history, document_manager, spec,
-                     most_recent_references_only, show_chunk_index, single_page_processing_max_images_trigger)
+                              most_recent_references_only, show_chunk_index, single_page_processing_settings)
         except RetryError:
             logger.warning(f"RetryError occurred for model {spec.model_id}. Continuing with next model.")
             continue
@@ -36,7 +36,7 @@ def run_chat_with_fallback(message: Message, message_history: List[Message],
 def run_chat(message: Message, message_history: List[Message],
              document_manager: DocumentManager, spec: MlModelSpecification,
              most_recent_references_only: bool, show_chunk_index: bool = False,
-             single_page_processing_max_images_trigger: Optional[int] = None) -> List[Message]:
+             single_page_processing_settings: Optional[SinglePageProcessingSettings] = None) -> List[Message]:
     """Run a chat with a specific model."""
     logger.info(f"Running chat with {spec.model_id}")
     output = []
@@ -55,12 +55,14 @@ def run_chat(message: Message, message_history: List[Message],
                 added_references.add(ref.reference_id())
 
     data = document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, chat_settings.min_tokens_for_instructions_and_history, show_chunk_index)
+
     # for multimodal queries, check if pages have to be processed individually
     process_pages_individually = False
     if type(data) is list:
         # check if pages can be processed one by one
-        if single_page_processing_max_images_trigger is not None and len(data) >= single_page_processing_max_images_trigger:
+        if single_page_processing_settings is not None and len(data) >= single_page_processing_settings.max_images_trigger:
             process_pages_individually = True
+
     if process_pages_individually:
         answers = []
         cost = Decimal(0)
@@ -74,7 +76,12 @@ def run_chat(message: Message, message_history: List[Message],
             current_answer, current_cost = model.make_prompt_request(prompt)
             answers.append(current_answer)
             cost += current_cost
-        answer = merge_answer_pieces(answers)
+
+        # Use custom merge strategy if provided, otherwise use default
+        if single_page_processing_settings is not None and single_page_processing_settings.merge_strategy is not None:
+            answer = single_page_processing_settings.merge_strategy(answers)
+        else:
+            answer = merge_answer_pieces(answers)
     else:
         prompt = Prompt(None, f"{message}", available_data=data, history=[str(m) for m in message_history])
         answer, cost = model.make_prompt_request(prompt)
