@@ -20,10 +20,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class RateLimitError(Exception):
-    pass
-
-
 class GoogleModel(LLMBaseModel):
 
     def __init__(self, model: MlModelSpecification):
@@ -42,7 +38,7 @@ class GoogleModel(LLMBaseModel):
 
     @retry(
         stop=stop_after_attempt(chat_settings.retry_attempts),
-        retry=retry_if_exception_type((RateLimitError, httpx.RemoteProtocolError)),
+        retry=retry_if_exception_type((errors.ClientError, httpx.RemoteProtocolError)),
         wait=wait_random_exponential(
             multiplier=chat_settings.retry_wait_multiplier,
             min=chat_settings.retry_wait_min,
@@ -87,18 +83,11 @@ class GoogleModel(LLMBaseModel):
             # add more settings as needed
         )
 
-        try:
-            response = self.client.models.generate_content(
-                model=self.spec.internal_name,
-                contents=contents,
-                config=config
-            )
-        except errors.ClientError as e:
-            if getattr(e, "status_code", None) == 429:
-                raise RateLimitError("Rate limit exceeded") from e
-            raise
-        except Exception as e:
-            raise
+        response = self.client.models.generate_content(
+            model=self.spec.internal_name,
+            contents=contents,
+            config=config
+        )
 
         # This assumes response.candidates[0].content.parts[0].text is the answer
         answer = ""
