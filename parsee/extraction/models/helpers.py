@@ -2,10 +2,10 @@ from parsee.extraction.models.model_dataclasses import *
 from parsee.utils.constants import NUM_TOKENS_DEFAULT_LLM
 
 
-def gpt_config(openai_api_key: str, token_limit: Optional[int] = None, openai_model_name: Optional[str] = None, multimodal: bool = False, max_images: int = 5, max_image_size: int = 2000, output_token_limit: Optional[int] = None, system_message: Optional[str] = None, file_path: Optional[str] = None, api_version: Optional[str] = None) -> MlModelSpecification:
+def gpt_config(openai_api_key: str, token_limit: Optional[int] = None, openai_model_name: Optional[str] = None, multimodal: bool = False, max_images: int = 5, max_image_size: int = 2000, output_token_limit: Optional[int] = None, system_message: Optional[str] = None, file_path: Optional[str] = None, api_version: Optional[str] = None, temperature: Optional[int] = None) -> MlModelSpecification:
     model_name = openai_model_name if openai_model_name is not None else "gpt-4-0314"
     token_limit = NUM_TOKENS_DEFAULT_LLM if token_limit is None else token_limit
-    return MlModelSpecification(f"OpenAI model: {model_name}", model_name, model_name, ModelType.GPT, file_path, None, None, None, token_limit, openai_api_key, None, None, None, None, None, multimodal, max_images, max_image_size, output_token_limit, system_message, api_version)
+    return MlModelSpecification(f"OpenAI model: {model_name}", model_name, model_name, ModelType.GPT, file_path, None, None, None, token_limit, openai_api_key, None, None, None, None, None, multimodal, max_images, max_image_size, output_token_limit, system_message, api_version, temperature)
 
 
 def replicate_config(replicate_api_key: str, model_name: str, token_limit: Optional[int] = None, output_token_limit: Optional[int] = None, system_message: Optional[str] = None) -> MlModelSpecification:
