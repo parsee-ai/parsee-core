@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parsee-core"
-version = "0.1.8.3"
+version = "0.1.8.4"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
 homepage = "https://parsee.ai"

@@ -56,7 +56,7 @@ class AnthropicModel(LLMBaseModel):
         message = self.client.messages.create(
             model=self.spec.internal_name,
             max_tokens=self.max_tokens_answer,
-            temperature=0,
+            temperature=self.spec.temperature if self.spec.temperature is not None else 0,
             system=self.spec.system_message if self.spec.system_message is not None else "",
             messages=[
                 {"role": "user", "content": user_message_content}

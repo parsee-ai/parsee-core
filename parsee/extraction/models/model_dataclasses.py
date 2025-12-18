@@ -29,7 +29,7 @@ class MlModelSpecification:
     max_output_tokens: Optional[int]
     system_message: Optional[str]
     api_version: Optional[str]
-    temperature: Optional[int]
+    temperature: Optional[int] = None
 
     def model_path(self) -> Union[None, str]:
         if self.file_path is None:

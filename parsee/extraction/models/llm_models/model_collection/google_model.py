@@ -73,7 +73,7 @@ class GoogleModel(LLMBaseModel):
         contents.append(types.Content(role="user", parts=parts))
 
         config = types.GenerateContentConfig(
-            temperature=0,
+            temperature=self.spec.temperature if self.spec.temperature is not None else 0,
             max_output_tokens=self.max_tokens_answer,
             top_p=1,
             safety_settings=[types.SafetySetting(

@@ -56,7 +56,7 @@ class MistralModel(LLMBaseModel):
         chat_response = self.client.chat.complete(
             model=self.spec.internal_name,
             messages=messages,
-            temperature=0
+            temperature=self.spec.temperature if self.spec.temperature is not None else 0
         )
 
         answer = chat_response.choices[0].message.content

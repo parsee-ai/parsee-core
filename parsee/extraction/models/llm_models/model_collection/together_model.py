@@ -39,7 +39,7 @@ class TogetherModel(LLMBaseModel):
         response = self.client.chat.completions.create(
             model=self.spec.internal_name,
             messages=messages,
-            temperature=0,
+            temperature=self.spec.temperature if self.spec.temperature is not None else 0,
             max_tokens=self.max_tokens_answer,
             top_p=1,
         )

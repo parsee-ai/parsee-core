@@ -39,7 +39,7 @@ class ReplicateModel(LLMBaseModel):
             "system_prompt": self.spec.system_message if self.spec.system_message is not None else "",
             "top_k": 50,
             "top_p": 0.9,
-            "temperature": 0,
+            "temperature": self.spec.temperature if self.spec.temperature is not None else 0,
             "max_new_tokens": 1024,
             "presence_penalty": 0,
             "frequency_penalty": 0

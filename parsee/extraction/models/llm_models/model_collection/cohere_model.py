@@ -38,7 +38,7 @@ class CohereModel(LLMBaseModel):
             model=self.spec.internal_name,
             preamble=self.spec.system_message,
             message=prompt,
-            temperature=0,
+            temperature=self.spec.temperature if self.spec.temperature is not None else 0,
             chat_history=[],
             prompt_truncation='OFF',
             connectors=[]
