@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parsee-core"
-version = "0.1.8.4"
+version = "0.1.8.5"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
 homepage = "https://parsee.ai"
@@ -14,7 +14,7 @@ numpy = "^1.23.1"
 tiktoken = "^0.4.0"
 pydantic = "^2.7.0"
 beautifulsoup4 = "^4.11.1"
-parsee-pdf-reader = "^0.1.8.1"
+parsee-pdf-reader = "^0.1.8.2"
 lxml = "^4.9.1"
 opencv-python = "^4.9.0.80"
 torch = "<2.3"
