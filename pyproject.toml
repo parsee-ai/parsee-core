@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parsee-core"
-version = "0.1.8.5"
+version = "0.1.8.6"
 description = ""
 authors = ["Parsee.ai <info@parsee.ai>"]
 homepage = "https://parsee.ai"
@@ -22,7 +22,7 @@ urllib3 = "<2"
 sentence-transformers = "^2.7"
 transformers = "^4.47.1,<4.50"
 scikit-learn = "^1.5.2"
-anthropic = "^0.20.0"
+anthropic = "^0.40.0"
 ollama = ">0.1.7"
 together = "^1.1.1"
 openai = "^2.13.0"
