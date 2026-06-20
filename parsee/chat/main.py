@@ -7,7 +7,7 @@ from parsee.extraction.models.model_loader import get_llm_base_model
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.utils.helper import merge_answer_pieces
 from parsee.settings import chat_settings
-from tenacity import RetryError, retry, retry_if_exception_type, stop_after_attempt
+from tenacity import RetryError, retry, retry_if_exception_type, stop_after_attempt, wait_random_exponential
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,6 +20,11 @@ class ReceiverLoopRetryError(Exception):
 @retry(
     stop=stop_after_attempt(chat_settings.receiver_loop_retry_attempts),
     retry=retry_if_exception_type(ReceiverLoopRetryError),
+    wait=wait_random_exponential(
+        multiplier=chat_settings.receiver_loop_retry_wait_multiplier,
+        min=chat_settings.receiver_loop_retry_wait_min,
+        max=chat_settings.receiver_loop_retry_wait_max
+    ),
     reraise=True,
 )
 def _run_receiver_loop(message: Message, message_history: List[Message],

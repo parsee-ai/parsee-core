@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from tenacity import RetryError, Future, stop_after_attempt
+from tenacity import RetryError, Future, stop_after_attempt, wait_none
 
 from parsee.chat.custom_dataclasses import Message
 from parsee.chat.main import _run_receiver_loop, run_chat_with_fallback
@@ -55,7 +55,7 @@ def test_run_chat_with_fallback_retries_receiver_loop(monkeypatch):
 
     monkeypatch.setattr("parsee.chat.main.run_chat", mock_run_chat)
     monkeypatch.setattr("parsee.chat.main._run_receiver_loop",
-                        _run_receiver_loop.retry_with(stop=stop_after_attempt(3)))
+                        _run_receiver_loop.retry_with(stop=stop_after_attempt(3), wait=wait_none()))
     storage = InMemoryStorageManager(None, DiskImageCreator())
     file_manager = LocalFileManager(storage, [])
 
@@ -78,7 +78,7 @@ def test_run_chat_with_fallback_does_not_retry_receiver_loop_by_default(monkeypa
 
     monkeypatch.setattr("parsee.chat.main.run_chat", mock_run_chat)
     monkeypatch.setattr("parsee.chat.main._run_receiver_loop",
-                        _run_receiver_loop.retry_with(stop=stop_after_attempt(1)))
+                        _run_receiver_loop.retry_with(stop=stop_after_attempt(1), wait=wait_none()))
     storage = InMemoryStorageManager(None, DiskImageCreator())
     file_manager = LocalFileManager(storage, [])
 

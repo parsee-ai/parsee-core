@@ -17,6 +17,9 @@ class ChatSettings(BaseSettings):
     retry_wait_min: int = 2
     retry_wait_max: int = 20
     receiver_loop_retry_attempts: int = 1
+    receiver_loop_retry_wait_multiplier: int = 1
+    receiver_loop_retry_wait_min: int = 2
+    receiver_loop_retry_wait_max: int = 20
     openai_key: Optional[str] = None
     replicate_key: Optional[str] = None
     together_api_key: Optional[str] = None
