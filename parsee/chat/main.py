@@ -7,19 +7,25 @@ from parsee.extraction.models.model_loader import get_llm_base_model
 from parsee.extraction.models.llm_models.prompts import Prompt
 from parsee.utils.helper import merge_answer_pieces
 from parsee.settings import chat_settings
-from tenacity import RetryError
+from tenacity import RetryError, retry, retry_if_exception_type, stop_after_attempt
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def run_chat_with_fallback(message: Message, message_history: List[Message],
-                           document_manager: DocumentManager, receivers: List[MlModelSpecification],
-                           most_recent_references_only: bool, show_chunk_index: bool = False,
-                           single_page_processing_settings: Optional[SinglePageProcessingSettings] = None) -> List[Message]:
-    """Runs a chat with a fallback to other models if the first one fails to process the message."""
-    logger.info(f"Running chat with fallback")
-    logger.debug(f"Message: {message}")
+class ReceiverLoopRetryError(Exception):
+    """Raised when every receiver failed and the fallback loop should retry."""
+
+
+@retry(
+    stop=stop_after_attempt(chat_settings.receiver_loop_retry_attempts),
+    retry=retry_if_exception_type(ReceiverLoopRetryError),
+    reraise=True,
+)
+def _run_receiver_loop(message: Message, message_history: List[Message],
+                       document_manager: DocumentManager, receivers: List[MlModelSpecification],
+                       most_recent_references_only: bool, show_chunk_index: bool,
+                       single_page_processing_settings: Optional[SinglePageProcessingSettings]) -> List[Message]:
     for spec in receivers:
         try:
             output = run_chat(message, message_history, document_manager, spec,
@@ -29,8 +35,28 @@ def run_chat_with_fallback(message: Message, message_history: List[Message],
             continue
         logger.debug(f"Output from the model: {output}")
         return output
-    logger.warning(f"No model was able to process the message")
-    return []
+    raise ReceiverLoopRetryError()
+
+
+def run_chat_with_fallback(message: Message, message_history: List[Message],
+                           document_manager: DocumentManager, receivers: List[MlModelSpecification],
+                           most_recent_references_only: bool, show_chunk_index: bool = False,
+                           single_page_processing_settings: Optional[SinglePageProcessingSettings] = None) -> List[Message]:
+    """Runs a chat with a fallback to other models if the first one fails to process the message."""
+    logger.info(f"Running chat with fallback")
+    logger.debug(f"Message: {message}")
+
+    if len(receivers) == 0:
+        logger.warning("No fallback models configured")
+        return []
+
+    try:
+        return _run_receiver_loop(message, message_history, document_manager, receivers,
+                                  most_recent_references_only, show_chunk_index,
+                                  single_page_processing_settings)
+    except ReceiverLoopRetryError:
+        logger.warning(f"No model was able to process the message")
+        return []
 
 
 def run_chat(message: Message, message_history: List[Message],
@@ -54,7 +80,12 @@ def run_chat(message: Message, message_history: List[Message],
                 references.append(ref)
                 added_references.add(ref.reference_id())
 
-    data = document_manager.load_documents(references, model.spec.multimodal, str(message), model.spec.max_images, chat_settings.min_tokens_for_instructions_and_history, show_chunk_index)
+    data = document_manager.load_documents(references,
+                                           model.spec.multimodal,
+                                           str(message),
+                                           model.spec.max_images,
+                                           chat_settings.min_tokens_for_instructions_and_history,
+                                           show_chunk_index)
 
     # for multimodal queries, check if pages have to be processed individually
     process_pages_individually = False
