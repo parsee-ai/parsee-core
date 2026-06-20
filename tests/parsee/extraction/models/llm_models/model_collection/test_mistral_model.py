@@ -14,11 +14,10 @@ class MockMistral:
 
     def complete(self, model, messages, temperature):
         raise SDKError("Rate limit exceeded",
-                       status_code=429,
-                             raw_response=httpx.Response(request=httpx.Request(method="get",
-                                                                           url="https://example.com"),
-                                                     status_code=429),
-                             body="123")
+                       raw_response=httpx.Response(request=httpx.Request(method="get",
+                                                                         url="https://example.com"),
+                                                   status_code=429),
+                       body="123")
 
 
 

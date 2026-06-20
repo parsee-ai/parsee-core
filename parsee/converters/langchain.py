@@ -7,8 +7,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents.base import Document
 
 # requires to install langchain via extras:
-# poetry install -E
-# or pip install -e
+# uv sync --extra langchain
+# or uv add "parsee-core[langchain]"
 
 
 def documents_to_extracted_elements(documents: List[Document], document_type: DocumentType) -> List[ExtractedEl]:
