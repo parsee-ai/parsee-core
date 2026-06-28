@@ -28,8 +28,8 @@ class FakeImageCreator:
         return self.images_by_identifier[document.source_identifier]
 
 
-def make_element(index, text):
-    source = ExtractedSource(DocumentType.TEXT, None, None, index, None)
+def make_element(index, text, page_idx=0):
+    source = ExtractedSource(DocumentType.TEXT, None, None, index, {"page_idx": page_idx})
     return ExtractedEl(ElementType.TEXT, source, text)
 
 
@@ -88,12 +88,7 @@ def test_load_documents_returns_text_content_for_text_modality():
     )
 
     assert result.images is None
-    assert result.text == (
-        "[START OF DOCUMENT with index 0]\n"
-        "[chunk 0] first\n"
-        "[chunk 1] second\n"
-        "[END OF DOCUMENT with index 0]\n\n"
-    )
+    assert result.texts == {"doc-a": ["[chunk 0] first\n[chunk 1] second\n"]}
 
 
 def test_load_documents_returns_images_and_text_for_combined_modality():
@@ -111,8 +106,8 @@ def test_load_documents_returns_images_and_text_for_combined_modality():
         show_chunk_index=False,
     )
 
-    assert result.images == [first_image, second_image]
-    assert result.text == "[START OF DOCUMENT with index 0]\nfirst\n[END OF DOCUMENT with index 0]\n\n"
+    assert result.images == {"doc-a": [first_image, second_image]}
+    assert result.texts == {"doc-a": ["first\n"]}
 
 
 def test_load_documents_rejects_chunk_indexes_for_image_only_modality():
@@ -138,8 +133,30 @@ def test_extract_images_caps_images_across_documents():
 
     result = manager._extract_images([make_doc("doc-a", ["a"]), make_doc("doc-b", ["b"])], max_images=3)
 
-    assert result == [
-        Base64Image("image/png", "a-0"),
-        Base64Image("image/png", "b-0"),
-        Base64Image("image/png", "b-1"),
-    ]
+    assert result == {
+        "doc-a": [Base64Image("image/png", "a-0")],
+        "doc-b": [Base64Image("image/png", "b-0"), Base64Image("image/png", "b-1")],
+    }
+
+
+def test_extract_text_groups_text_by_document_and_page():
+    manager = make_manager()
+    doc = StandardDocumentFormat(
+        DocumentType.TEXT,
+        "doc-a",
+        [
+            make_element(0, "page 2 first", page_idx=2),
+            make_element(1, "page 1 first", page_idx=1),
+            make_element(2, "page 2 second", page_idx=2),
+        ],
+        None,
+    )
+
+    result = manager._extract_texts([doc], show_chunk_index=True)
+
+    assert result == {
+        "doc-a": [
+            "[chunk 1] page 1 first\n",
+            "[chunk 0] page 2 first\n[chunk 2] page 2 second\n",
+        ]
+    }

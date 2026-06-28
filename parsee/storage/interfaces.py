@@ -1,18 +1,16 @@
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum
-from typing import *
-from typing import Callable
+from typing import Callable, List, Optional
 
 import math
-from functools import reduce
 
 from parsee.templates.job_template import JobTemplate
 from parsee.extraction.models.model_dataclasses import MlModelSpecification
 from parsee.storage.vector_stores.interfaces import VectorStore
-from parsee.extraction.extractor_elements import FileReference, StandardDocumentFormat
+from parsee.extraction.extractor_elements import ExtractedEl, FileReference, StandardDocumentFormat
 from parsee.converters.image_creation import ImageCreator
-from parsee.extraction.extractor_dataclasses import Base64Image
+from parsee.extraction.extractor_dataclasses import Base64Image, ExtractedSource
 from parsee.settings import chat_settings
 import logging
 logger = logging.getLogger(__name__)
@@ -31,13 +29,14 @@ class DocumentContent:
     """Loaded document content prepared for chat prompts.
 
     Attributes:
-        images: Base64-encoded page or element images, or `None` when images were
-            not requested.
-        text: Rendered document text, or `None` when text was not requested.
+        images: Base64-encoded page or element images grouped by document
+            identifier, or `None` when images were not requested.
+        text: Rendered page texts grouped by document identifier, or `None`
+            when text was not requested.
     """
 
-    images: list[Base64Image] | None
-    text: str | None
+    images: dict[str, list[Base64Image]] | None
+    texts: dict[str, list[str]] | None
 
 
 class StorageManager:
@@ -146,7 +145,7 @@ class DocumentManager:
         docs = []
         unique_identifiers = set([x.source_identifier for x in references])
         for source_identifier in self.storage.vector_store.sort_identifiers_by_relevance(unique_identifiers,
-                                                                                         search_term):
+                                                                                         search_term or ""):
             total_added = 0
             doc = load_function(source_identifier)
             # check if all elements should be taken or not
@@ -165,7 +164,7 @@ class DocumentManager:
             docs.append(doc)
         return docs
 
-    def _extract_images(self, docs: list[StandardDocumentFormat], max_images: int | None) -> list[Base64Image]:
+    def _extract_images(self, docs: list[StandardDocumentFormat], max_images: int | None) -> dict[str, list[Base64Image]]:
         """Extract images from documents and optionally cap the total count.
 
         Args:
@@ -174,14 +173,15 @@ class DocumentManager:
                 return all rendered images.
 
         Returns:
-            Rendered images from the supplied documents. When `max_images` is
-            set and the rendered total is larger, images are limited across
-            documents.
+            Rendered images from the supplied documents grouped by document
+            identifier. When `max_images` is set and the rendered total is
+            larger, images are limited across documents.
         """
         output_by_doc = {}
         total_images = 0
         for doc in docs:
-            output_by_doc[doc.source_identifier] = self.storage.image_creator.get_images(doc, doc.elements,
+            element_selection: list[ExtractedEl | ExtractedSource] = list(doc.elements)
+            output_by_doc[doc.source_identifier] = self.storage.image_creator.get_images(doc, element_selection,
                                                                                          chat_settings.max_images_to_load_per_doc,
                                                                                          None)
             total_images += len(output_by_doc[doc.source_identifier])
@@ -189,36 +189,53 @@ class DocumentManager:
             doc_identifiers = [doc.source_identifier for doc in docs]
             max_images_per_file = math.floor(max_images / len(output_by_doc.keys()))
             logger.warning(f"There are too many images to load, taking maximum {max_images_per_file} images per document. Document identifiers: {doc_identifiers}")
-            output = []
+            output = {}
+            loaded_images = 0
             for k, values in output_by_doc.items():
                 if len(values) > max_images_per_file:
                     if k == list(output_by_doc.keys())[-1]:
-                        images_left = max_images - len(output)
-                        output += values[0:images_left]
+                        images_left = max_images - loaded_images
+                        output[k] = values[0:images_left]
                     else:
-                        output += values[0:max_images_per_file]
+                        output[k] = values[0:max_images_per_file]
                 else:
-                    output += values
+                    output[k] = values
+                loaded_images += len(output[k])
             return output
         else:
-            return reduce(lambda acc, x: acc + x, output_by_doc.values(), [])
+            return output_by_doc
 
-    def _extract_text(self, docs: list[StandardDocumentFormat], show_chunk_index: bool) -> str:
-        """Render documents as prompt text with stable document index markers.
+    def _extract_texts(self, docs: list[StandardDocumentFormat], show_chunk_index: bool) -> dict[str, list[str]]:
+        """Render documents as page texts grouped by document identifier.
 
         Args:
             docs: Documents to render as text.
-            show_chunk_index: Whether each document should include chunk indexes
+            show_chunk_index: Whether each element should include chunk indexes
                 in its rendered text.
 
         Returns:
-            Concatenated document text wrapped in start and end markers.
+            Page texts grouped by document identifier. Each page text contains
+            elements with the same `source.other_info["page_idx"]` and is
+            formatted like `StandardDocumentFormat.to_string`.
         """
-        output = []
-        for k, doc in enumerate(docs):
-            doc_text = doc.to_string(show_chunk_index)
-            output.append(f"[START OF DOCUMENT with index {k}]\n{doc_text}[END OF DOCUMENT with index {k}]\n\n")
-        return "".join(output)
+        output_by_doc = {}
+        for doc in docs:
+            elements_by_page = {}
+            for el in doc.elements:
+                page_idx = 0
+                if el.source.other_info is not None and "page_idx" in el.source.other_info:
+                    page_idx = int(el.source.other_info["page_idx"])
+                if page_idx not in elements_by_page:
+                    elements_by_page[page_idx] = []
+                elements_by_page[page_idx].append(el)
+
+            output_by_doc[doc.source_identifier] = []
+            for page_idx in sorted(elements_by_page.keys()):
+                page_text = []
+                for el in elements_by_page[page_idx]:
+                    page_text.append((f"[chunk {el.source.element_index}] " if show_chunk_index else "") + el.get_text_llm(True) + "\n")
+                output_by_doc[doc.source_identifier].append("".join(page_text))
+        return output_by_doc
 
     def _load_documents(self, references: List[FileReference], modality: Modality, search_term: Optional[str],
                         max_images: Optional[int], load_function: Callable, show_chunk_index: bool) -> DocumentContent:
@@ -248,14 +265,14 @@ class DocumentManager:
         match modality:
             case Modality.IMAGES:
                 images = self._extract_images(docs, max_images)
-                return DocumentContent(images=images, text=None)
+                return DocumentContent(images=images, texts=None)
             case Modality.TEXT:
-                text = self._extract_text(docs, show_chunk_index)
-                return DocumentContent(images=None, text=text)
+                texts = self._extract_texts(docs, show_chunk_index)
+                return DocumentContent(images=None, texts=texts)
             case Modality.IMAGES_AND_TEXT:
                 images = self._extract_images(docs, max_images)
-                text = self._extract_text(docs, show_chunk_index)
-                return DocumentContent(images=images, text=text)
+                texts = self._extract_texts(docs, show_chunk_index)
+                return DocumentContent(images=images, texts=texts)
 
     def load_documents(self, references: List[FileReference], modality: Modality, search_term: str | None, max_images: int | None, show_chunk_index: bool = False) -> DocumentContent:
         """Load document content for references using a backend-specific loader.

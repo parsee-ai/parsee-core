@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import *
+from typing import List
 from parsee.chat.custom_dataclasses import Message, SingleImageProcessingSettings
 from decimal import Decimal
 
@@ -114,7 +114,7 @@ def run_chat_with_fallback(message: Message, message_history: List[Message],
 
 
 def prompt_pagewise(images: list[Base64Image], message: Message, message_history: list[Message],
-                    model: LLMBaseModel, single_image_processing: SingleImageProcessingSettings, text: str | None = None) -> tuple[str, Decimal]:
+                    model: LLMBaseModel, single_image_processing: SingleImageProcessingSettings, texts: list[str] | None = None) -> tuple[str, Decimal]:
     """Prompt a model with images one at a time and merge the answers.
 
     Args:
@@ -124,7 +124,8 @@ def prompt_pagewise(images: list[Base64Image], message: Message, message_history
         model: Loaded LLM implementation used to make prompt requests.
         single_image_processing: Settings that control answer merging and the
             threshold for pagewise processing.
-        text: Optional document text to include with each image prompt.
+        texts: Optional page texts aligned one-to-one with `images`; when
+            provided, each image prompt receives the text at the same index.
 
     Returns:
         A tuple containing the merged answer text and the accumulated request
@@ -133,6 +134,7 @@ def prompt_pagewise(images: list[Base64Image], message: Message, message_history
     answers = []
     cost = Decimal(0)
     for k, img in enumerate(images):
+        text = texts[k] if texts is not None else None
         if k > 0:
             additional_info = f"We are showing you the images contained in the document one by one. The current image is number {k + 1} out of a total of {len(images)}.\n Your last answer ended with the following (make sure that your new answer is valid JSON or similar, as requested; last 500 characters are shown):\n" \
                               f"{answers[-1][-500:]}"
@@ -150,6 +152,19 @@ def prompt_pagewise(images: list[Base64Image], message: Message, message_history
     else:
         answer = merge_answer_pieces(answers)
     return answer, cost
+
+
+def _flatten_images(images_by_document: dict[str, list[Base64Image]]) -> list[Base64Image]:
+    """Return document-grouped images in their existing document order."""
+    return [image for images in images_by_document.values() for image in images]
+
+
+def _flatten_texts(text_by_document: dict[str, list[str]]) -> list[str]:
+    """Return document-grouped page texts in their existing document order."""
+    output: list[str] = []
+    for page_texts in text_by_document.values():
+        output.extend(page_texts)
+    return output
 
 
 def run_chat(message: Message, message_history: List[Message],
@@ -202,25 +217,36 @@ def run_chat(message: Message, message_history: List[Message],
         case Modality.IMAGES:
             if document_content.images is None:
                 raise ValueError("Images are not specified")
-            if run_spec.single_image_processing is not None and len(document_content.images) >= run_spec.single_image_processing.min_images_trigger:
-                answer, cost = prompt_pagewise(document_content.images, message, message_history, model, run_spec.single_image_processing)
+            images = _flatten_images(document_content.images)
+            if run_spec.single_image_processing is not None and len(images) >= run_spec.single_image_processing.min_images_trigger:
+                answer, cost = prompt_pagewise(images, message, message_history, model, run_spec.single_image_processing)
             else:
-                prompt = Prompt(None, f"{message}", images=document_content.images, text=None, history=[str(m) for m in message_history])
+                prompt = Prompt(None, str(message), images=images, text=None, history=[str(m) for m in message_history])
                 answer, cost = model.make_prompt_request(prompt)
         case Modality.TEXT:
-            prompt = Prompt(None, f"{message}", images=[], text=document_content.text,
+            if document_content.texts is None:
+                raise ValueError("Texts are not specified")
+            text = "\n".join(_flatten_texts(document_content.texts))
+            prompt = Prompt(None, str(message), images=[], text=text,
                             history=[str(m) for m in message_history])
             answer, cost = model.make_prompt_request(prompt)
         case Modality.IMAGES_AND_TEXT:
             if document_content.images is None:
                 raise ValueError("Images are not specified")
-            if run_spec.single_image_processing is not None and len(document_content.images) >= run_spec.single_image_processing.min_images_trigger:
-                answer, cost = prompt_pagewise(document_content.images, message, message_history, model, run_spec.single_image_processing, text=document_content.text)
+            if document_content.texts is None:
+                raise ValueError("Texts are not specified")
+            images = _flatten_images(document_content.images)
+            texts = _flatten_texts(document_content.texts)
+            if len(images) != len(texts):
+                raise ValueError("Images and texts are not the same length")
+            if run_spec.single_image_processing is not None and len(images) >= run_spec.single_image_processing.min_images_trigger:
+                answer, cost = prompt_pagewise(images, message, message_history, model, run_spec.single_image_processing, texts=texts)
             else:
-                prompt = Prompt(None, f"{message}", images=document_content.images, text=document_content.text, history=[str(m) for m in message_history])
+                text = "\n".join(texts)
+                prompt = Prompt(None, str(message), images=images, text=text, history=[str(m) for m in message_history])
                 answer, cost = model.make_prompt_request(prompt)
 
     output_message = Message(answer, [], model.spec.model_id, cost=cost)
-    cache_info = model.make_prompt_request.cache_info()
+    cache_info = getattr(model.make_prompt_request, "cache_info", lambda: None)()
     logger.info(f"Chat with {spec.model_id} done. Cache info: {cache_info}")
     return output_message

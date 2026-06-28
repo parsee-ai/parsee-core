@@ -30,7 +30,7 @@ def test__call_api_retry(monkeypatch):
     spec = mistral_api_config(mistral_api_key="123", model_name="123")
     model = get_llm_base_model(spec)
     message = Message("What is the capital of France?", [])
-    prompt = Prompt(None, f"{message}", available_data="123", history=[])
+    prompt = Prompt(None, f"{message}", text="123", images=[], history=[])
     try:
         model.make_prompt_request(prompt)
     except RetryError:
