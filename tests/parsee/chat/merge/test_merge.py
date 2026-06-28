@@ -1,7 +1,7 @@
 import pytest
 import json
 from parsee.utils.merge_strategies import merge_list_of_dict
-from parsee.chat.custom_dataclasses import SinglePageProcessingSettings
+from parsee.chat.custom_dataclasses import SingleImageProcessingSettings
 from tests.parsee.chat.merge.test_data import TestData
 
 
@@ -148,25 +148,25 @@ def test_duplicate_handling():
 # SinglePageProcessingSettings tests
 def test_default_values():
     """Test default values of SinglePageProcessingSettings."""
-    settings = SinglePageProcessingSettings()
-    assert settings.max_images_trigger == 3
+    settings = SingleImageProcessingSettings()
+    assert settings.min_images_trigger == 3
     assert settings.merge_strategy is None
 
 
 def test_custom_values():
     """Test SinglePageProcessingSettings with custom values."""
-    settings = SinglePageProcessingSettings(
-        max_images_trigger=5,
+    settings = SingleImageProcessingSettings(
+        min_images_trigger=5,
         merge_strategy=merge_list_of_dict
     )
-    assert settings.max_images_trigger == 5
+    assert settings.min_images_trigger == 5
     assert settings.merge_strategy == merge_list_of_dict
 
 
 def test_merge_strategy_execution():
     """Test that the merge strategy works when called."""
-    settings = SinglePageProcessingSettings(
-        max_images_trigger=5,
+    settings = SingleImageProcessingSettings(
+        min_images_trigger=5,
         merge_strategy=merge_list_of_dict
     )
 
@@ -181,7 +181,7 @@ def test_merge_strategy_execution():
 
 def test_none_merge_strategy():
     """Test behavior when merge_strategy is None."""
-    settings = SinglePageProcessingSettings(max_images_trigger=10)
+    settings = SingleImageProcessingSettings(min_images_trigger=10)
     assert settings.merge_strategy is None
 
 

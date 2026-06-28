@@ -83,5 +83,5 @@ class ChatGPTModel(LLMBaseModel):
 
     @lru_cache(maxsize=chat_settings.max_cache_size)
     def make_prompt_request(self, prompt: Prompt) -> Tuple[str, Decimal]:
-        final_prompt, _ = truncate_prompt(prompt, self.encoding, self.max_tokens_question)
-        return self._call_api(final_prompt, prompt.available_data if self.spec.multimodal else [])
+        final_prompt = str(prompt)
+        return self._call_api(final_prompt, prompt.images if prompt.images else [])

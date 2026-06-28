@@ -22,6 +22,6 @@ class Message:
 
 
 @dataclass
-class SinglePageProcessingSettings:
-    max_images_trigger: int = 3
+class SingleImageProcessingSettings:
+    min_images_trigger: int = 3
     merge_strategy: Optional[Callable[[List[str]], str]] = None
