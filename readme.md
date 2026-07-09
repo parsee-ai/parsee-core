@@ -12,13 +12,37 @@ For handling tables from PDFs and images properly, we also released our open sou
 
 ## Installation:
 
-Recommended install with poetry: https://python-poetry.org/docs/
+Recommended install with uv:
 
-    poetry add parsee-core
+    uv add parsee-core
 
 Alternatively:
 
     pip install parsee-core
+
+For local development in this repository:
+
+    uv sync --group dev
+
+If you need the optional LangChain integration:
+
+    uv sync --group dev --extra langchain
+
+## Dependency Policy
+
+This project uses two layers of dependency control:
+
+1. `pyproject.toml` keeps compatible version ranges for published library dependencies. This avoids over-constraining downstream users while still protecting against accidental major-version upgrades.
+2. `uv.lock` pins the full transitive dependency graph for local development, CI, and releases. Contributors should run tests from the lockfile-backed environment, not from an ad-hoc resolver result.
+
+Recommended workflow for dependency updates:
+
+1. Edit `pyproject.toml` only when you intentionally want to change the supported dependency range.
+2. Regenerate the lockfile with `uv lock`.
+3. Sync and test with `uv sync --group dev --extra langchain` and `uv run pytest`.
+4. Review lockfile changes in PRs like code. Do not update dependencies opportunistically in unrelated changes.
+
+For supply-chain hygiene, prefer small and intentional dependency updates, keep `uv.lock` committed, and avoid unbounded dependency specifiers.
 
 In order to use the PDF to image functionality (for multimodal models) you need to install poppler, e.g. on MacOSX:
 
