@@ -19,6 +19,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+MULTI_REGION_API_BASE_URLS = {
+    "eu": "https://aiplatform.eu.rep.googleapis.com",
+    "us": "https://aiplatform.us.rep.googleapis.com",
+}
+
 
 class GoogleModel(LLMBaseModel):
 
@@ -30,10 +35,13 @@ class GoogleModel(LLMBaseModel):
         if model.file_path is None or len(model.file_path.split("__")) != 2:
             raise Exception("for google models please provide the file_path argument in the format: PROJECT__LOCATION")
         project, location = tuple(model.file_path.split("__"))
+        base_url = MULTI_REGION_API_BASE_URLS.get(location)
+        http_options = types.HttpOptions(base_url=base_url) if base_url else None
         self.client = genai.Client(
             vertexai=True,
             project=project,
             location=location,
+            http_options=http_options,
         )
 
     @retry(
